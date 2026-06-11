@@ -1,0 +1,65 @@
+<!-- ============================================================================
+  pom-snippets.xml — copy the relevant blocks into your project's pom.xml.
+  These tools are the deterministic enforcement layer of architecture/.
+============================================================================= -->
+
+<!-- ===== <dependencies> ===== -->
+
+<!-- ArchUnit: executable architecture rules (src/test/.../ArchitectureTest.java) -->
+<dependency>
+  <groupId>com.tngtech.archunit</groupId>
+  <artifactId>archunit-junit5</artifactId>
+  <version>1.3.0</version>
+  <scope>test</scope>
+</dependency>
+
+<!-- Spring Modulith: module boundary verification + docs (ModularityTests.java).
+     Optional but recommended for modular monoliths. Align version with your Boot version. -->
+<dependency>
+  <groupId>org.springframework.modulith</groupId>
+  <artifactId>spring-modulith-starter-test</artifactId>
+  <version>1.3.5</version>
+  <scope>test</scope>
+</dependency>
+
+<!-- ===== <build><plugins> ===== -->
+
+<!-- Spotless: formatting as a build fact. `mvn spotless:apply` to fix,
+     `spotless:check` bound to verify so CI blocks unformatted code. -->
+<plugin>
+  <groupId>com.diffplug.spotless</groupId>
+  <artifactId>spotless-maven-plugin</artifactId>
+  <version>2.44.4</version>
+  <configuration>
+    <java>
+      <palantirJavaFormat/>
+      <removeUnusedImports/>
+      <importOrder/>
+    </java>
+  </configuration>
+  <executions>
+    <execution>
+      <goals><goal>check</goal></goals>
+      <phase>verify</phase>
+    </execution>
+  </executions>
+</plugin>
+
+<!-- Checkstyle: minimal, high-signal rules only (backend/config/checkstyle.xml).
+     Per architecture/delivery.md: block real problems, no wall of noisy rules. -->
+<plugin>
+  <groupId>org.apache.maven.plugins</groupId>
+  <artifactId>maven-checkstyle-plugin</artifactId>
+  <version>3.6.0</version>
+  <configuration>
+    <configLocation>config/checkstyle.xml</configLocation>
+    <failOnViolation>true</failOnViolation>
+    <consoleOutput>true</consoleOutput>
+  </configuration>
+  <executions>
+    <execution>
+      <goals><goal>check</goal></goals>
+      <phase>verify</phase>
+    </execution>
+  </executions>
+</plugin>

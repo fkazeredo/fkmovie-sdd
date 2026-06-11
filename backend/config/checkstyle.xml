@@ -1,0 +1,52 @@
+<?xml version="1.0"?>
+<!DOCTYPE module PUBLIC
+    "-//Checkstyle//DTD Checkstyle Configuration 1.3//EN"
+    "https://checkstyle.org/dtds/configuration_1_3.dtd">
+<!--
+  Minimal, high-signal Checkstyle config (architecture/delivery.md):
+  block real problems, do not create pointless friction.
+  Formatting itself is owned by Spotless, not Checkstyle.
+-->
+<module name="Checker">
+  <property name="charset" value="UTF-8"/>
+  <property name="severity" value="error"/>
+
+  <!-- No loose TODOs: must reference an issue/spec/ADR (architecture/backend.md) -->
+  <module name="RegexpSingleline">
+    <property name="format" value="(TODO|FIXME)(?!.*(#\d+|SPEC-|ADR-))"/>
+    <property name="message"
+              value="TODO/FIXME must reference an issue (#123), spec (SPEC-xxx) or ADR (ADR-xxx)."/>
+  </module>
+
+  <module name="TreeWalker">
+    <!-- Real problems -->
+    <module name="UnusedImports"/>
+    <module name="AvoidStarImport"/>
+    <module name="IllegalImport"/>
+    <module name="EmptyCatchBlock">
+      <property name="exceptionVariableName" value="expected|ignored"/>
+    </module>
+    <module name="EqualsHashCode"/>
+    <module name="StringLiteralEquality"/>
+    <module name="MissingSwitchDefault"/>
+    <module name="FallThrough"/>
+    <module name="OneTopLevelClass"/>
+
+    <!-- Keep methods reviewable -->
+    <module name="MethodLength">
+      <property name="max" value="80"/>
+    </module>
+    <module name="ParameterNumber">
+      <property name="max" value="7"/>
+    </module>
+
+    <!-- Javadoc where business meaning lives (architecture/backend.md, revised owner rule).
+         Scope=public keeps it on contracts without forcing trivial accessors. -->
+    <module name="MissingJavadocMethod">
+      <property name="scope" value="public"/>
+      <property name="minLineCount" value="5"/>
+      <property name="allowedAnnotations" value="Override, Test, ParameterizedTest, Bean"/>
+      <property name="ignoreMethodNamesRegex" value="^(get|set|is|builder|toString|equals|hashCode).*$"/>
+    </module>
+  </module>
+</module>
