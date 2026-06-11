@@ -1,6 +1,6 @@
 # 0000 - Project Foundation
 
-Status: Draft
+Status: Implemented
 Related ADRs: 0001, 0002, 0003
 
 ## Goal

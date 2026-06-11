@@ -1,6 +1,6 @@
 # 0001 - Backend Foundation
 
-Status: Draft
+Status: Implemented
 Related ADRs: 0001, 0002, 0008 (frontend stack referenced for proxy alignment)
 
 ## Goal
@@ -48,8 +48,9 @@ introduced from spec 0007 onward.
 - Spring Web MVC.
 - Spring Data JPA.
 - Spring Validation (Jakarta).
-- Spring WebSocket / STOMP.
-- Spring Security 6.x (configured for JWT in spec 0003).
+- Spring WebSocket / STOMP (dependency lands with spec 0013, ADR 0009).
+- Spring Security 7.x, managed by Spring Boot 4 (dependency and JWT configuration land
+  in spec 0003).
 - Spring Actuator.
 - Testcontainers (Postgres module).
 - JUnit 5, AssertJ.
@@ -69,8 +70,8 @@ Not applicable.
 
 ## Persistence Changes
 
-- `compose.yaml`: Postgres service `db` (port 5432), persistent volume,
-  healthcheck.
+- `compose.yaml`: Postgres service `db` (port 5432, host port overridable via
+  `DB_PORT`), persistent volume, healthcheck.
 - Flyway baseline migration `V1__baseline.sql` empty (placeholder for first
   real migration in 0007).
 
@@ -125,8 +126,10 @@ Not applicable.
 
 ## Open Questions
 
-- Postgres major version pin: 16 or 17? (Default 16 unless infra requires
-  otherwise.) Decision needed before staging.
+- Postgres major version pin: resolved as 16 for local dev (`compose.yaml` and
+  Testcontainers both pin `postgres:16`). Note: a legacy local container from a
+  previous experiment runs postgres:17 on port 5432. Final 16-vs-17 decision still
+  needed before staging.
 
 ## Out of Scope
 
