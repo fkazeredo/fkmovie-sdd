@@ -13,9 +13,10 @@ import org.springframework.modulith.docs.Documenter;
  * public module APIs, no dependency on another module's repositories, entities or
  * implementation classes.
  *
- * <p>The module set is empty until SPEC-0007: business modules will live under
- * {@code com.fksoft.application.<module>}, and the module detection strategy must be
- * revisited when the first one lands.
+ * <p>Modules are detected via {@code spring.modulith.detection-strategy=explicitly-annotated}
+ * (application.yaml): every {@code com.fksoft.application.<module>} package carries
+ * {@code @ApplicationModule} on its package-info; {@code infra}/{@code shared} are
+ * arrangement code governed by ArchUnit, not modules.
  */
 class ModularityTests {
 
@@ -25,6 +26,13 @@ class ModularityTests {
     @Test
     void verifiesModularStructure() {
         modules.verify();
+    }
+
+    /** Guards the detection strategy: if the property were ignored, verify() would pass vacuously. */
+    @Test
+    void detectsAuthModule() {
+        org.assertj.core.api.Assertions.assertThat(modules.getModuleByName("application.auth"))
+                .isPresent();
     }
 
     /** Generates module documentation (PlantUML/AsciiDoc) under target/spring-modulith-docs. */

@@ -1,6 +1,10 @@
 spring:
   application:
     name: fkmovies
+  modulith:
+    # Only @ApplicationModule-annotated packages are modules (com.fksoft.application.<module>);
+    # infra/shared are arrangement code governed by ArchUnit. See ModularityTests.
+    detection-strategy: explicitly-annotated
   datasource:
     url: ${DB_URL}
     username: ${DB_USER}

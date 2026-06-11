@@ -4,7 +4,9 @@ import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.classes;
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.fields;
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noClasses;
 
+import com.tngtech.archunit.core.domain.JavaClass;
 import com.tngtech.archunit.core.domain.JavaClasses;
+import com.tngtech.archunit.core.domain.properties.CanBeAnnotated;
 import com.tngtech.archunit.core.importer.ClassFileImporter;
 import com.tngtech.archunit.core.importer.ImportOption;
 import org.junit.jupiter.api.Test;
@@ -106,6 +108,24 @@ class ArchitectureTest {
     void noFieldInjection() {
         fields().should()
                 .notBeAnnotatedWith("org.springframework.beans.factory.annotation.Autowired")
+                .allowEmptyShould(true)
+                .check(PRODUCTION_CLASSES);
+    }
+
+    /**
+     * SPEC-0003 architectural test: no other module accesses the auth module's persistence
+     * (its {@code users} table) directly — repositories and entities are module-internal.
+     */
+    @Test
+    void otherModulesMustNotTouchAuthPersistence() {
+        var authPersistence = JavaClass.Predicates.resideInAPackage("com.fksoft.application.auth..")
+                .and(JavaClass.Predicates.simpleNameEndingWith("Repository")
+                        .or(CanBeAnnotated.Predicates.annotatedWith("jakarta.persistence.Entity")));
+        noClasses()
+                .that()
+                .resideOutsideOfPackage("com.fksoft.application.auth..")
+                .should()
+                .dependOnClassesThat(authPersistence)
                 .allowEmptyShould(true)
                 .check(PRODUCTION_CLASSES);
     }

@@ -6,17 +6,20 @@ import java.net.http.HttpResponse;
 import org.junit.jupiter.api.Test;
 
 /**
- * Global error contract from SPEC-0001: unknown paths return the standard
- * {code, message, fields} payload and every response carries a correlation ID header.
+ * Global error contract: since SPEC-0003 the API is protected by default, so an
+ * unauthenticated request to an unknown path gets the 401 contract (the authenticated 404
+ * contract is covered by AuthFlowIntegrationTest). Every response carries a correlation ID.
  */
 class GlobalErrorHandlingIntegrationTest extends AbstractIntegrationTest {
 
     @Test
-    void unknownPathReturnsStandardNotFoundPayload() throws Exception {
+    void unknownPathWithoutTokenReturnsStandardUnauthenticatedPayload() throws Exception {
         HttpResponse<String> response = get("/unknown");
 
-        assertThat(response.statusCode()).isEqualTo(404);
-        assertThat(response.body()).contains("\"code\":\"not-found\"").contains("\"fields\":[]");
+        assertThat(response.statusCode()).isEqualTo(401);
+        assertThat(response.body())
+                .contains("\"code\":\"auth.unauthenticated\"")
+                .contains("\"fields\":[]");
     }
 
     @Test

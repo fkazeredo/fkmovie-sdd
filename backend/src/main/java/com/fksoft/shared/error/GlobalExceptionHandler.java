@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -27,6 +28,17 @@ public class GlobalExceptionHandler {
 
     public GlobalExceptionHandler(MessageSource messageSource) {
         this.messageSource = messageSource;
+    }
+
+    /** Business errors: status, stable code and optional headers defined by the exception. */
+    @ExceptionHandler(BusinessException.class)
+    public ResponseEntity<ApiErrorResponse> handleBusiness(BusinessException exception) {
+        var body = ApiErrorResponse.of(
+                exception.code(),
+                messageSource.getMessage(exception.code(), exception.messageArgs(), LocaleContextHolder.getLocale()));
+        var response = ResponseEntity.status(exception.status());
+        exception.httpHeaders().forEach(response::header);
+        return response.body(body);
     }
 
     /** Bean Validation failures on request bodies: 400 with one entry per invalid field. */
