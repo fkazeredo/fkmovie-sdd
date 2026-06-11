@@ -1,0 +1,21 @@
+<p-toolbar>
+  <ng-template #start>
+    <span class="text-xl font-semibold">{{ 'app.title' | translate }}</span>
+  </ng-template>
+  <ng-template #end>
+    <div class="flex gap-2">
+      <p-button
+        label="PT"
+        size="small"
+        [outlined]="language.current() !== 'pt-BR'"
+        (onClick)="language.use('pt-BR')"
+      />
+      <p-button
+        label="EN"
+        size="small"
+        [outlined]="language.current() !== 'en'"
+        (onClick)="language.use('en')"
+      />
+    </div>
+  </ng-template>
+</p-toolbar>

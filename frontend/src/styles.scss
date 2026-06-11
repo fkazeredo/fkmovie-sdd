@@ -1,0 +1,6 @@
+// Global SCSS — keep minimal; component styles live with their components and layout
+// utilities come from Tailwind (src/tailwind.css). See ADR 0008.
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}

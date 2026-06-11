@@ -1,0 +1,11 @@
+{
+  "app": {
+    "title": "fkmovies"
+  },
+  "home": {
+    "welcome": "Welcome to fkmovies",
+    "subtitle": "Cinema ticketing system — frontend foundation (spec 0002).",
+    "cta": "Browse screenings",
+    "foundation": "Foundation"
+  }
+}

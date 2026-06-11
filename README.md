@@ -53,6 +53,20 @@ cd backend
 ./mvnw verify           # tests + ArchUnit + Modulith + spotless:check + checkstyle
 ```
 
+## Getting started (frontend)
+
+Prerequisites: Node 22.22.3+ (Angular 22). Stack: Angular 22 standalone + signals,
+PrimeNG 21, Tailwind 4, ngx-translate (PT-BR default, EN fallback) — see ADR 0008.
+
+```bash
+cd frontend
+npm install        # .npmrc uses legacy-peer-deps until PrimeNG ships Angular 22 support
+npm start          # serves http://localhost:4200 with /api and /ws proxied to :8080
+npm run lint && npm run lint:styles && npm test && npm run build
+```
+
+The dev proxy (`frontend/proxy.conf.json`) expects the backend on `http://localhost:8080`.
+
 ## Adopting in a new project
 
 1. Copy `CLAUDE.md`, `architecture/`, `docs/`, `.claude/` to the repository root.

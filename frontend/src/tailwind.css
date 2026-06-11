@@ -1,0 +1,6 @@
+/* Tailwind v4 entry point — kept as plain CSS so Sass never touches the at-rules.
+   Layer order integrates PrimeNG themes with Tailwind (PrimeNG owns component
+   internals, Tailwind owns layout — ADR 0008). */
+@layer theme, base, primeng, components, utilities;
+@import "tailwindcss";
+@plugin "tailwindcss-primeui";
