@@ -1,0 +1,25 @@
+# Build output
+target/
+
+# Environment files (never commit secrets; .env.example is the committed contract)
+.env
+.env.local
+.env.*.local
+
+# IDE
+.idea/
+*.iml
+.vscode/
+.classpath
+.project
+.settings/
+
+# Frontend (spec 0002+)
+node_modules/
+frontend/dist/
+.angular/
+
+# Misc
+*.log
+.DS_Store
+Thumbs.db

@@ -1,0 +1,22 @@
+# Local development infrastructure (spec 0001, ADR 0002).
+# Credentials below are local-dev only and intentionally match .env.example.
+services:
+  db:
+    image: postgres:16
+    container_name: fkmovies-db
+    environment:
+      POSTGRES_DB: fkmovies
+      POSTGRES_USER: fkmovies
+      POSTGRES_PASSWORD: fkmovies
+    ports:
+      - "5432:5432"
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U fkmovies -d fkmovies"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  db-data:
