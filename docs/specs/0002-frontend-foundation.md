@@ -1,7 +1,13 @@
 # 0002 - Frontend Foundation
 
-Status: Draft
+Status: Implemented
 Related ADRs: 0008
+
+> Implementation note: PrimeNG had no Angular 22 release at implementation time
+> (latest 21.1.9, peer range ^21). PrimeNG 21 is installed under
+> `legacy-peer-deps` (`frontend/.npmrc`), which is within Angular's N-1 library
+> compatibility policy. Remove the `.npmrc` override and upgrade when PrimeNG
+> ships Angular 22 support.
 
 ## Goal
 
@@ -97,8 +103,8 @@ Global error handling will be specified in spec 0021. Foundation provides:
 
 ## Open Questions
 
-- Browser support matrix: latest Chrome/Edge/Firefox/Safari only, or include
-  one previous major? Default: latest two majors of evergreen browsers.
+- Browser support matrix: resolved with the stated default — latest two majors
+  of evergreen browsers (Chrome/Edge/Firefox/Safari).
 
 ## Out of Scope
 
