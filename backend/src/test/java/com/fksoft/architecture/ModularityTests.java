@@ -30,8 +30,10 @@ class ModularityTests {
 
     /** Guards the detection strategy: if the property were ignored, verify() would pass vacuously. */
     @Test
-    void detectsAuthModule() {
+    void detectsBusinessModules() {
         org.assertj.core.api.Assertions.assertThat(modules.getModuleByName("application.auth"))
+                .isPresent();
+        org.assertj.core.api.Assertions.assertThat(modules.getModuleByName("application.notification"))
                 .isPresent();
     }
 

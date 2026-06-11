@@ -47,6 +47,14 @@ class SecurityConfig {
                         .permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/auth/login", "/api/auth/refresh", "/api/auth/logout")
                         .permitAll()
+                        .requestMatchers(
+                                HttpMethod.POST,
+                                "/api/users/register",
+                                "/api/users/resend-verification",
+                                "/api/users/verify-email",
+                                "/api/users/forgot-password",
+                                "/api/users/reset-password")
+                        .permitAll()
                         .anyRequest()
                         .authenticated())
                 .oauth2ResourceServer(

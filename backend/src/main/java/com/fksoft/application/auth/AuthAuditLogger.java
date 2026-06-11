@@ -28,4 +28,19 @@ class AuthAuditLogger {
     void on(PasswordChanged event) {
         log.info("audit passwordChanged userId={}", event.userId());
     }
+
+    @TransactionalEventListener
+    void on(CustomerRegistered event) {
+        log.info("audit customerRegistered userId={}", event.userId());
+    }
+
+    @TransactionalEventListener
+    void on(EmailVerified event) {
+        log.info("audit emailVerified userId={}", event.userId());
+    }
+
+    @TransactionalEventListener
+    void on(PasswordResetCompleted event) {
+        log.info("audit passwordResetCompleted userId={}", event.userId());
+    }
 }

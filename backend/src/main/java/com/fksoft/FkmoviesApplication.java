@@ -4,13 +4,16 @@ import java.util.TimeZone;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 /**
  * fkmovies modular monolith entry point (ADR 0001). Business modules live under
- * {@code com.fksoft.application.<module>} and are introduced from SPEC-0007 onward.
+ * {@code com.fksoft.application.<module>}. Scheduling is enabled for the email outbox
+ * dispatcher (SPEC-0006).
  */
 @SpringBootApplication
 @ConfigurationPropertiesScan
+@EnableScheduling
 public class FkmoviesApplication {
 
     /**

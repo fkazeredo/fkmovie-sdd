@@ -130,6 +130,24 @@ class ArchitectureTest {
                 .check(PRODUCTION_CLASSES);
     }
 
+    /**
+     * SPEC-0006: the notification module's outbox is module-internal — other modules trigger
+     * email by publishing events, never by touching {@code OutboxEmail}/its repository.
+     */
+    @Test
+    void otherModulesMustNotTouchNotificationPersistence() {
+        var notificationPersistence = JavaClass.Predicates.resideInAPackage("com.fksoft.application.notification..")
+                .and(JavaClass.Predicates.simpleNameEndingWith("Repository")
+                        .or(CanBeAnnotated.Predicates.annotatedWith("jakarta.persistence.Entity")));
+        noClasses()
+                .that()
+                .resideOutsideOfPackage("com.fksoft.application.notification..")
+                .should()
+                .dependOnClassesThat(notificationPersistence)
+                .allowEmptyShould(true)
+                .check(PRODUCTION_CLASSES);
+    }
+
     /** Business exceptions must be specific and meaningful, in business language. */
     @Test
     void exceptionsLiveWithTheirDomain() {

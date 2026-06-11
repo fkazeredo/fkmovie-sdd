@@ -5,6 +5,10 @@ spring:
     # Only @ApplicationModule-annotated packages are modules (com.fksoft.application.<module>);
     # infra/shared are arrangement code governed by ArchUnit. See ModularityTests.
     detection-strategy: explicitly-annotated
+  messages:
+    # Fall back to the en bundle (messages.properties), never the server's locale, so an
+    # English user never receives Portuguese emails (SPEC-0006 locale resolution).
+    fallback-to-system-locale: false
   datasource:
     url: ${DB_URL}
     username: ${DB_USER}
@@ -31,6 +35,11 @@ app:
     to-override: ${MAIL_TO_OVERRIDE:}
   payment:
     webhook-secret: ${PAYMENT_WEBHOOK_SECRET:}
+  notification:
+    # Public base URL used to build verification/reset links in emails.
+    base-url: ${APP_BASE_URL:http://localhost:4200}
+    poll-interval: PT30S
+    batch-size: 20
 
 management:
   endpoints:

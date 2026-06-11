@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title th:text="#{email.verification.subject}">Verify your email</title>
+  </head>
+  <body>
+    <p th:text="#{email.verification.greeting(${name})}">Hello,</p>
+    <p th:text="#{email.verification.body}">Please confirm your email address.</p>
+    <p>
+      <a th:href="${link}" th:text="#{email.verification.cta}">Verify email</a>
+    </p>
+    <p th:text="#{email.verification.expiry}">This link expires in 24 hours.</p>
+  </body>
+</html>

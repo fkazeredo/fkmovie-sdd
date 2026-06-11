@@ -24,7 +24,7 @@ class SecurityBaselineIntegrationTest extends AuthIntegrationTestSupport {
         assertThat(get("/actuator/prometheus").statusCode()).isEqualTo(200);
         var apiDocs = get("/v3/api-docs");
         assertThat(apiDocs.statusCode()).isEqualTo(200);
-        assertThat(apiDocs.body()).contains("/api/auth/login");
+        assertThat(apiDocs.body()).contains("/api/auth/login").contains("/api/users/register");
     }
 
     @Test

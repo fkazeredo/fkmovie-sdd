@@ -14,10 +14,17 @@ app:
     refresh-ttl: 7d
   mail:
     host: localhost
-    port: 1025
+    # GreenMail default SMTP port; only EmailDeliveryGreenMailTest actually starts a server.
+    port: 3025
     username: ""
     password: ""
     from: noreply@fkmovies.local
     to-override: ""
   payment:
     webhook-secret: test-webhook-secret
+  notification:
+    base-url: http://localhost:4200
+    poll-interval: PT30S
+    batch-size: 20
+    # Tests drive OutboxSendWorker directly; the scheduled dispatcher stays off.
+    dispatch-enabled: false

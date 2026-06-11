@@ -22,6 +22,23 @@ class UserTest {
     }
 
     @Test
+    void newCustomerStartsActiveUnverifiedWithGivenLocale() {
+        var user = User.newCustomer("c@example.com", "hash", "Frank", "en");
+        assertThat(user.role()).isEqualTo(Role.CUSTOMER);
+        assertThat(user.isEmailVerified()).isFalse();
+        assertThat(user.preferredLocale()).isEqualTo("en");
+    }
+
+    @Test
+    void verifyEmailIsIdempotentAndKeepsFirstTime() {
+        var user = User.newCustomer("c@example.com", "hash", "Frank", "pt-BR");
+        var first = java.time.Instant.parse("2026-06-11T00:00:00Z");
+        user.verifyEmail(first);
+        user.verifyEmail(first.plusSeconds(60));
+        assertThat(user.isEmailVerified()).isTrue();
+    }
+
+    @Test
     void bcryptCost12RoundTrip() {
         var encoder = new BCryptPasswordEncoder(12);
         var hash = encoder.encode("secret123");

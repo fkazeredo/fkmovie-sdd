@@ -1,0 +1,7 @@
+[# th:text="#{email.verification.greeting(${name})}"]Hello,[/]
+
+[# th:text="#{email.verification.body}"]Please confirm your email address.[/]
+
+[# th:text="#{email.verification.cta}"]Verify email[/]: [# th:text="${link}"]link[/]
+
+[# th:text="#{email.verification.expiry}"]This link expires in 24 hours.[/]

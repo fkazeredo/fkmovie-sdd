@@ -47,6 +47,9 @@ public class User {
     @Column(name = "email_verified_at")
     private Instant emailVerifiedAt;
 
+    @Column(name = "preferred_locale", nullable = false)
+    private String preferredLocale;
+
     @Column(name = "created_at", nullable = false)
     private Instant createdAt;
 
@@ -59,6 +62,10 @@ public class User {
 
     /** Creates an ACTIVE user in the default tenant; the email is normalized to lowercase. */
     public User(String email, String passwordHash, String name, Role role) {
+        this(email, passwordHash, name, role, "pt-BR");
+    }
+
+    private User(String email, String passwordHash, String name, Role role, String preferredLocale) {
         this.id = UUID.randomUUID();
         this.tenantId = "default";
         this.email = normalizeEmail(email);
@@ -66,6 +73,12 @@ public class User {
         this.name = name;
         this.role = role;
         this.status = UserStatus.ACTIVE;
+        this.preferredLocale = preferredLocale;
+    }
+
+    /** Creates an unverified CUSTOMER (SPEC-0004): ACTIVE, but email_verified_at stays NULL. */
+    public static User newCustomer(String email, String passwordHash, String name, String preferredLocale) {
+        return new User(email, passwordHash, name, Role.CUSTOMER, preferredLocale);
     }
 
     /** Lowercase trim applied at every storage path (SPEC-0003: email unique case-insensitive). */
@@ -87,6 +100,17 @@ public class User {
     /** Replaces the stored hash; callers are responsible for bcrypt encoding and revocations. */
     public void changePassword(String newPasswordHash) {
         this.passwordHash = newPasswordHash;
+    }
+
+    /** Marks the email verified (SPEC-0004); idempotent — keeps the first verification time. */
+    public void verifyEmail(Instant now) {
+        if (emailVerifiedAt == null) {
+            emailVerifiedAt = now;
+        }
+    }
+
+    public boolean isEmailVerified() {
+        return emailVerifiedAt != null;
     }
 
     public void disable() {
@@ -131,5 +155,9 @@ public class User {
 
     public UserStatus status() {
         return status;
+    }
+
+    public String preferredLocale() {
+        return preferredLocale;
     }
 }
