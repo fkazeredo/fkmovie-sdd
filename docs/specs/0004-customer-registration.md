@@ -1,7 +1,20 @@
 # 0004 - Customer Registration, Email Verification and Password Reset
 
-Status: Draft
+Status: Implemented
 Related ADRs: 0005, 0007
+
+> Implementation notes (backend, bundled with spec 0006):
+> - Registration auto-logs the customer in (Open Question resolved → yes): POST
+>   /register returns 201 with accessToken + refresh cookie, same shape as login,
+>   and `user.emailVerified=false`.
+> - `preferred_locale` added to `users` (V3 migration), captured from
+>   `Accept-Language` (pt-BR default); used for email locale.
+> - `user.invalid-request` (400) is delivered as the foundation's global
+>   `validation.error` contract (spec 0001) with `fields`.
+> - Registration lives inside the `auth` module (same `users` aggregate, reuses
+>   token issuer + refresh revocation) rather than a separate module.
+> - Reservation gate (reject `email_verified_at` NULL) is enforced from spec 0014.
+> - Angular UI is spec 0021.
 
 ## Goal
 
@@ -145,9 +158,10 @@ defense). Internally still emits a metric for ops visibility.
 ## Open Questions
 
 - Token TTLs (24h verification, 1h reset) — confirmed. Owner can shorten.
-- Should registration also issue an access token immediately (auto-login)?
-  Proposal: yes — improves onboarding UX. Verified email is still required
-  for reservation, but the user can browse.
+- Auto-login on registration — resolved: yes (see implementation note).
+- Daily cleanup job for expired/consumed tokens (kept 30 days then purged):
+  deferred. Window/single-use checks do not depend on it; tables grow until a
+  retention job is added.
 
 ## Out of Scope
 

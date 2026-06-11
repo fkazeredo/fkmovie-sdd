@@ -1,7 +1,17 @@
 # 0006 - Notifications and Email
 
-Status: Draft
+Status: Implemented
 Related ADRs: 0007
+
+> Implementation notes:
+> - Outbox + @Scheduled dispatcher (not @Async) for crash-safe, restartable
+>   delivery. Backoff 1m/5m/15m/1h/6h/24h; FAILED_PERMANENT after the 6th failure.
+> - Only VERIFICATION and PASSWORD_RESET templates ship now; other templates
+>   arrive with their producing specs (Rule Zero).
+> - `preferred_locale` (Open Question) added to `users` in spec 0004's V3 migration.
+> - Cleanup of SENT/FAILED_PERMANENT rows is deferred (manual in v1).
+> - `spring.messages.fallback-to-system-locale=false` so an EN user never receives
+>   a PT email regardless of the server locale.
 
 ## Goal
 

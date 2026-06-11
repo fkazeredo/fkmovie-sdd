@@ -37,10 +37,11 @@ The application code does not branch on environment. Templates rendered with
 Spring's `MessageSource` for i18n (PT-BR default, EN fallback).
 
 Failure mode: email sending is best-effort and **must not** fail the business
-transaction that triggered it. Sending is asynchronous (via Spring's
-`@Async` or a dedicated outbox table; see spec 0006). Failed sends are
-retried with exponential backoff and a dead-letter table for permanently
-failed messages.
+transaction that triggered it. Sending is asynchronous via a dedicated outbox
+table polled by a scheduled worker (chosen over `@Async` for crash safety and
+restartability; see spec 0006). Failed sends are retried with exponential
+backoff and a dead-letter status (`FAILED_PERMANENT`) for permanently failed
+messages.
 
 ## Consequences
 
