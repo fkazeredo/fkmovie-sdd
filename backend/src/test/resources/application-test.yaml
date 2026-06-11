@@ -1,0 +1,23 @@
+# Test profile: keeps the main application.yaml env-var placeholders out of the way.
+# The real database connection comes from the Postgres Testcontainer via @ServiceConnection,
+# which supersedes spring.datasource.* values.
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/overridden-by-testcontainers
+    username: overridden-by-testcontainers
+    password: overridden-by-testcontainers
+
+app:
+  jwt:
+    secret: test-secret-0123456789-0123456789-0123456789
+    access-ttl: 15m
+    refresh-ttl: 7d
+  mail:
+    host: localhost
+    port: 1025
+    username: ""
+    password: ""
+    from: noreply@fkmovies.local
+    to-override: ""
+  payment:
+    webhook-secret: test-webhook-secret

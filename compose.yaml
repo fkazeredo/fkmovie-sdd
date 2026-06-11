@@ -9,7 +9,8 @@ services:
       POSTGRES_USER: fkmovies
       POSTGRES_PASSWORD: fkmovies
     ports:
-      - "5432:5432"
+      # Override with DB_PORT when 5432 is taken on the host (keep DB_URL in sync)
+      - "${DB_PORT:-5432}:5432"
     volumes:
       - db-data:/var/lib/postgresql/data
     healthcheck:

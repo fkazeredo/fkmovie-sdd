@@ -1,0 +1,2 @@
+-- Flyway baseline (SPEC-0001). Intentionally empty: it only proves database connectivity
+-- and migration wiring. The first real schema migration lands with SPEC-0007.

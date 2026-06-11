@@ -64,12 +64,12 @@ contract impacts, commands executed, verification result, risks and pending item
 ## Project commands
 
 Use official project commands; inspect `README.md`, `pom.xml`, `package.json`, `Makefile`
-before inventing any. Typical defaults (adjust per project):
+before inventing any. No system Maven — always use the wrapper from `backend/`:
 
 ```bash
-mvn verify                 # backend build + tests (includes ArchUnit)
-mvn spotless:apply         # format
-npm run lint && npm test   # frontend
+cd backend && ./mvnw verify           # backend build + tests (ArchUnit; needs Docker up)
+cd backend && ./mvnw spotless:apply   # format
+npm run lint && npm test              # frontend (from spec 0002)
 ```
 
 Destructive operations are governed by `.claude/settings.json` permissions. Do not attempt

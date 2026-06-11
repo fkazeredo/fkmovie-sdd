@@ -1,0 +1,42 @@
+spring:
+  application:
+    name: fkmovies
+  datasource:
+    url: ${DB_URL}
+    username: ${DB_USER}
+    password: ${DB_PASSWORD}
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+
+# Required variables default to empty so a missing one fails Bean Validation at startup.
+# The Boot binder ignores unresolvable ${VAR} placeholders (binds the literal), so a bare
+# ${JWT_SECRET} would silently pass @NotBlank — the ":" empty default is the fail-fast.
+app:
+  jwt:
+    secret: ${JWT_SECRET:}
+    access-ttl: ${JWT_ACCESS_TTL:}
+    refresh-ttl: ${JWT_REFRESH_TTL:}
+  mail:
+    host: ${MAIL_HOST:}
+    port: ${MAIL_PORT:0}
+    username: ${MAIL_USERNAME:}
+    password: ${MAIL_PASSWORD:}
+    from: ${MAIL_FROM:}
+    to-override: ${MAIL_TO_OVERRIDE:}
+  payment:
+    webhook-secret: ${PAYMENT_WEBHOOK_SECRET:}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,prometheus
+  endpoint:
+    health:
+      probes:
+        enabled: true
+      group:
+        readiness:
+          include: readinessState,db

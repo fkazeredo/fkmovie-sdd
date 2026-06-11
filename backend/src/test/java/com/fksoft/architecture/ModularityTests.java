@@ -1,5 +1,6 @@
 package com.fksoft.architecture;
 
+import com.fksoft.FkmoviesApplication;
 import org.junit.jupiter.api.Test;
 import org.springframework.modulith.core.ApplicationModules;
 import org.springframework.modulith.docs.Documenter;
@@ -12,23 +13,23 @@ import org.springframework.modulith.docs.Documenter;
  * public module APIs, no dependency on another module's repositories, entities or
  * implementation classes.
  *
- * <p>Requires the {@code spring-modulith-starter-test} dependency (see
- * backend/config/pom-snippets.xml) and module packages directly under the application root
- * (e.g. {@code com.fksoft.application.booking}). Adjust the main class reference.
+ * <p>The module set is empty until SPEC-0007: business modules will live under
+ * {@code com.fksoft.application.<module>}, and the module detection strategy must be
+ * revisited when the first one lands.
  */
 class ModularityTests {
 
-  ApplicationModules modules = ApplicationModules.of(com.fksoft.Application.class);
+    ApplicationModules modules = ApplicationModules.of(FkmoviesApplication.class);
 
-  /** Fails when any module violates declared boundaries or accesses internals. */
-  @Test
-  void verifiesModularStructure() {
-    modules.verify();
-  }
+    /** Fails when any module violates declared boundaries or accesses internals. */
+    @Test
+    void verifiesModularStructure() {
+        modules.verify();
+    }
 
-  /** Generates module documentation (PlantUML/AsciiDoc) under target/spring-modulith-docs. */
-  @Test
-  void writeDocumentationSnippets() {
-    new Documenter(modules).writeModulesAsPlantUml().writeIndividualModulesAsPlantUml();
-  }
+    /** Generates module documentation (PlantUML/AsciiDoc) under target/spring-modulith-docs. */
+    @Test
+    void writeDocumentationSnippets() {
+        new Documenter(modules).writeModulesAsPlantUml().writeIndividualModulesAsPlantUml();
+    }
 }

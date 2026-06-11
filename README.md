@@ -17,6 +17,42 @@ Claude Code. Derived from `architecture.md` v1, restructured around three layers
      after edits and block manual edits to generated files.
    - `.claude/commands/` — `/spec`, `/adr`, `/arch-review`.
 
+## Getting started (backend)
+
+Prerequisites: Java 21, Docker. Maven is provided by the wrapper (`backend/mvnw`).
+
+1. Copy `.env.example` to `.env.local` and set a real `JWT_SECRET` (min 32 chars).
+   `.env.local` is git-ignored.
+2. Start the database: `docker compose up -d db`
+3. Load the env vars into your shell, then run the app from `backend/`:
+
+   PowerShell:
+
+   ```powershell
+   Get-Content ..\.env.local | Where-Object { $_ -match '^\s*[^#].*=' } |
+     ForEach-Object { $n, $v = $_ -split '=', 2; Set-Item "env:$($n.Trim())" $v.Trim() }
+   .\mvnw.cmd spring-boot:run
+   ```
+
+   bash:
+
+   ```bash
+   set -a; source ../.env.local; set +a
+   ./mvnw spring-boot:run
+   ```
+
+4. Health checks: <http://localhost:8080/actuator/health/liveness> and
+   `/actuator/health/readiness` (returns 503 when the DB is down). Prometheus metrics at
+   `/actuator/prometheus`.
+
+Build + all tests (integration tests use Testcontainers, so Docker must be running):
+
+```bash
+cd backend
+./mvnw spotless:apply   # format
+./mvnw verify           # tests + ArchUnit + Modulith + spotless:check + checkstyle
+```
+
 ## Adopting in a new project
 
 1. Copy `CLAUDE.md`, `architecture/`, `docs/`, `.claude/` to the repository root.
