@@ -8,6 +8,10 @@ Related ADRs: 0009, 0005, 0002
 Clients viewing a seat map receive seat status changes in real time.
 Realtime is a core product requirement.
 
+> Note: the STOMP CONNECT JWT validation from spec 0003 lands here (no transport
+> existed at 0003). Reuse the `JwtDecoder` bean from `com.fksoft.infra.security`
+> in a CONNECT `ChannelInterceptor` to authenticate and bind the principal.
+
 ## Scope
 
 Two parts, in line with ADR 0009: STOMP transport configuration in

@@ -1,7 +1,22 @@
 # 0003 - Authentication
 
-Status: Draft
+Status: Implemented
 Related ADRs: 0005, 0003
+
+> Implementation notes (backend, this milestone):
+> - WebSocket CONNECT JWT validation is deferred to spec 0013 (no STOMP transport
+>   exists yet). The reusable seam is the `JwtDecoder` bean in
+>   `com.fksoft.infra.security`, to be injected into the future CONNECT
+>   `ChannelInterceptor`.
+> - `auth.invalid-request` (400) is delivered as the foundation's global
+>   `validation.error` contract (spec 0001) with the `fields` list, instead of a
+>   separate code — one validation contract across the API.
+> - Per-IP rate limit threshold set to 20 failures / 15 min (spec left the number open).
+> - `users.email` is `CITEXT` (DB-level case-insensitive uniqueness) AND normalized to
+>   lowercase by the application — redundant by design, defense in depth.
+> - Change-password revokes all of the user's refresh tokens (other sessions must
+>   re-authenticate).
+> - Angular login/registration UI is spec 0021.
 
 ## Goal
 
@@ -124,6 +139,9 @@ Indexes: `users(email)`, `refresh_tokens(user_id)`,
 | 403 | `auth.disabled` | User exists but is DISABLED. |
 | 429 | `auth.rate-limited` | Lockout active. Response includes `Retry-After`. |
 | 401 | `auth.password-mismatch` | Change-password with wrong old password. |
+| 401 | `auth.unauthenticated` | Missing/invalid access token on a protected endpoint. |
+| 403 | `auth.forbidden` | Authenticated but lacking the required authority. |
+| 400 | `validation.error` | Missing/invalid fields (replaces `auth.invalid-request`; global contract from spec 0001). |
 
 User-facing messages are i18n keys; the API also returns a stable `message`
 field localized by `Accept-Language` (pt-BR / en).
@@ -158,6 +176,10 @@ field localized by `Accept-Language` (pt-BR / en).
 
 ## Open Questions
 
+- `login_attempts` retention: rows accumulate indefinitely (window queries are
+  index-served regardless of size). A scheduled cleanup/retention job is deferred.
+- Reset-on-success semantics: a successful login does not reset the failure window;
+  failures within the last 15 min still count toward lockout (literal reading).
 - Password reset flow lives in spec 0004 (uses email infra from 0006).
 - Should we enforce email verification before allowing reservation? Default
   proposal: yes (decided in 0004).

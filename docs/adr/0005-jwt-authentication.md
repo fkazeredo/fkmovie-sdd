@@ -15,9 +15,10 @@ mobile clients in the future, and the WebSocket handshake.
 Token-based authentication using JSON Web Tokens with the two-token pattern:
 
 - **Access token**: short-lived (15 minutes), signed with HS256 using a
-  rotated secret stored as env var. Carries `userId`, `roles`, `tenantId`,
-  `exp`. Sent on every API call as `Authorization: Bearer <token>` and on
-  the STOMP CONNECT frame for WebSocket.
+  rotated secret stored as env var. Carries `userId` (as `sub`), a single
+  `role` claim (spec 0003: one active role per user, roles do not stack in v1),
+  `tenantId`, `iat` and `exp`. Sent on every API call as
+  `Authorization: Bearer <token>` and on the STOMP CONNECT frame for WebSocket.
 - **Refresh token**: long-lived (7 days), opaque random string, stored
   server-side in the `refresh_tokens` table with `userId`, `expiresAt`,
   `revokedAt`. Persisted client-side in `httpOnly`+`secure`+`SameSite=Strict`
