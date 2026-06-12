@@ -1,7 +1,23 @@
 # 0005 - User Management (Admin)
 
-Status: Draft
+Status: Implemented
 Related ADRs: 0005
+
+> Implementation notes (backend):
+> - First-admin bootstrap resolved (Open Question): an `ApplicationRunner` creates
+>   one ACTIVE admin from `BOOTSTRAP_ADMIN_EMAIL`/`BOOTSTRAP_ADMIN_PASSWORD` at
+>   startup if no admin exists; idempotent afterwards.
+> - Role change does NOT revoke active tokens (Open Question resolved → no; they
+>   expire within 15 min).
+> - Error codes `auth.unauthorized`/`auth.forbidden` in the table are served by the
+>   existing `auth.unauthenticated` (401) / `auth.forbidden` (403) from spec 0003.
+> - Management lives inside the `auth` module (same `users` aggregate); admin
+>   endpoints are gated by `ROLE_ADMIN` URL rules in SecurityConfig.
+> - The "cannot disable the last admin" rule is unreachable in normal flow (the
+>   acting admin is itself active, so a second active admin always remains) — it
+>   only triggers for a disabled admin acting on a still-valid token; covered by a
+>   unit test on `UserManagementPolicy`.
+> - Angular admin console UI is spec 0026.
 
 ## Goal
 
@@ -136,13 +152,13 @@ Tables:
 
 ## Open Questions
 
-- Bootstrap: how is the first admin created? Proposal: a Flyway seed creates
-  a single admin with credentials from env vars (`BOOTSTRAP_ADMIN_EMAIL`,
-  `BOOTSTRAP_ADMIN_PASSWORD`) at first startup if no admins exist. After
-  first start, the env vars are no longer used.
-- Should role changes immediately revoke the user's active access tokens?
-  Proposal: no by default (let them expire in 15 min). Admin can explicitly
-  revoke if needed via a dedicated endpoint (out of scope v1).
+- Bootstrap: resolved — an `ApplicationRunner` (not a Flyway seed, which cannot
+  bcrypt) creates the first admin from `BOOTSTRAP_ADMIN_EMAIL`/
+  `BOOTSTRAP_ADMIN_PASSWORD` if no admin exists; idempotent thereafter.
+- Role-change token revocation: resolved — no (tokens expire within 15 min). A
+  dedicated revoke endpoint remains out of scope for v1.
+- Invitation-token cleanup job (consumed/expired): deferred, same posture as the
+  other token tables (spec 0004).
 
 ## Out of Scope
 
