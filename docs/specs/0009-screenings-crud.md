@@ -1,7 +1,31 @@
 # 0009 - Screenings CRUD (Admin)
 
-Status: Draft
+Status: Implemented
 Related ADRs: 0001, 0009
+
+> Implementation notes (backend):
+> - Cleaning buffer resolved (Open Question): 30 min, configurable via
+>   `app.screening.buffer-minutes`. `endsAt = startsAt + movie duration + buffer`.
+> - Room overlap is guaranteed by a Postgres `btree_gist` `EXCLUDE` constraint over
+>   `tstzrange(starts_at, ends_at)` where `status = 'SCHEDULED'`; the service pre-checks for
+>   the friendly 409 and also maps the constraint violation to `screening.room-overlap`.
+> - First synchronous cross-module read: the `cinema` module now exposes a public
+>   `CinemaCatalog`/`SeatView` facade (harmonizes the read seam deferred in 0007). The
+>   booking materializer reads room seats through it, never the `Seat` entity.
+> - GET `/{id}` returns screening fields only. The seat inventory summary the contract
+>   mentions is **deferred to 0011**: having the screening admin GET read booking would make
+>   `screening → booking` cyclic (booking already depends on screening via `ScreeningCreated`)
+>   and break Modulith `verify()`. The seat map/inventory is booking's public endpoint (0011).
+> - Seat materialization runs in the booking module via an AFTER_COMMIT consumer of
+>   `ScreeningCreated` (REQUIRES_NEW, idempotent; `UNIQUE(screening_id, seat_id)`). The
+>   `screening_seats` table (owned by 0011) is created here because the consumer needs it.
+> - Harmonized the 0008 movie deletion guard: `movie.has-screenings` 409 is now live.
+> - Edit/cancel guards against reservations/sold tickets are **inert** (wired but no-op)
+>   until reservations exist (0014); `screening.has-reservations`/`screening.has-sold-tickets`
+>   and the `ScreeningModificationGuard` are the deferred seam.
+> - `ScreeningCancelled` is published but the booking module takes no seat action in v1 (the
+>   CANCELLED status blocks new reservations; no sold tickets by rule).
+> - Movie that is missing OR not ACTIVE → `screening.movie-not-found` (404).
 
 ## Goal
 
