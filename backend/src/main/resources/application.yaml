@@ -44,6 +44,12 @@ app:
     # Cleaning/exit buffer (minutes) added after the movie duration when computing a
     # screening's end time and checking room overlap (spec 0009).
     buffer-minutes: ${SCREENING_BUFFER_MINUTES:30}
+  booking:
+    # Seat reservation tunables (spec 0014): max seats per reservation, hold (PENDING) duration,
+    # and the minimum lead time before start during which new reservations are refused.
+    max-seats-per-reservation: ${BOOKING_MAX_SEATS:8}
+    hold-minutes: ${BOOKING_HOLD_MINUTES:5}
+    min-lead-minutes: ${BOOKING_MIN_LEAD_MINUTES:10}
   bootstrap:
     # First-admin seed (spec 0005): used once at startup if no admin exists, then ignored.
     admin-email: ${BOOTSTRAP_ADMIN_EMAIL:}

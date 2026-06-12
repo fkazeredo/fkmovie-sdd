@@ -1,5 +1,6 @@
 package com.fksoft.shared.error;
 
+import java.util.List;
 import java.util.Map;
 import org.springframework.http.HttpStatus;
 
@@ -37,5 +38,10 @@ public abstract class BusinessException extends RuntimeException {
     /** Extra HTTP headers for the error response; empty by default. */
     public Map<String, String> httpHeaders() {
         return Map.of();
+    }
+
+    /** Per-field violations to include in the response (e.g. the unavailable seats); empty by default. */
+    public List<ApiErrorResponse.FieldViolation> fields() {
+        return List.of();
     }
 }

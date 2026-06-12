@@ -61,6 +61,23 @@ public class ScreeningSeat {
         return new ScreeningSeat(screeningId, seatId);
     }
 
+    public boolean isFree() {
+        return status == ScreeningSeatStatus.FREE;
+    }
+
+    /**
+     * Holds the seat for a reservation (SPEC-0014): {@code FREE → HELD}. Callers MUST hold the
+     * pessimistic row lock (ADR 0004) and have verified {@link #isFree()} first.
+     *
+     * @throws IllegalStateException if the seat is not FREE (defensive — the lock + check prevent it).
+     */
+    public void hold() {
+        if (status != ScreeningSeatStatus.FREE) {
+            throw new IllegalStateException("Seat " + id + " is not FREE: " + status);
+        }
+        status = ScreeningSeatStatus.HELD;
+    }
+
     @PrePersist
     @PreUpdate
     void touch() {

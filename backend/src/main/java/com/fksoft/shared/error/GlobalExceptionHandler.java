@@ -33,9 +33,10 @@ public class GlobalExceptionHandler {
     /** Business errors: status, stable code and optional headers defined by the exception. */
     @ExceptionHandler(BusinessException.class)
     public ResponseEntity<ApiErrorResponse> handleBusiness(BusinessException exception) {
-        var body = ApiErrorResponse.of(
+        var body = new ApiErrorResponse(
                 exception.code(),
-                messageSource.getMessage(exception.code(), exception.messageArgs(), LocaleContextHolder.getLocale()));
+                messageSource.getMessage(exception.code(), exception.messageArgs(), LocaleContextHolder.getLocale()),
+                exception.fields());
         var response = ResponseEntity.status(exception.status());
         exception.httpHeaders().forEach(response::header);
         return response.body(body);
