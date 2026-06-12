@@ -206,6 +206,25 @@ class ArchitectureTest {
                 .check(PRODUCTION_CLASSES);
     }
 
+    /**
+     * SPEC-0012: the pricing module's config persistence ({@code PricingSeatType}/{@code
+     * PricingWeekday} and their repositories) is module-internal. Other modules price through the
+     * public {@code PriceCalculator} facade, never these classes.
+     */
+    @Test
+    void otherModulesMustNotTouchPricingPersistence() {
+        var pricingPersistence = JavaClass.Predicates.resideInAPackage("com.fksoft.application.pricing..")
+                .and(JavaClass.Predicates.simpleNameEndingWith("Repository")
+                        .or(CanBeAnnotated.Predicates.annotatedWith("jakarta.persistence.Entity")));
+        noClasses()
+                .that()
+                .resideOutsideOfPackage("com.fksoft.application.pricing..")
+                .should()
+                .dependOnClassesThat(pricingPersistence)
+                .allowEmptyShould(true)
+                .check(PRODUCTION_CLASSES);
+    }
+
     /** Business exceptions must be specific and meaningful, in business language. */
     @Test
     void exceptionsLiveWithTheirDomain() {

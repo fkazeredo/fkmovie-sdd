@@ -51,7 +51,9 @@ class SeatMapIntegrationTest extends AbstractIntegrationTest {
         assertThat(response.body())
                 .contains("\"roomName\":\"Room 1\"")
                 .contains("\"status\":\"FREE\"")
+                // Pricing (0012) seed: STANDARD/ACCESSIBLE/COMPANION = base 3000; VIP = base + 1000.
                 .contains("\"fullPriceCents\":3000")
+                .contains("\"fullPriceCents\":4000")
                 .contains("\"type\":\"ACCESSIBLE\"")
                 .contains("\"type\":\"COMPANION\"")
                 .contains("\"type\":\"VIP\"")

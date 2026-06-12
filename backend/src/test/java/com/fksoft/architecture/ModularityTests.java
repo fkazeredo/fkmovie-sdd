@@ -41,6 +41,8 @@ class ModularityTests {
                 .isPresent();
         org.assertj.core.api.Assertions.assertThat(modules.getModuleByName("application.booking"))
                 .isPresent();
+        org.assertj.core.api.Assertions.assertThat(modules.getModuleByName("application.pricing"))
+                .isPresent();
     }
 
     /** Generates module documentation (PlantUML/AsciiDoc) under target/spring-modulith-docs. */

@@ -3,11 +3,13 @@ package com.fksoft.application.booking;
 import com.fksoft.application.cinema.CinemaCatalog;
 import com.fksoft.application.cinema.RoomView;
 import com.fksoft.application.cinema.SeatView;
+import com.fksoft.application.pricing.PriceCalculator;
+import com.fksoft.application.pricing.ScreeningPricingContext;
+import com.fksoft.application.pricing.TicketType;
 import com.fksoft.application.screening.ScreeningCancelledException;
 import com.fksoft.application.screening.ScreeningCatalog;
 import com.fksoft.application.screening.ScreeningNotFoundException;
 import com.fksoft.application.screening.ScreeningStatus;
-import com.fksoft.application.screening.ScreeningView;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Timer;
 import java.util.Comparator;
@@ -28,14 +30,14 @@ public class SeatMapService {
     private final ScreeningCatalog screenings;
     private final CinemaCatalog cinema;
     private final ScreeningSeatRepository screeningSeats;
-    private final SeatPricing pricing;
+    private final PriceCalculator pricing;
     private final MeterRegistry meterRegistry;
 
     SeatMapService(
             ScreeningCatalog screenings,
             CinemaCatalog cinema,
             ScreeningSeatRepository screeningSeats,
-            SeatPricing pricing,
+            PriceCalculator pricing,
             MeterRegistry meterRegistry) {
         this.screenings = screenings;
         this.cinema = cinema;
@@ -78,20 +80,21 @@ public class SeatMapService {
                 .orElseThrow(() -> new IllegalStateException("Room missing for screening " + screeningId));
         var seatsBySeatId = cinema.seatsOf(screening.roomId()).stream()
                 .collect(Collectors.toMap(SeatView::seatId, Function.identity()));
+        var pricingContext = new ScreeningPricingContext(screening.basePriceCents(), screening.startsAt());
         var seats = screeningSeats.findByScreeningId(screeningId).stream()
-                .map(inventory -> toSeat(inventory, seatsBySeatId.get(inventory.seatId()), screening))
+                .map(inventory -> toSeat(inventory, seatsBySeatId.get(inventory.seatId()), pricingContext))
                 .sorted(Comparator.comparing(SeatMapSeat::row).thenComparingInt(SeatMapSeat::number))
                 .toList();
         return new SeatMapResponse(screeningId, roomName, screening.startsAt(), seats);
     }
 
-    private SeatMapSeat toSeat(ScreeningSeat inventory, SeatView seat, ScreeningView screening) {
+    private SeatMapSeat toSeat(ScreeningSeat inventory, SeatView seat, ScreeningPricingContext pricingContext) {
         return new SeatMapSeat(
                 seat.seatId(),
                 seat.row(),
                 seat.number(),
                 seat.type(),
                 inventory.status(),
-                pricing.fullPriceCents(screening.basePriceCents(), seat.type()));
+                pricing.quote(pricingContext, seat.type(), TicketType.FULL).fullCents());
     }
 }
