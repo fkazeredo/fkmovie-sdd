@@ -148,6 +148,83 @@ class ArchitectureTest {
                 .check(PRODUCTION_CLASSES);
     }
 
+    /**
+     * SPEC-0007: the cinema module's persistence ({@code CinemaRoom}/{@code Seat} and their
+     * repositories) is module-internal. The first consumer (SPEC-0011) will read seats through a
+     * public module API, never by touching these classes — see
+     * {@code architecture/simulation-and-mocking.md}.
+     */
+    @Test
+    void otherModulesMustNotTouchCinemaPersistence() {
+        var cinemaPersistence = JavaClass.Predicates.resideInAPackage("com.fksoft.application.cinema..")
+                .and(JavaClass.Predicates.simpleNameEndingWith("Repository")
+                        .or(CanBeAnnotated.Predicates.annotatedWith("jakarta.persistence.Entity")));
+        noClasses()
+                .that()
+                .resideOutsideOfPackage("com.fksoft.application.cinema..")
+                .should()
+                .dependOnClassesThat(cinemaPersistence)
+                .allowEmptyShould(true)
+                .check(PRODUCTION_CLASSES);
+    }
+
+    /**
+     * SPEC-0008: the screening module's persistence ({@code Movie} and its repository) is
+     * module-internal. Other modules collaborate through its public API/events, never by touching
+     * these classes.
+     */
+    @Test
+    void otherModulesMustNotTouchScreeningPersistence() {
+        var screeningPersistence = JavaClass.Predicates.resideInAPackage("com.fksoft.application.screening..")
+                .and(JavaClass.Predicates.simpleNameEndingWith("Repository")
+                        .or(CanBeAnnotated.Predicates.annotatedWith("jakarta.persistence.Entity")));
+        noClasses()
+                .that()
+                .resideOutsideOfPackage("com.fksoft.application.screening..")
+                .should()
+                .dependOnClassesThat(screeningPersistence)
+                .allowEmptyShould(true)
+                .check(PRODUCTION_CLASSES);
+    }
+
+    /**
+     * SPEC-0009: the booking module's persistence ({@code ScreeningSeat} and its repository) is
+     * module-internal. Other modules collaborate through events and its public API, never these
+     * classes.
+     */
+    @Test
+    void otherModulesMustNotTouchBookingPersistence() {
+        var bookingPersistence = JavaClass.Predicates.resideInAPackage("com.fksoft.application.booking..")
+                .and(JavaClass.Predicates.simpleNameEndingWith("Repository")
+                        .or(CanBeAnnotated.Predicates.annotatedWith("jakarta.persistence.Entity")));
+        noClasses()
+                .that()
+                .resideOutsideOfPackage("com.fksoft.application.booking..")
+                .should()
+                .dependOnClassesThat(bookingPersistence)
+                .allowEmptyShould(true)
+                .check(PRODUCTION_CLASSES);
+    }
+
+    /**
+     * SPEC-0012: the pricing module's config persistence ({@code PricingSeatType}/{@code
+     * PricingWeekday} and their repositories) is module-internal. Other modules price through the
+     * public {@code PriceCalculator} facade, never these classes.
+     */
+    @Test
+    void otherModulesMustNotTouchPricingPersistence() {
+        var pricingPersistence = JavaClass.Predicates.resideInAPackage("com.fksoft.application.pricing..")
+                .and(JavaClass.Predicates.simpleNameEndingWith("Repository")
+                        .or(CanBeAnnotated.Predicates.annotatedWith("jakarta.persistence.Entity")));
+        noClasses()
+                .that()
+                .resideOutsideOfPackage("com.fksoft.application.pricing..")
+                .should()
+                .dependOnClassesThat(pricingPersistence)
+                .allowEmptyShould(true)
+                .check(PRODUCTION_CLASSES);
+    }
+
     /** Business exceptions must be specific and meaningful, in business language. */
     @Test
     void exceptionsLiveWithTheirDomain() {

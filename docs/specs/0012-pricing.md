@@ -1,7 +1,26 @@
 # 0012 - Pricing
 
-Status: Draft
+Status: Implemented
 Related ADRs: 0001
+
+> Implementation notes (backend):
+> - Open Questions resolved: VIP seed surcharge = R$10,00 (1000 cents); rounding is to the cent
+>   (round-half-up; `half = ceil(full/2)`), not to "pretty" R$0,50 multiples.
+> - Public facade `PriceCalculator.quote(ctx, type, ticketType)` is pure over an in-memory config
+>   snapshot (`PricingConfig`), so the hot seat-map path never hits the DB per seat. The snapshot
+>   loads after Flyway and reloads after an admin change commits (`PricingConfigChanged`
+>   AFTER_COMMIT listener).
+> - Surcharge (≥0; ACCESSIBLE/COMPANION must be 0) and multiplier range [0.10, 2.00] are validated
+>   in the service (not bean validation) so they surface `pricing.invalid-surcharge` /
+>   `pricing.invalid-multiplier` rather than a generic `validation.error`. DB CHECKs are the backstop.
+> - Admin endpoints take a bulk PUT (list of entries). `day_of_week` is stored as `INT` (ISO
+>   Mon=1..Sun=7) for a clean JPA mapping; the weekday is the screening's start day in
+>   America/Sao_Paulo.
+> - Harmonizes the SPEC-0011 `SeatPricing` seam: the flat mock was removed and the booking seat map
+>   now prices via `PriceCalculator` (VIP seats show base + surcharge).
+> - `HalfPriceCategory` + `documentReference` and the price snapshot at reservation are deferred to
+>   SPEC-0014 (the quote does not need the category; half is always 50%).
+> - Module graph stays acyclic: `booking → pricing → cinema` (only the `SeatType` enum).
 
 ## Goal
 

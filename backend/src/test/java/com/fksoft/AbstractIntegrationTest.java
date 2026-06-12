@@ -35,6 +35,17 @@ public abstract class AbstractIntegrationTest {
                 .POST(HttpRequest.BodyPublishers.ofString(jsonBody)));
     }
 
+    protected HttpResponse<String> putJson(String path, String jsonBody, String... headerPairs)
+            throws IOException, InterruptedException {
+        return send(requestBuilder(path, headerPairs)
+                .header("Content-Type", "application/json")
+                .PUT(HttpRequest.BodyPublishers.ofString(jsonBody)));
+    }
+
+    protected HttpResponse<String> delete(String path, String... headerPairs) throws IOException, InterruptedException {
+        return send(requestBuilder(path, headerPairs).DELETE());
+    }
+
     private HttpRequest.Builder requestBuilder(String path, String... headerPairs) {
         int port = environment.getRequiredProperty("local.server.port", Integer.class);
         var builder = HttpRequest.newBuilder(URI.create("http://localhost:" + port + path));

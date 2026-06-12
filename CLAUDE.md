@@ -47,6 +47,7 @@ contract impacts, commands executed, verification result, risks and pending item
 | If the task involves... | Read first |
 |---|---|
 | Any non-trivial design decision | `architecture/core-principles.md` |
+| Requirement out of scope/undecided; stubbing a future seam | `architecture/simulation-and-mocking.md` |
 | Specs, ADRs, plans, large tasks | `architecture/workflow.md` |
 | Backend code, services, entities, DTOs, errors, dates, naming | `architecture/backend.md` |
 | Module boundaries, cross-module calls, microservices, BFF, repos layout | `architecture/modules-and-apis.md` |

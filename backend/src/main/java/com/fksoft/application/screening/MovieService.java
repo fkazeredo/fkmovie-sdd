@@ -1,0 +1,113 @@
+package com.fksoft.application.screening;
+
+import io.micrometer.core.instrument.MeterRegistry;
+import java.time.Instant;
+import java.util.UUID;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+/**
+ * Admin movie catalog management (SPEC-0008): create, list/search, full update, archive/unarchive
+ * and delete. Only {@code ADMIN} reaches this service (URL-gated in SecurityConfig); every
+ * mutation is audited and metered.
+ */
+@Service
+public class MovieService {
+
+    private static final Logger log = LoggerFactory.getLogger(MovieService.class);
+
+    private final MovieRepository movies;
+    private final MovieDeletionGuard deletionGuard;
+    private final ApplicationEventPublisher events;
+    private final MeterRegistry meterRegistry;
+
+    /** Collaborators injected by Spring — constructor injection only (CLAUDE.md). */
+    public MovieService(
+            MovieRepository movies,
+            MovieDeletionGuard deletionGuard,
+            ApplicationEventPublisher events,
+            MeterRegistry meterRegistry) {
+        this.movies = movies;
+        this.deletionGuard = deletionGuard;
+        this.events = events;
+        this.meterRegistry = meterRegistry;
+    }
+
+    /** Creates an ACTIVE movie (SPEC-0008). */
+    @Transactional
+    public Movie create(
+            String title,
+            int durationMinutes,
+            AgeRating ageRating,
+            String synopsis,
+            String posterUrl,
+            UUID actingAdminId) {
+        var movie = movies.save(new Movie(title, durationMinutes, ageRating, synopsis, posterUrl));
+        audit(actingAdminId, movie.id(), "create");
+        return movie;
+    }
+
+    @Transactional(readOnly = true)
+    public Page<Movie> list(MovieStatus status, String search, Pageable pageable) {
+        var term = (search == null || search.isBlank()) ? "" : search.trim();
+        return movies.search(status, term, pageable);
+    }
+
+    @Transactional(readOnly = true)
+    public Movie get(UUID id) {
+        return movies.findById(id).orElseThrow(MovieNotFoundException::new);
+    }
+
+    /** Full update of a movie's descriptive fields (SPEC-0008); status is unchanged. */
+    @Transactional
+    public Movie update(
+            UUID id,
+            String title,
+            int durationMinutes,
+            AgeRating ageRating,
+            String synopsis,
+            String posterUrl,
+            UUID actingAdminId) {
+        var movie = get(id);
+        movie.update(title, durationMinutes, ageRating, synopsis, posterUrl);
+        audit(actingAdminId, id, "update");
+        return movie;
+    }
+
+    /** Archives a movie and publishes {@link MovieArchived} (SPEC-0008). */
+    @Transactional
+    public Movie archive(UUID id, UUID actingAdminId) {
+        var movie = get(id);
+        movie.archive();
+        events.publishEvent(new MovieArchived(movie.id(), Instant.now()));
+        audit(actingAdminId, id, "archive");
+        return movie;
+    }
+
+    @Transactional
+    public Movie unarchive(UUID id, UUID actingAdminId) {
+        var movie = get(id);
+        movie.unarchive();
+        audit(actingAdminId, id, "unarchive");
+        return movie;
+    }
+
+    /** Hard-deletes a movie after the screening-reference guard (SPEC-0008; guard inert until 0009). */
+    @Transactional
+    public void delete(UUID id, UUID actingAdminId) {
+        var movie = get(id);
+        deletionGuard.assertDeletable(movie.id());
+        movies.delete(movie);
+        audit(actingAdminId, id, "delete");
+    }
+
+    private void audit(UUID actingAdminId, UUID movieId, String action) {
+        meterRegistry.counter("admin.movies.mutations", "action", action).increment();
+        log.info("admin action acting={} movieId={} action={}", actingAdminId, movieId, action);
+    }
+}

@@ -1,7 +1,22 @@
 # 0011 - Seat Map Read Model
 
-Status: Draft
+Status: Implemented
 Related ADRs: 0001, 0004
+
+> Implementation notes (backend):
+> - `GET /api/screenings/{screeningId}/seats` is public (permitAll); the table
+>   `screening_seats` and the inventory were created/materialized in 0009.
+> - `fullPriceCents` is a deferred pricing seam (`SeatPricing`, see
+>   `architecture/simulation-and-mocking.md`): it returns the screening's flat base price for
+>   every seat type until SPEC-0012 ships the real formula (per-type surcharge × weekday
+>   multiplier). The map is informational; reservations (0014) snapshot the real price.
+> - The read joins three modules via public facades: screening `ScreeningCatalog`/`ScreeningView`
+>   (new), cinema `CinemaCatalog`/`SeatView`/`RoomView`, and booking's own `screening_seats`.
+>   `booking → screening` stays one-directional (no module cycle).
+> - Errors: 404 reuses `screening.not-found`; 410 `screening.cancelled` is introduced here.
+> - The assembled read model (`SeatMapResponse`/`SeatMapSeat`) lives in the booking root (built
+>   by the service), not the `api` package, to honor the core-must-not-depend-on-api rule.
+> - Realtime patching of this read model is SPEC-0013.
 
 ## Goal
 
