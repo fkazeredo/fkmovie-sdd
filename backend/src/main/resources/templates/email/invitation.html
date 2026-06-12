@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title th:text="#{email.invitation.subject}">You have been invited</title>
+  </head>
+  <body>
+    <p th:text="#{email.invitation.greeting(${name})}">Hello,</p>
+    <p th:text="#{email.invitation.body(${role})}">You have been invited to fkmovies.</p>
+    <p>
+      <a th:href="${link}" th:text="#{email.invitation.cta}">Accept invitation</a>
+    </p>
+    <p th:text="#{email.invitation.expiry}">This link expires in 24 hours.</p>
+  </body>
+</html>

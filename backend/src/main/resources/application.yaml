@@ -40,6 +40,10 @@ app:
     base-url: ${APP_BASE_URL:http://localhost:4200}
     poll-interval: PT30S
     batch-size: 20
+  bootstrap:
+    # First-admin seed (spec 0005): used once at startup if no admin exists, then ignored.
+    admin-email: ${BOOTSTRAP_ADMIN_EMAIL:}
+    admin-password: ${BOOTSTRAP_ADMIN_PASSWORD:}
 
 management:
   endpoints:

@@ -7,7 +7,8 @@ package com.fksoft.application.notification;
  */
 public enum EmailTemplate {
     VERIFICATION("verification", "email.verification.subject"),
-    PASSWORD_RESET("password-reset", "email.password-reset.subject");
+    PASSWORD_RESET("password-reset", "email.password-reset.subject"),
+    INVITATION("invitation", "email.invitation.subject");
 
     private final String templateName;
     private final String subjectKey;

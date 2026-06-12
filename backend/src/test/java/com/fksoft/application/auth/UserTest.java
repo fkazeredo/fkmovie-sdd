@@ -3,6 +3,7 @@ package com.fksoft.application.auth;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import java.time.Instant;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
@@ -35,6 +36,25 @@ class UserTest {
         var first = java.time.Instant.parse("2026-06-11T00:00:00Z");
         user.verifyEmail(first);
         user.verifyEmail(first.plusSeconds(60));
+        assertThat(user.isEmailVerified()).isTrue();
+    }
+
+    @Test
+    void invitedUserHasNoPasswordIsDisabledAndUnverified() {
+        var user = User.invited("op@example.com", "Op", Role.OPERATOR, java.util.UUID.randomUUID(), Instant.now());
+        assertThat(user.role()).isEqualTo(Role.OPERATOR);
+        assertThat(user.status()).isEqualTo(UserStatus.DISABLED);
+        assertThat(user.passwordHash()).isNull();
+        assertThat(user.isEmailVerified()).isFalse();
+    }
+
+    @Test
+    void acceptInvitationSetsPasswordActivatesAndVerifies() {
+        var user = User.invited("op@example.com", "Op", Role.OPERATOR, null, Instant.now());
+        user.acceptInvitation("hash", "Op Silva", Instant.parse("2026-06-12T00:00:00Z"));
+        assertThat(user.passwordHash()).isEqualTo("hash");
+        assertThat(user.name()).isEqualTo("Op Silva");
+        assertThat(user.status()).isEqualTo(UserStatus.ACTIVE);
         assertThat(user.isEmailVerified()).isTrue();
     }
 

@@ -43,4 +43,34 @@ class AuthAuditLogger {
     void on(PasswordResetCompleted event) {
         log.info("audit passwordResetCompleted userId={}", event.userId());
     }
+
+    @TransactionalEventListener
+    void on(UserInvited event) {
+        log.info("audit userInvited target={} role={} by={}", event.userId(), event.role(), event.invitedByAdminId());
+    }
+
+    @TransactionalEventListener
+    void on(UserInvitationAccepted event) {
+        log.info("audit userInvitationAccepted userId={}", event.userId());
+    }
+
+    @TransactionalEventListener
+    void on(UserRoleChanged event) {
+        log.info(
+                "audit userRoleChanged target={} from={} to={} by={}",
+                event.userId(),
+                event.oldRole(),
+                event.newRole(),
+                event.changedByAdminId());
+    }
+
+    @TransactionalEventListener
+    void on(UserDisabled event) {
+        log.info("audit userDisabled target={} by={}", event.userId(), event.disabledByAdminId());
+    }
+
+    @TransactionalEventListener
+    void on(UserEnabled event) {
+        log.info("audit userEnabled target={} by={}", event.userId(), event.enabledByAdminId());
+    }
 }

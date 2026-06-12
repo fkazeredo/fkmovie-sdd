@@ -1,0 +1,7 @@
+[# th:text="#{email.invitation.greeting(${name})}"]Hello,[/]
+
+[# th:text="#{email.invitation.body(${role})}"]You have been invited to fkmovies.[/]
+
+[# th:text="#{email.invitation.cta}"]Accept invitation[/]: [# th:text="${link}"]link[/]
+
+[# th:text="#{email.invitation.expiry}"]This link expires in 24 hours.[/]

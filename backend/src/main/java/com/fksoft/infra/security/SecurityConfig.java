@@ -53,8 +53,11 @@ class SecurityConfig {
                                 "/api/users/resend-verification",
                                 "/api/users/verify-email",
                                 "/api/users/forgot-password",
-                                "/api/users/reset-password")
+                                "/api/users/reset-password",
+                                "/api/users/accept-invitation")
                         .permitAll()
+                        .requestMatchers("/api/admin/**")
+                        .hasRole("ADMIN")
                         .anyRequest()
                         .authenticated())
                 .oauth2ResourceServer(

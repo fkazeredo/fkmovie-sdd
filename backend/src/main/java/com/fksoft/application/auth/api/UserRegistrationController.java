@@ -1,6 +1,7 @@
 package com.fksoft.application.auth.api;
 
 import com.fksoft.application.auth.CustomerRegistrationService;
+import com.fksoft.application.auth.UserManagementService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import java.time.Duration;
@@ -32,12 +33,29 @@ class UserRegistrationController {
             List.of(new Locale.LanguageRange("pt-BR"), new Locale.LanguageRange("en"));
 
     private final CustomerRegistrationService registrationService;
+    private final UserManagementService userManagementService;
     private final Duration refreshTtl;
 
     UserRegistrationController(
-            CustomerRegistrationService registrationService, @Value("${app.jwt.refresh-ttl}") Duration refreshTtl) {
+            CustomerRegistrationService registrationService,
+            UserManagementService userManagementService,
+            @Value("${app.jwt.refresh-ttl}") Duration refreshTtl) {
         this.registrationService = registrationService;
+        this.userManagementService = userManagementService;
         this.refreshTtl = refreshTtl;
+    }
+
+    @PostMapping("/accept-invitation")
+    @ResponseStatus(HttpStatus.OK)
+    ResponseEntity<AuthTokensResponse> acceptInvitation(
+            @Valid @RequestBody AcceptInvitationRequest request, HttpServletRequest http) {
+        var result = userManagementService.acceptInvitation(
+                request.token(), request.password(), request.name(), http.getRemoteAddr(), userAgent(http));
+        return ResponseEntity.ok()
+                .header(
+                        HttpHeaders.SET_COOKIE,
+                        refreshCookie(result.refreshToken(), refreshTtl).toString())
+                .body(AuthTokensResponse.from(result));
     }
 
     @PostMapping("/register")

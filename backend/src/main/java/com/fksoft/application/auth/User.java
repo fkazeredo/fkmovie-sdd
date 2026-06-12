@@ -30,7 +30,8 @@ public class User {
     @Column(nullable = false, columnDefinition = "citext")
     private String email;
 
-    @Column(name = "password_hash", nullable = false)
+    // Nullable: invited internal users (SPEC-0005) have no password until they accept.
+    @Column(name = "password_hash")
     private String passwordHash;
 
     @Column(nullable = false)
@@ -49,6 +50,12 @@ public class User {
 
     @Column(name = "preferred_locale", nullable = false)
     private String preferredLocale;
+
+    @Column(name = "invited_by_user_id")
+    private UUID invitedByUserId;
+
+    @Column(name = "invited_at")
+    private Instant invitedAt;
 
     @Column(name = "created_at", nullable = false)
     private Instant createdAt;
@@ -79,6 +86,18 @@ public class User {
     /** Creates an unverified CUSTOMER (SPEC-0004): ACTIVE, but email_verified_at stays NULL. */
     public static User newCustomer(String email, String passwordHash, String name, String preferredLocale) {
         return new User(email, passwordHash, name, Role.CUSTOMER, preferredLocale);
+    }
+
+    /**
+     * Creates an invited internal user (SPEC-0005): DISABLED, no password and unverified
+     * email until the invitation is accepted. Records who invited them and when.
+     */
+    public static User invited(String email, String name, Role role, UUID invitedByUserId, Instant invitedAt) {
+        var user = new User(email, null, name, role, "pt-BR");
+        user.status = UserStatus.DISABLED;
+        user.invitedByUserId = invitedByUserId;
+        user.invitedAt = invitedAt;
+        return user;
     }
 
     /** Lowercase trim applied at every storage path (SPEC-0003: email unique case-insensitive). */
@@ -115,6 +134,29 @@ public class User {
 
     public void disable() {
         this.status = UserStatus.DISABLED;
+    }
+
+    public void enable() {
+        this.status = UserStatus.ACTIVE;
+    }
+
+    /** Changes the user's single active role (SPEC-0005). */
+    public void changeRole(Role newRole) {
+        this.role = newRole;
+    }
+
+    /**
+     * Accepts an invitation (SPEC-0005): sets the password and (optionally) the name,
+     * activates the account and marks the email verified — clicking the emailed link proves
+     * control of the address.
+     */
+    public void acceptInvitation(String passwordHash, String name, Instant now) {
+        this.passwordHash = passwordHash;
+        if (name != null && !name.isBlank()) {
+            this.name = name.trim();
+        }
+        this.status = UserStatus.ACTIVE;
+        verifyEmail(now);
     }
 
     @PrePersist
@@ -159,5 +201,9 @@ public class User {
 
     public String preferredLocale() {
         return preferredLocale;
+    }
+
+    public Instant invitedAt() {
+        return invitedAt;
     }
 }

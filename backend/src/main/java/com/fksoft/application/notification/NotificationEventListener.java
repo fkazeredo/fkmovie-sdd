@@ -2,6 +2,7 @@ package com.fksoft.application.notification;
 
 import com.fksoft.application.auth.CustomerRegistered;
 import com.fksoft.application.auth.PasswordResetRequested;
+import com.fksoft.application.auth.UserInvited;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -42,6 +43,16 @@ class NotificationEventListener {
                 event.email(),
                 event.preferredLocale(),
                 Map.of("name", event.name(), "link", link));
+    }
+
+    @TransactionalEventListener
+    void on(UserInvited event) {
+        var link = link("/accept-invitation", event.invitationToken());
+        outbox.enqueue(
+                EmailTemplate.INVITATION,
+                event.email(),
+                event.preferredLocale(),
+                Map.of("name", event.name(), "link", link, "role", event.role().name()));
     }
 
     private String link(String path, String token) {

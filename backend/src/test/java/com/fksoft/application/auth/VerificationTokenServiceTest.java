@@ -19,7 +19,9 @@ class VerificationTokenServiceTest {
 
     private final EmailVerificationTokenRepository verificationTokens = mock(EmailVerificationTokenRepository.class);
     private final PasswordResetTokenRepository resetTokens = mock(PasswordResetTokenRepository.class);
-    private final VerificationTokenService service = new VerificationTokenService(verificationTokens, resetTokens);
+    private final InvitationTokenRepository invitationTokens = mock(InvitationTokenRepository.class);
+    private final VerificationTokenService service =
+            new VerificationTokenService(verificationTokens, resetTokens, invitationTokens);
 
     @Test
     void issuesOpaqueTokenAndStoresOnlyItsHashWith24hTtl() {
