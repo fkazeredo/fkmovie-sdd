@@ -5,18 +5,24 @@ import org.springframework.stereotype.Component;
 
 /**
  * Guards movie deletion (SPEC-0008): a movie referenced by screenings must be archived, not
- * deleted.
- *
- * <p>Deferred seam (see {@code architecture/simulation-and-mocking.md}): screenings only exist
- * from SPEC-0009, so this guard currently reports no references and permits deletion. SPEC-0009
- * will inject the screening repository here and throw {@link MovieHasScreeningsException} when a
- * screening references the movie — the 409 path and its i18n message are already wired but inert.
+ * deleted. Harmonized in SPEC-0009 — now that {@code Screening} exists, the check is live
+ * (the deferred seam from SPEC-0008 is wired to {@link ScreeningRepository}).
  */
 @Component
 public class MovieDeletionGuard {
 
-    /** No-op until SPEC-0009 wires the real screening-reference check. */
+    private final ScreeningRepository screenings;
+
+    MovieDeletionGuard(ScreeningRepository screenings) {
+        this.screenings = screenings;
+    }
+
+    /**
+     * @throws MovieHasScreeningsException if any screening references the movie.
+     */
     public void assertDeletable(UUID movieId) {
-        // SPEC-0009: throw MovieHasScreeningsException when a screening references this movie.
+        if (screenings.existsByMovieId(movieId)) {
+            throw new MovieHasScreeningsException();
+        }
     }
 }
