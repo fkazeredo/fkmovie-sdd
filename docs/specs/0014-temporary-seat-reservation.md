@@ -1,7 +1,28 @@
 # 0014 - Temporary Seat Reservation
 
-Status: Draft
+Status: Implemented
 Related ADRs: 0004, 0003, 0009
+
+> Implementation notes (backend):
+> - Open Questions resolved: max 8 seats per reservation and 5-min hold (`app.booking.*`); one
+>   active reservation (PENDING/AWAITING_PAYMENT) per user per screening, enforced by a partial
+>   unique index `uq_active_reservation` (the service pre-checks and maps the violation to 409).
+> - Concurrency (ADR 0004): `ScreeningSeatRepository.lockForReservation` loads the target rows
+>   `FOR UPDATE` ordered by id; the service verifies all FREE, snapshots prices and transitions
+>   FREE→HELD. A 12-thread hammer test proves exactly one reservation wins the same seat.
+> - Email verification is checked live via the new auth `UserAccounts` facade (the JWT does not
+>   carry it and could be stale). The CUSTOMER-only rule is enforced by the security chain (POST →
+>   `hasRole('CUSTOMER')`), so non-customers get 403 `auth.forbidden`.
+> - Prices are snapshotted on `reservation_seats` via the pricing facade (SPEC-0012);
+>   `HalfPriceCategory` was added to pricing here.
+> - `SeatsStatusChanged` and `ReservationCreated` are published AFTER_COMMIT; the STOMP send is
+>   SPEC-0013 (no consumer yet — the event contract is in place and tested).
+> - `booking.invalid-request` (shape/limits) is served by the global `validation.error`; the
+>   HALF-needs-category rule is an `@AssertTrue` at the boundary. `booking.seats-unavailable` lists
+>   the offending seats via the new `BusinessException.fields()`.
+> - A non-SCHEDULED screening is treated as `screening.not-found` (404) for reservations.
+> - Deferred (mock-and-defer): the other status transitions and `payment_deadline_at` (SPEC-0015–
+>   0018), realtime STOMP (SPEC-0013). Module graph stays acyclic (booking → auth/pricing/cinema/screening).
 
 ## Goal
 
