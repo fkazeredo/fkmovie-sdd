@@ -1,7 +1,25 @@
 # 0008 - Movies CRUD (Admin)
 
-Status: Draft
+Status: Implemented
 Related ADRs: 0001
+
+> Implementation notes (backend):
+> - Lives in the new `screening` module (`com.fksoft.application.screening`), which will
+>   also host `Screening` (0009). v1 ships only `Movie`.
+> - Admin-only access is served by the existing `/api/admin/**` → `ROLE_ADMIN` rule in
+>   SecurityConfig (no security change); 401/403 use the existing `auth.unauthenticated`/
+>   `auth.forbidden` codes. The table's `auth.unauthorized` maps to `auth.unauthenticated`.
+> - 400 validation failures are served by the global `validation.error` (with `fields`),
+>   so the table's `movie.invalid-request` is that existing code — same posture as 0005.
+> - `DELETE` + `movie.has-screenings`: screenings only exist from 0009, so this is a
+>   deferred seam (`MovieDeletionGuard`, see `architecture/simulation-and-mocking.md`). The
+>   guard reports no references today (DELETE hard-deletes any movie); the 409 path and its
+>   i18n message are wired but inert, and the "delete blocked with screenings" test is
+>   deferred to 0009 when the guard gets the real check.
+> - `MovieArchived` is published but has no consumer until the public-list cache hook (0010).
+> - Title search is `LOWER(title) LIKE` (functional index); trigram is deferred (single
+>   cinema scale). The search term is normalized to a non-null empty string to avoid a
+>   Postgres `lower(bytea)` error on a null bound parameter.
 
 ## Goal
 
