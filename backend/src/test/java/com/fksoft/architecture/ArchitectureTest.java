@@ -168,6 +168,25 @@ class ArchitectureTest {
                 .check(PRODUCTION_CLASSES);
     }
 
+    /**
+     * SPEC-0008: the screening module's persistence ({@code Movie} and its repository) is
+     * module-internal. Other modules collaborate through its public API/events, never by touching
+     * these classes.
+     */
+    @Test
+    void otherModulesMustNotTouchScreeningPersistence() {
+        var screeningPersistence = JavaClass.Predicates.resideInAPackage("com.fksoft.application.screening..")
+                .and(JavaClass.Predicates.simpleNameEndingWith("Repository")
+                        .or(CanBeAnnotated.Predicates.annotatedWith("jakarta.persistence.Entity")));
+        noClasses()
+                .that()
+                .resideOutsideOfPackage("com.fksoft.application.screening..")
+                .should()
+                .dependOnClassesThat(screeningPersistence)
+                .allowEmptyShould(true)
+                .check(PRODUCTION_CLASSES);
+    }
+
     /** Business exceptions must be specific and meaningful, in business language. */
     @Test
     void exceptionsLiveWithTheirDomain() {
