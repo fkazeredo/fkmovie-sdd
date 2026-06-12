@@ -1,6 +1,7 @@
 package com.fksoft.application.cinema;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,6 +27,12 @@ public class CinemaCatalog {
 
     public boolean roomExists(UUID roomId) {
         return rooms.existsById(roomId);
+    }
+
+    /** A room as a stable projection (empty if unknown). */
+    @Transactional(readOnly = true)
+    public Optional<RoomView> findRoom(UUID roomId) {
+        return rooms.findById(roomId).map(room -> new RoomView(room.id(), room.name()));
     }
 
     /** Physical seats of a room as a stable projection (empty if the room is unknown). */
