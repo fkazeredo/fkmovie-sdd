@@ -148,6 +148,26 @@ class ArchitectureTest {
                 .check(PRODUCTION_CLASSES);
     }
 
+    /**
+     * SPEC-0007: the cinema module's persistence ({@code CinemaRoom}/{@code Seat} and their
+     * repositories) is module-internal. The first consumer (SPEC-0011) will read seats through a
+     * public module API, never by touching these classes — see
+     * {@code architecture/simulation-and-mocking.md}.
+     */
+    @Test
+    void otherModulesMustNotTouchCinemaPersistence() {
+        var cinemaPersistence = JavaClass.Predicates.resideInAPackage("com.fksoft.application.cinema..")
+                .and(JavaClass.Predicates.simpleNameEndingWith("Repository")
+                        .or(CanBeAnnotated.Predicates.annotatedWith("jakarta.persistence.Entity")));
+        noClasses()
+                .that()
+                .resideOutsideOfPackage("com.fksoft.application.cinema..")
+                .should()
+                .dependOnClassesThat(cinemaPersistence)
+                .allowEmptyShould(true)
+                .check(PRODUCTION_CLASSES);
+    }
+
     /** Business exceptions must be specific and meaningful, in business language. */
     @Test
     void exceptionsLiveWithTheirDomain() {
