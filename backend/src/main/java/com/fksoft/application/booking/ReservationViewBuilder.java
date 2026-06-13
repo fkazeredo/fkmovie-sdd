@@ -1,10 +1,14 @@
 package com.fksoft.application.booking;
 
+import com.fksoft.application.booking.ReservationView.RefundSummary;
 import com.fksoft.application.booking.ReservationView.ReservationSeatView;
 import com.fksoft.application.booking.ReservationView.TicketView;
 import com.fksoft.application.cinema.CinemaCatalog;
 import com.fksoft.application.cinema.SeatView;
+import com.fksoft.application.payment.PaymentLedger;
+import com.fksoft.application.screening.MovieCatalog;
 import com.fksoft.application.screening.ScreeningCatalog;
+import com.fksoft.application.screening.ScreeningView;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -24,16 +28,22 @@ class ReservationViewBuilder {
 
     private final CinemaCatalog cinema;
     private final ScreeningCatalog screenings;
+    private final MovieCatalog movies;
+    private final PaymentLedger paymentLedger;
     private final ScreeningSeatRepository screeningSeats;
     private final TicketRepository tickets;
 
     ReservationViewBuilder(
             CinemaCatalog cinema,
             ScreeningCatalog screenings,
+            MovieCatalog movies,
+            PaymentLedger paymentLedger,
             ScreeningSeatRepository screeningSeats,
             TicketRepository tickets) {
         this.cinema = cinema;
         this.screenings = screenings;
+        this.movies = movies;
+        this.paymentLedger = paymentLedger;
         this.screeningSeats = screeningSeats;
         this.tickets = tickets;
     }
@@ -63,10 +73,35 @@ class ReservationViewBuilder {
                 reservation.id(),
                 reservation.screeningId(),
                 reservation.status(),
+                movieTitle(screening),
+                roomName(screening.roomId()),
+                screening.startsAt(),
                 reservation.expiresAt(),
+                reservation.paymentDeadlineAt(),
                 reservation.totalCents(),
                 seats,
-                ticketViews(seatViewByReservationSeatId));
+                ticketViews(seatViewByReservationSeatId),
+                refundSummary(reservation.id()));
+    }
+
+    private String movieTitle(ScreeningView screening) {
+        return movies.find(screening.movieId())
+                .map(com.fksoft.application.screening.MovieView::title)
+                .orElse("");
+    }
+
+    private String roomName(UUID roomId) {
+        return cinema.findRoom(roomId)
+                .map(com.fksoft.application.cinema.RoomView::name)
+                .orElse("");
+    }
+
+    private RefundSummary refundSummary(UUID reservationId) {
+        return paymentLedger
+                .latestRefund(reservationId)
+                .map(refund ->
+                        new RefundSummary(refund.amountCents(), refund.status().name()))
+                .orElse(null);
     }
 
     private ReservationSeatView toSeatView(ReservationSeat seat, SeatView view) {

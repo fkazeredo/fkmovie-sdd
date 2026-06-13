@@ -1,6 +1,7 @@
 package com.fksoft.application.screening;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.UUID;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -13,6 +14,10 @@ public interface ScreeningRepository extends JpaRepository<Screening, UUID> {
 
     /** Whether the movie is referenced by any screening — backs the movie deletion guard. */
     boolean existsByMovieId(UUID movieId);
+
+    /** Ids of screenings starting after {@code now} — backs the booking "upcoming" filter (SPEC-0019). */
+    @Query("select s.id from Screening s where s.startsAt > :now")
+    List<UUID> findIdsByStartsAtAfter(@Param("now") Instant now);
 
     /**
      * Application-level overlap pre-check (the DB exclusion constraint is the guarantee). Two

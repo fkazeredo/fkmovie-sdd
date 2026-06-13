@@ -1,5 +1,8 @@
 package com.fksoft.application.screening;
 
+import java.time.Instant;
+import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import org.springframework.stereotype.Service;
@@ -22,9 +25,25 @@ public class ScreeningCatalog {
     /** Reads a screening as a stable projection (empty if unknown). */
     @Transactional(readOnly = true)
     public Optional<ScreeningView> find(UUID screeningId) {
-        return screenings
-                .findById(screeningId)
-                .map(s -> new ScreeningView(
-                        s.id(), s.movieId(), s.roomId(), s.startsAt(), s.endsAt(), s.basePriceCents(), s.status()));
+        return screenings.findById(screeningId).map(ScreeningCatalog::toView);
+    }
+
+    /** Batch read for list assembly (SPEC-0019); unknown ids are simply absent. */
+    @Transactional(readOnly = true)
+    public List<ScreeningView> findAll(Collection<UUID> screeningIds) {
+        return screenings.findAllById(screeningIds).stream()
+                .map(ScreeningCatalog::toView)
+                .toList();
+    }
+
+    /** Ids of screenings starting after {@code now} — backs the booking "upcoming" filter (SPEC-0019). */
+    @Transactional(readOnly = true)
+    public List<UUID> futureScreeningIds(Instant now) {
+        return screenings.findIdsByStartsAtAfter(now);
+    }
+
+    private static ScreeningView toView(Screening s) {
+        return new ScreeningView(
+                s.id(), s.movieId(), s.roomId(), s.startsAt(), s.endsAt(), s.basePriceCents(), s.status());
     }
 }

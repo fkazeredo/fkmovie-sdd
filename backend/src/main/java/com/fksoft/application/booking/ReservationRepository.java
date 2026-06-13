@@ -6,6 +6,7 @@ import java.time.Instant;
 import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Lock;
@@ -18,6 +19,17 @@ public interface ReservationRepository extends JpaRepository<Reservation, UUID> 
 
     boolean existsByUserIdAndScreeningIdAndStatusIn(
             UUID userId, UUID screeningId, Collection<ReservationStatus> statuses);
+
+    // Owner-scoped, paginated listing for "my reservations" (SPEC-0019); the caller passes the
+    // newest-first sort. Separate finders keep optional filters off nullable JPQL params (see 0009).
+    Page<Reservation> findByUserId(UUID userId, Pageable pageable);
+
+    Page<Reservation> findByUserIdAndStatus(UUID userId, ReservationStatus status, Pageable pageable);
+
+    Page<Reservation> findByUserIdAndScreeningIdIn(UUID userId, Collection<UUID> screeningIds, Pageable pageable);
+
+    Page<Reservation> findByUserIdAndStatusAndScreeningIdIn(
+            UUID userId, ReservationStatus status, Collection<UUID> screeningIds, Pageable pageable);
 
     /**
      * Claims PENDING reservations past their hold expiry, skipping rows another sweep already locked
