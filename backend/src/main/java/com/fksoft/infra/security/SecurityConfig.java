@@ -45,6 +45,10 @@ class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth.requestMatchers(
                                 "/actuator/health/**", "/actuator/prometheus", "/v3/api-docs/**")
                         .permitAll()
+                        // The STOMP handshake is permitted; the JWT is validated on the CONNECT frame
+                        // by StompAuthChannelInterceptor (the upgrade carries no Bearer header). SPEC-0013.
+                        .requestMatchers("/ws/**")
+                        .permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/auth/login", "/api/auth/refresh", "/api/auth/logout")
                         .permitAll()
                         .requestMatchers(

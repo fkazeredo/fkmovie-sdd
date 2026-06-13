@@ -23,6 +23,9 @@ class PaymentWebhookIntegrationTest extends AbstractIntegrationTest {
     private PaymentGateway gateway;
 
     @Autowired
+    private MockPaymentDispatcher dispatcher;
+
+    @Autowired
     private PaymentRepository payments;
 
     @Autowired
@@ -54,7 +57,7 @@ class PaymentWebhookIntegrationTest extends AbstractIntegrationTest {
         var paymentId =
                 gateway.request(PaymentRequest.of(UUID.randomUUID(), 3000)).paymentId();
 
-        await(() -> captor.succeeded.contains(paymentId));
+        dispatcher.deliverDue();
 
         assertThat(captor.succeeded).filteredOn(id -> id.equals(paymentId)).hasSize(1);
         assertThat(payments.findById(paymentId).orElseThrow().status()).isEqualTo(PaymentStatus.SUCCEEDED);
@@ -65,7 +68,7 @@ class PaymentWebhookIntegrationTest extends AbstractIntegrationTest {
         var paymentId = gateway.request(new PaymentRequest(UUID.randomUUID(), 3000, PaymentOutcome.FAILED))
                 .paymentId();
 
-        await(() -> captor.failed.contains(paymentId));
+        dispatcher.deliverDue();
 
         assertThat(payments.findById(paymentId).orElseThrow().status()).isEqualTo(PaymentStatus.FAILED);
     }
@@ -114,17 +117,6 @@ class PaymentWebhookIntegrationTest extends AbstractIntegrationTest {
     private String bodyFor(UUID paymentId) {
         return json.write(new WebhookPayload(
                 UUID.randomUUID(), "PAYMENT_SUCCEEDED", paymentId, UUID.randomUUID(), 3000, Instant.now()));
-    }
-
-    private void await(java.util.function.BooleanSupplier condition) {
-        for (int i = 0; i < 100 && !condition.getAsBoolean(); i++) {
-            try {
-                Thread.sleep(100);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-            }
-        }
-        assertThat(condition.getAsBoolean()).as("condition met within timeout").isTrue();
     }
 
     @TestConfiguration

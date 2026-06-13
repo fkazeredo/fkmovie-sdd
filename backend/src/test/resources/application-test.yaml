@@ -23,9 +23,10 @@ app:
   payment:
     webhook-secret: test-webhook-secret
     mock:
-      # Deliver the webhook almost immediately so e2e tests settle fast (awaitility polls).
+      # Tests drive MockPaymentDispatcher.deliverDue() explicitly (deterministic, no scheduler race
+      # with cleanup); a long interval keeps the @Scheduled poll dormant. Zero delay = due immediately.
       delay: PT0S
-      poll-interval: PT0.2S
+      poll-interval: PT1H
       failure-rules-enabled: true
   booking:
     payment-deadline-minutes: 10

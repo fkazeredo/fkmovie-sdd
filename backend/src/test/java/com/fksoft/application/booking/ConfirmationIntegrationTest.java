@@ -10,6 +10,7 @@ import com.fksoft.application.cinema.SeatRepository;
 import com.fksoft.application.cinema.SeatType;
 import com.fksoft.application.notification.OutboxEmailRepository;
 import com.fksoft.application.notification.OutboxStatus;
+import com.fksoft.application.payment.MockPaymentDispatcher;
 import com.fksoft.application.payment.MockPaymentJobRepository;
 import com.fksoft.application.payment.PaymentKind;
 import com.fksoft.application.payment.PaymentRepository;
@@ -24,7 +25,6 @@ import java.net.http.HttpResponse;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.UUID;
-import java.util.function.BooleanSupplier;
 import java.util.regex.Pattern;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
@@ -81,6 +81,9 @@ class ConfirmationIntegrationTest extends RegistrationIntegrationTestSupport {
     @Autowired
     private PaymentWebhookEventRepository webhookEvents;
 
+    @Autowired
+    private MockPaymentDispatcher paymentDispatcher;
+
     @AfterEach
     void clean() {
         tickets.deleteAll();
@@ -105,9 +108,10 @@ class ConfirmationIntegrationTest extends RegistrationIntegrationTestSupport {
         assertThat(confirm.statusCode()).isEqualTo(202);
         assertThat(confirm.body()).contains("\"status\":\"AWAITING_PAYMENT\"").contains("\"paymentId\":\"");
 
-        await(() -> getReservation(bearer, reservationId).body().contains("\"status\":\"CONFIRMED\""));
+        paymentDispatcher.deliverDue();
 
         var view = getReservation(bearer, reservationId).body();
+        assertThat(view).contains("\"status\":\"CONFIRMED\"");
         assertThat(view).containsPattern("\"code\":\"FKM-\\d{4}-\\d{6}\"").contains("\"status\":\"VALID\"");
         assertThat(screeningSeats.findByScreeningId(screeningId).stream()
                         .filter(seat -> seat.status() == ScreeningSeatStatus.SOLD)
@@ -124,8 +128,9 @@ class ConfirmationIntegrationTest extends RegistrationIntegrationTestSupport {
         var reservationId = reserveOneSeat(bearer, screeningId, seatOfType(SeatType.STANDARD));
 
         assertThat(confirm(bearer, reservationId).statusCode()).isEqualTo(202);
-        await(() -> getReservation(bearer, reservationId).body().contains("\"status\":\"CANCELLED\""));
+        paymentDispatcher.deliverDue();
 
+        assertThat(getReservation(bearer, reservationId).body()).contains("\"status\":\"CANCELLED\"");
         assertThat(screeningSeats.findByScreeningId(screeningId).stream())
                 .allMatch(seat -> seat.status() == ScreeningSeatStatus.FREE);
     }
@@ -146,7 +151,8 @@ class ConfirmationIntegrationTest extends RegistrationIntegrationTestSupport {
         var bearer = verifiedCustomerBearer();
         var reservationId = reserveOneSeat(bearer, screeningId, seatOfType(SeatType.STANDARD));
         confirm(bearer, reservationId);
-        await(() -> getReservation(bearer, reservationId).body().contains("\"status\":\"CONFIRMED\""));
+        paymentDispatcher.deliverDue();
+        assertThat(getReservation(bearer, reservationId).body()).contains("\"status\":\"CONFIRMED\"");
 
         // A second (late) success for the already-CONFIRMED reservation: refund, no state change.
         confirmer.onPaymentSucceeded(UUID.fromString(reservationId), 3000);
@@ -198,12 +204,9 @@ class ConfirmationIntegrationTest extends RegistrationIntegrationTestSupport {
         return postJson("/api/reservations/" + reservationId + "/confirm", "", "Authorization", bearer);
     }
 
-    private HttpResponse<String> getReservation(String bearer, String reservationId) {
-        try {
-            return get("/api/reservations/" + reservationId, "Authorization", bearer);
-        } catch (IOException | InterruptedException e) {
-            throw new IllegalStateException(e);
-        }
+    private HttpResponse<String> getReservation(String bearer, String reservationId)
+            throws IOException, InterruptedException {
+        return get("/api/reservations/" + reservationId, "Authorization", bearer);
     }
 
     private String verifiedCustomerBearer() throws Exception {
@@ -214,16 +217,5 @@ class ConfirmationIntegrationTest extends RegistrationIntegrationTestSupport {
         return "Bearer "
                 + accessTokenOf(postJson(
                         "/api/auth/login", "{\"email\":\"%s\",\"password\":\"%s\"}".formatted(email, PASSWORD)));
-    }
-
-    private void await(BooleanSupplier condition) {
-        for (int i = 0; i < 100 && !condition.getAsBoolean(); i++) {
-            try {
-                Thread.sleep(100);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-            }
-        }
-        assertThat(condition.getAsBoolean()).as("condition met within timeout").isTrue();
     }
 }
