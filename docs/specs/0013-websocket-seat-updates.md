@@ -1,7 +1,24 @@
 # 0013 - WebSocket Seat Updates
 
-Status: Draft
+Status: Implemented
 Related ADRs: 0009, 0005, 0002
+
+> Implementation notes (backend):
+> - Open Question resolved: anonymous viewers get **no** realtime in v1 — CONNECT requires a JWT, so
+>   pre-login uses REST polling. `/ws` is plain WebSocket (no SockJS).
+> - Transport in `com.fksoft.infra.realtime` (`WebSocketConfig` + `StompAuthChannelInterceptor`):
+>   in-memory broker (`/topic`, `/queue`, `/app`, `/user`); the CONNECT frame is authenticated with
+>   the existing `JwtDecoder` (the STOMP JWT-on-CONNECT promised in 0003 lands here) and the principal
+>   is the userId. The `/ws` handshake is permitAll (auth is on CONNECT, not the HTTP upgrade).
+> - Publishers in `com.fksoft.application.booking.realtime` (ADR 0009): consume the booking events
+>   AFTER_COMMIT and send via `SimpMessagingTemplate` — read-only, never changing seat state, never
+>   depending on `infra`. Seat row/number resolved via the cinema facade.
+> - Metrics: `ws_connections_active`, `ws_connect_rejected_total`, `ws_messages_sent_total{type}`.
+> - To make the payment/confirmation e2e tests deterministic, the mock payment dispatcher is driven
+>   explicitly in tests (long poll interval); no behavior change in prod.
+
+> Out of scope still: external broker / multi-instance relay (ADR 0002 revision); frontend
+> subscription (0023/0024).
 
 ## Goal
 
