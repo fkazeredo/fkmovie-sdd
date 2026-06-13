@@ -10,14 +10,17 @@ public class BookingProperties {
     private final int maxSeatsPerReservation;
     private final int holdMinutes;
     private final int minLeadMinutes;
+    private final int paymentDeadlineMinutes;
 
     BookingProperties(
             @Value("${app.booking.max-seats-per-reservation:8}") int maxSeatsPerReservation,
             @Value("${app.booking.hold-minutes:5}") int holdMinutes,
-            @Value("${app.booking.min-lead-minutes:10}") int minLeadMinutes) {
+            @Value("${app.booking.min-lead-minutes:10}") int minLeadMinutes,
+            @Value("${app.booking.payment-deadline-minutes:10}") int paymentDeadlineMinutes) {
         this.maxSeatsPerReservation = maxSeatsPerReservation;
         this.holdMinutes = holdMinutes;
         this.minLeadMinutes = minLeadMinutes;
+        this.paymentDeadlineMinutes = paymentDeadlineMinutes;
     }
 
     public int maxSeatsPerReservation() {
@@ -30,5 +33,9 @@ public class BookingProperties {
 
     public int minLeadMinutes() {
         return minLeadMinutes;
+    }
+
+    public int paymentDeadlineMinutes() {
+        return paymentDeadlineMinutes;
     }
 }

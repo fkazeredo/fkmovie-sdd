@@ -78,6 +78,22 @@ public class ScreeningSeat {
         status = ScreeningSeatStatus.HELD;
     }
 
+    /** Sells the seat on payment success (SPEC-0016): {@code HELD → SOLD}. */
+    public void sell() {
+        if (status != ScreeningSeatStatus.HELD) {
+            throw new IllegalStateException("Seat " + id + " is not HELD: " + status);
+        }
+        status = ScreeningSeatStatus.SOLD;
+    }
+
+    /** Releases the seat on payment failure/expiry (SPEC-0016/0017): {@code HELD → FREE}. */
+    public void release() {
+        if (status != ScreeningSeatStatus.HELD) {
+            throw new IllegalStateException("Seat " + id + " is not HELD: " + status);
+        }
+        status = ScreeningSeatStatus.FREE;
+    }
+
     @PrePersist
     @PreUpdate
     void touch() {

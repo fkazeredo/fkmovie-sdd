@@ -35,6 +35,14 @@ app:
     to-override: ${MAIL_TO_OVERRIDE:}
   payment:
     webhook-secret: ${PAYMENT_WEBHOOK_SECRET:}
+    # Backend's own base URL for the mock gateway's self-delivered webhook (single instance,
+    # ADR 0002). In tests the live random port is used instead (spec 0015).
+    webhook-base-url: ${PAYMENT_WEBHOOK_BASE_URL:http://localhost:8080}
+    mock:
+      delay: ${PAYMENT_MOCK_DELAY:PT3S}
+      poll-interval: ${PAYMENT_MOCK_POLL_INTERVAL:PT1S}
+      # Deterministic failure hooks (amount ending in 13) — keep off in prod.
+      failure-rules-enabled: ${PAYMENT_MOCK_FAILURE_RULES:true}
   notification:
     # Public base URL used to build verification/reset links in emails.
     base-url: ${APP_BASE_URL:http://localhost:4200}
@@ -50,6 +58,8 @@ app:
     max-seats-per-reservation: ${BOOKING_MAX_SEATS:8}
     hold-minutes: ${BOOKING_HOLD_MINUTES:5}
     min-lead-minutes: ${BOOKING_MIN_LEAD_MINUTES:10}
+    # Window to pay after confirming (AWAITING_PAYMENT) before the deadline passes (spec 0016).
+    payment-deadline-minutes: ${BOOKING_PAYMENT_DEADLINE_MINUTES:10}
   bootstrap:
     # First-admin seed (spec 0005): used once at startup if no admin exists, then ignored.
     admin-email: ${BOOTSTRAP_ADMIN_EMAIL:}

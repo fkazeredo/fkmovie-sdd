@@ -51,6 +51,9 @@ public class Reservation {
     @Column(name = "payment_deadline_at")
     private Instant paymentDeadlineAt;
 
+    @Column(name = "payment_id")
+    private UUID paymentId;
+
     @Version
     private Long version;
 
@@ -89,6 +92,33 @@ public class Reservation {
         totalCents += seat.priceCents();
     }
 
+    public boolean isPending() {
+        return status == ReservationStatus.PENDING;
+    }
+
+    public boolean isAwaitingPayment() {
+        return status == ReservationStatus.AWAITING_PAYMENT;
+    }
+
+    public boolean isExpired(Instant now) {
+        return now.isAfter(expiresAt);
+    }
+
+    /** Starts payment (SPEC-0016): PENDING → AWAITING_PAYMENT, recording the charge and deadline. */
+    public void awaitPayment(UUID paymentId, Instant paymentDeadlineAt) {
+        this.status = ReservationStatus.AWAITING_PAYMENT;
+        this.paymentId = paymentId;
+        this.paymentDeadlineAt = paymentDeadlineAt;
+    }
+
+    public void confirm() {
+        this.status = ReservationStatus.CONFIRMED;
+    }
+
+    public void cancel() {
+        this.status = ReservationStatus.CANCELLED;
+    }
+
     @PrePersist
     void onCreate() {
         var now = Instant.now();
@@ -123,6 +153,14 @@ public class Reservation {
 
     public Instant expiresAt() {
         return expiresAt;
+    }
+
+    public Instant paymentDeadlineAt() {
+        return paymentDeadlineAt;
+    }
+
+    public UUID paymentId() {
+        return paymentId;
     }
 
     public List<ReservationSeat> seats() {

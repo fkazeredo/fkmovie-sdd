@@ -57,6 +57,10 @@ public class ReservationSeat {
         this.priceCents = priceCents;
     }
 
+    public UUID id() {
+        return id;
+    }
+
     public UUID screeningSeatId() {
         return screeningSeatId;
     }

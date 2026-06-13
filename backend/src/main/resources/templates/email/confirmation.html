@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title th:text="#{email.confirmation.subject}">Your tickets</title>
+  </head>
+  <body>
+    <p th:text="#{email.confirmation.greeting(${name})}">Hello,</p>
+    <p th:text="#{email.confirmation.body}">Your purchase is confirmed. Here are your tickets:</p>
+    <pre th:text="${tickets}">A1 — FKM-2026-000001</pre>
+    <p th:text="#{email.confirmation.footer}">Show this code at the entrance.</p>
+  </body>
+</html>

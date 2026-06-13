@@ -1,0 +1,7 @@
+[# th:text="#{email.confirmation.greeting(${name})}"]Hello,[/]
+
+[# th:text="#{email.confirmation.body}"]Your purchase is confirmed. Here are your tickets:[/]
+
+[# th:text="${tickets}"]A1 — FKM-2026-000001[/]
+
+[# th:text="#{email.confirmation.footer}"]Show this code at the entrance.[/]

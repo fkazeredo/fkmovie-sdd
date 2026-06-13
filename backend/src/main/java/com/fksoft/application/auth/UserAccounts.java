@@ -23,6 +23,13 @@ public class UserAccounts {
     @Transactional(readOnly = true)
     public Optional<AccountView> find(UUID userId) {
         return users.findById(userId)
-                .map(user -> new AccountView(user.id(), user.role(), user.status(), user.isEmailVerified()));
+                .map(user -> new AccountView(
+                        user.id(),
+                        user.email(),
+                        user.name(),
+                        user.preferredLocale(),
+                        user.role(),
+                        user.status(),
+                        user.isEmailVerified()));
     }
 }

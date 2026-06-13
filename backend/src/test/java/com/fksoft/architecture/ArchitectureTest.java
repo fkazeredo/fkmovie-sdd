@@ -225,6 +225,25 @@ class ArchitectureTest {
                 .check(PRODUCTION_CLASSES);
     }
 
+    /**
+     * SPEC-0015: the payment module's ledger ({@code Payment}/{@code MockPaymentJob}/{@code
+     * PaymentWebhookEvent} and their repositories) is module-internal. Other modules use the
+     * {@code PaymentGateway} port and react to its events, never these classes.
+     */
+    @Test
+    void otherModulesMustNotTouchPaymentPersistence() {
+        var paymentPersistence = JavaClass.Predicates.resideInAPackage("com.fksoft.application.payment..")
+                .and(JavaClass.Predicates.simpleNameEndingWith("Repository")
+                        .or(CanBeAnnotated.Predicates.annotatedWith("jakarta.persistence.Entity")));
+        noClasses()
+                .that()
+                .resideOutsideOfPackage("com.fksoft.application.payment..")
+                .should()
+                .dependOnClassesThat(paymentPersistence)
+                .allowEmptyShould(true)
+                .check(PRODUCTION_CLASSES);
+    }
+
     /** Business exceptions must be specific and meaningful, in business language. */
     @Test
     void exceptionsLiveWithTheirDomain() {

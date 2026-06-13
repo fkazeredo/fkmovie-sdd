@@ -7,4 +7,11 @@ import java.util.UUID;
  * read API ({@link UserAccounts}); never the {@code User} entity. Lets the booking module check the
  * caller's live role and email-verification without touching auth persistence.
  */
-public record AccountView(UUID userId, Role role, UserStatus status, boolean emailVerified) {}
+public record AccountView(
+        UUID userId,
+        String email,
+        String name,
+        String preferredLocale,
+        Role role,
+        UserStatus status,
+        boolean emailVerified) {}

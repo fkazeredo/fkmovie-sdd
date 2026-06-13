@@ -3,7 +3,9 @@ package com.fksoft.application.notification;
 import com.fksoft.application.auth.CustomerRegistered;
 import com.fksoft.application.auth.PasswordResetRequested;
 import com.fksoft.application.auth.UserInvited;
+import com.fksoft.application.booking.ReservationConfirmed;
 import java.util.Map;
+import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionalEventListener;
@@ -53,6 +55,18 @@ class NotificationEventListener {
                 event.email(),
                 event.preferredLocale(),
                 Map.of("name", event.name(), "link", link, "role", event.role().name()));
+    }
+
+    @TransactionalEventListener
+    void on(ReservationConfirmed event) {
+        var ticketLines = event.tickets().stream()
+                .map(ticket -> ticket.seatLabel() + " — " + ticket.code())
+                .collect(Collectors.joining("\n"));
+        outbox.enqueue(
+                EmailTemplate.TICKETS,
+                event.email(),
+                event.preferredLocale(),
+                Map.of("name", event.name(), "tickets", ticketLines));
     }
 
     private String link(String path, String token) {
