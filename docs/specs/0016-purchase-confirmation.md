@@ -1,7 +1,25 @@
 # 0016 - Purchase Confirmation
 
-Status: Draft
+Status: Implemented
 Related ADRs: 0006, 0004, 0009
+
+> Implementation notes (backend):
+> - Open Question resolved: payment deadline 10 min (`app.booking.payment-deadline-minutes`).
+> - Confirm (owner only) is idempotent on AWAITING_PAYMENT (same paymentId, no second charge);
+>   stores `reservations.payment_id`. Expiry checked against the injected `Clock` → 410 even if
+>   unswept.
+> - On `PaymentSucceeded` (after-commit, REQUIRES_NEW): CONFIRMED, seats HELD→SOLD, one VALID ticket
+>   per seat (FKM-YYYY-NNNNNN from `ticket_code_seq`), `ReservationConfirmed` → ticket email. Late
+>   success (non-AWAITING_PAYMENT) → automatic refund + WARN, no state change. On `PaymentFailed`:
+>   CANCELLED, seats HELD→FREE.
+> - Code reconciliation (precedent of 0005): the table's `booking.not-owner` /
+>   `booking.reservation-not-found` are served by the existing `auth.forbidden` /
+>   `reservation.not-found`. New codes: `booking.already-confirmed` (409),
+>   `booking.reservation-expired` (410), `booking.reservation-cancelled` (409).
+> - `auth.AccountView` was extended with email/name/locale so the confirmation event carries the
+>   recipient (no auth lookup in notification). `GET /api/reservations/{id}` now includes tickets.
+> - Realtime: `SeatsStatusChanged`/`ReservationStatusChanged` are published after commit; the STOMP
+>   send is deferred to SPEC-0013. The failed-payment email is omitted in v1 (user-queue only).
 
 ## Goal
 

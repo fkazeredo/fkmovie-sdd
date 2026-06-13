@@ -1,7 +1,21 @@
 # 0015 - Mock Payment Gateway and Webhook
 
-Status: Draft
+Status: Implemented
 Related ADRs: 0006, 0007
+
+> Implementation notes (backend):
+> - Open Question resolved: webhook path uses a provider suffix `/api/webhooks/payments/mock`; a
+>   real adapter adds its own path. Public endpoint (no JWT), HMAC-verified.
+> - The mock signs with `WebhookJson` (its own ObjectMapper) and delivers over HTTP to the app's own
+>   endpoint, resolved from the live `local.server.port` (prod: configured base URL). The @Scheduled
+>   dispatcher is a separate bean from the transactional worker so the claim/deliver transactions
+>   apply (the outbox pattern).
+> - Idempotency via `payment_webhook_events` UNIQUE(payment_id, event_type); duplicate → 200 no-op.
+>   HMAC verified before parsing (401 `payment.invalid-signature`); malformed → 422
+>   `payment.invalid-payload`.
+> - `payments.reservation_id` is a soft reference (no FK) to keep the ledger decoupled from booking
+>   (ADR 0006 boundary). The module publishes events and never touches reservations.
+> - Refund path (`requestRefund`) is in place; consumed by cancellation (0018) and late-success (0016).
 
 ## Goal
 
