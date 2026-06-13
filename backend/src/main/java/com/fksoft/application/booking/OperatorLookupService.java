@@ -1,8 +1,12 @@
 package com.fksoft.application.booking;
 
+import com.fksoft.application.auth.AccountView;
 import com.fksoft.application.auth.UserAccounts;
+import com.fksoft.application.booking.ReservationSummaryAssembler.ReservationSummary;
 import java.util.List;
 import java.util.UUID;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.PageRequest;
@@ -25,16 +29,19 @@ public class OperatorLookupService {
     private final ReservationRepository reservations;
     private final TicketRepository tickets;
     private final UserAccounts userAccounts;
+    private final ReservationSummaryAssembler summaries;
     private final ReservationViewBuilder viewBuilder;
 
     OperatorLookupService(
             ReservationRepository reservations,
             TicketRepository tickets,
             UserAccounts userAccounts,
+            ReservationSummaryAssembler summaries,
             ReservationViewBuilder viewBuilder) {
         this.reservations = reservations;
         this.tickets = tickets;
         this.userAccounts = userAccounts;
+        this.summaries = summaries;
         this.viewBuilder = viewBuilder;
     }
 
@@ -50,7 +57,17 @@ public class OperatorLookupService {
                         reservations.findById(reservationId).map(List::of).orElseGet(List::of);
                     case EMAIL -> byEmail(email);
                 };
-        return found.stream().map(this::toOperatorView).toList();
+        var summaryById = summaries.summarize(found).stream()
+                .collect(Collectors.toMap(ReservationSummary::reservationId, Function.identity()));
+        var accountByUser = found.stream()
+                .map(Reservation::userId)
+                .distinct()
+                .collect(Collectors.toMap(
+                        Function.identity(), id -> userAccounts.find(id).orElse(null)));
+        return found.stream()
+                .map(reservation -> toOperatorView(
+                        reservation, summaryById.get(reservation.id()), accountByUser.get(reservation.userId())))
+                .toList();
     }
 
     /** Reads a full reservation detail with the customer's full contact (SPEC-0020); any owner. */
@@ -79,17 +96,16 @@ public class OperatorLookupService {
                 .orElseGet(List::of);
     }
 
-    private OperatorReservationView toOperatorView(Reservation reservation) {
-        var view = viewBuilder.build(reservation);
-        var account = userAccounts.find(reservation.userId()).orElse(null);
+    private OperatorReservationView toOperatorView(
+            Reservation reservation, ReservationSummary summary, AccountView account) {
         return new OperatorReservationView(
                 reservation.id(),
                 reservation.status(),
                 account == null ? "" : account.name(),
                 account == null ? "" : maskEmail(account.email()),
-                view.movieTitle(),
-                view.startsAt(),
-                view.seats().stream().map(seat -> seat.row() + seat.number()).toList());
+                summary.movieTitle(),
+                summary.startsAt(),
+                summary.seatLabels());
     }
 
     private static Criterion exactlyOne(String ticketCode, UUID reservationId, String email) {

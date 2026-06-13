@@ -81,7 +81,7 @@ class ReservationViewBuilder {
                 reservation.totalCents(),
                 seats,
                 ticketViews(seatViewByReservationSeatId),
-                refundSummary(reservation.id()));
+                refundSummary(reservation));
     }
 
     private String movieTitle(ScreeningView screening) {
@@ -96,9 +96,14 @@ class ReservationViewBuilder {
                 .orElse("");
     }
 
-    private RefundSummary refundSummary(UUID reservationId) {
+    private RefundSummary refundSummary(Reservation reservation) {
+        // A refund only exists for a cancelled-with-refund reservation (SPEC-0019); skip the query
+        // otherwise — keeps it off the hot create/confirm path.
+        if (reservation.status() != ReservationStatus.CANCELLED) {
+            return null;
+        }
         return paymentLedger
-                .latestRefund(reservationId)
+                .latestRefund(reservation.id())
                 .map(refund ->
                         new RefundSummary(refund.amountCents(), refund.status().name()))
                 .orElse(null);
