@@ -1,7 +1,13 @@
 # 0007 - Cinema Rooms and Seats with Types
 
-Status: Draft
+Status: Implemented
 Related ADRs: 0001, 0003
+
+> Implementation notes (backend): the cinema module ships rooms/seats as seed-managed schema +
+> entities (V6 schema, V7 seed; `CinemaRoom`/`Seat`/`SeatType`). Per `architecture/simulation-and-mocking.md`,
+> room/seat admin CRUD and the cross-module read access are **out of this spec's scope** — the read
+> seam is harmonized by SPEC-0011 (`CinemaCatalog`), CRUD remains a future spec. The Open Question
+> stays open by design.
 
 ## Goal
 
