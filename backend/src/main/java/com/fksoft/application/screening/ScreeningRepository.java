@@ -59,4 +59,33 @@ public interface ScreeningRepository extends JpaRepository<Screening, UUID> {
             @Param("from") Instant from,
             @Param("to") Instant to,
             Pageable pageable);
+
+    /**
+     * Public listing (SPEC-0010): SCHEDULED screenings of ACTIVE movies in the future, within an
+     * explicit {@code [from, to)} window (the caller passes a wide window when no date filter is set,
+     * so no nullable bind appears in a bare {@code is null}; the optional movie uses {@code coalesce}).
+     */
+    @Query(
+            value =
+                    """
+                    select s from Screening s, Movie m
+                    where m.id = s.movieId and m.status = com.fksoft.application.screening.MovieStatus.ACTIVE
+                      and s.status = com.fksoft.application.screening.ScreeningStatus.SCHEDULED
+                      and s.startsAt > :now and s.startsAt >= :from and s.startsAt < :to
+                      and s.movieId = coalesce(:movieId, s.movieId)
+                    """,
+            countQuery =
+                    """
+                    select count(s) from Screening s, Movie m
+                    where m.id = s.movieId and m.status = com.fksoft.application.screening.MovieStatus.ACTIVE
+                      and s.status = com.fksoft.application.screening.ScreeningStatus.SCHEDULED
+                      and s.startsAt > :now and s.startsAt >= :from and s.startsAt < :to
+                      and s.movieId = coalesce(:movieId, s.movieId)
+                    """)
+    Page<Screening> searchPublic(
+            @Param("now") Instant now,
+            @Param("from") Instant from,
+            @Param("to") Instant to,
+            @Param("movieId") UUID movieId,
+            Pageable pageable);
 }

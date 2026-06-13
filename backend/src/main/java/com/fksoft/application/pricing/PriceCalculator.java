@@ -27,4 +27,19 @@ public class PriceCalculator {
         var price = ticketType == TicketType.HALF ? half : full;
         return new PriceQuote(full, half, price);
     }
+
+    /**
+     * The cheapest possible full price for a screening (SPEC-0010): the minimum full price across the
+     * seat types — the "a partir de" floor shown on the public list. Pure over the config snapshot.
+     */
+    public int cheapestFull(ScreeningPricingContext ctx) {
+        var snapshot = config.current();
+        var multiplier = snapshot.multiplier(PricingZone.dayOfWeek(ctx.startsAt()));
+        var cheapest = Integer.MAX_VALUE;
+        for (var type : SeatType.values()) {
+            cheapest =
+                    Math.min(cheapest, PriceFormula.full(ctx.basePriceCents(), snapshot.surcharge(type), multiplier));
+        }
+        return cheapest;
+    }
 }

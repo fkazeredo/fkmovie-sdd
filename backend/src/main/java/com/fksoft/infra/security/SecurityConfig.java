@@ -60,6 +60,8 @@ class SecurityConfig {
                                 "/api/users/reset-password",
                                 "/api/users/accept-invitation")
                         .permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/screenings")
+                        .permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/screenings/*/seats")
                         .permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/webhooks/payments/**")
