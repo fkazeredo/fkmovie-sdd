@@ -12,10 +12,10 @@ Related ADRs: 0006, 0004, 0009
 >   per seat (FKM-YYYY-NNNNNN from `ticket_code_seq`), `ReservationConfirmed` → ticket email. Late
 >   success (non-AWAITING_PAYMENT) → automatic refund + WARN, no state change. On `PaymentFailed`:
 >   CANCELLED, seats HELD→FREE.
-> - Code reconciliation (precedent of 0005): the table's `booking.not-owner` /
->   `booking.reservation-not-found` are served by the existing `auth.forbidden` /
->   `reservation.not-found`. New codes: `booking.already-confirmed` (409),
->   `booking.reservation-expired` (410), `booking.reservation-cancelled` (409).
+> - Error codes match the table: `booking.not-owner` (403), `booking.already-confirmed` (409),
+>   `booking.reservation-expired` (410), `booking.reservation-cancelled` (409). A non-customer hitting
+>   the endpoint gets the transport-level 403 `auth.forbidden` (security chain), distinct from the
+>   business `booking.not-owner`.
 > - `auth.AccountView` was extended with email/name/locale so the confirmation event carries the
 >   recipient (no auth lookup in notification). `GET /api/reservations/{id}` now includes tickets.
 > - Realtime: `SeatsStatusChanged`/`ReservationStatusChanged` are published after commit; the STOMP

@@ -147,8 +147,9 @@ class MyReservationsIntegrationTest extends RegistrationIntegrationTestSupport {
         var owner = verifiedCustomer();
         var reservationId = seedReservation(owner.id(), futureScreening(), ReservationStatus.PENDING);
 
-        assertThat(detail(bearerFor(verifiedCustomer().email()), reservationId).statusCode())
-                .isEqualTo(403);
+        var forbidden = detail(bearerFor(verifiedCustomer().email()), reservationId);
+        assertThat(forbidden.statusCode()).isEqualTo(403);
+        assertThat(forbidden.body()).contains("\"code\":\"booking.not-owner\"");
         assertThat(detail(bearerFor(seedAdmin(uniqueEmail()).email()), reservationId)
                         .statusCode())
                 .isEqualTo(200);

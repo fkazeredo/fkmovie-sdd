@@ -16,9 +16,9 @@ Related ADRs: 0006
 > - Decision: **one** cancellation email at cancel time (mentions the refund when applicable);
 >   `RefundSucceeded` needs no booking action (the `payments` table is the ledger); `RefundFailed`
 >   raises an ERROR audit + `refunds_failed_total` (`RefundEventListener`).
-> - Decision: reused existing error codes — `auth.forbidden` (403), `reservation.not-found` (404),
->   `booking.reservation-cancelled` (409, already-cancelled), `booking.reservation-expired` (410) —
->   plus the one new `booking.cancellation-window-closed` (409). HTTP statuses match the table below.
+> - Error codes match the table: `booking.not-owner` (403), `booking.reservation-not-found` (404),
+>   `booking.already-cancelled` (409), `booking.reservation-expired` (410, EXPIRED) and the new
+>   `booking.cancellation-window-closed` (409). The expired case reuses `booking.reservation-expired`.
 > - Metrics: `reservations_cancelled_total{previousStatus}`, `refunds_requested_total`,
 >   `refunds_failed_total`. No schema change. Open Question (refund SLA copy) deferred to 0025.
 

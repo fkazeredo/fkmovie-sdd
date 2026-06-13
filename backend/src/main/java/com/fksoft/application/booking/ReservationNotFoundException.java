@@ -7,6 +7,6 @@ import org.springframework.http.HttpStatus;
 public class ReservationNotFoundException extends BusinessException {
 
     public ReservationNotFoundException() {
-        super(HttpStatus.NOT_FOUND, "reservation.not-found");
+        super(HttpStatus.NOT_FOUND, "booking.reservation-not-found");
     }
 }

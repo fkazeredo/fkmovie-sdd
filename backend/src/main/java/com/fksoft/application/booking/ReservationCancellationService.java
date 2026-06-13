@@ -62,7 +62,7 @@ public class ReservationCancellationService {
                 switch (previousStatus) {
                     case PENDING, AWAITING_PAYMENT -> cancelWithoutRefund(reservation, previousStatus);
                     case CONFIRMED -> cancelConfirmed(reservation, previousStatus);
-                    case CANCELLED -> throw new ReservationCancelledException();
+                    case CANCELLED -> throw new AlreadyCancelledException();
                     case EXPIRED -> throw new ReservationExpiredException();
                 };
         log.info("reservation cancelled reservationId={} previousStatus={}", reservationId, previousStatus);

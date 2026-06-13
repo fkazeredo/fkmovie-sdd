@@ -5,6 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 /**
@@ -50,6 +52,25 @@ public class GlobalExceptionHandler {
                 .map(error -> new ApiErrorResponse.FieldViolation(error.getField(), error.getDefaultMessage()))
                 .toList();
         return new ApiErrorResponse("validation.error", resolveMessage("validation.error"), fields);
+    }
+
+    /** Malformed query/path parameter (bad enum, UUID, number, date): 400, not a framework 500. */
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ApiErrorResponse handleTypeMismatch(MethodArgumentTypeMismatchException exception) {
+        var field = new ApiErrorResponse.FieldViolation(exception.getName(), "Invalid value");
+        return new ApiErrorResponse("validation.error", resolveMessage("validation.error"), List.of(field));
+    }
+
+    /**
+     * Concurrency conflict (optimistic {@code @Version} clash on a contended transition): 409, a clear
+     * error instead of a raw 500. The caller may retry; the second writer lost the race.
+     */
+    @ExceptionHandler(OptimisticLockingFailureException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ApiErrorResponse handleConcurrentConflict(OptimisticLockingFailureException exception) {
+        log.warn("Optimistic lock conflict: {}", exception.getMessage());
+        return ApiErrorResponse.of("concurrent.conflict", resolveMessage("concurrent.conflict"));
     }
 
     /** Requests to unknown paths: 404 in the standard error shape instead of a framework page. */

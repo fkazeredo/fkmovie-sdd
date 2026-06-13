@@ -28,4 +28,13 @@ class GlobalErrorHandlingIntegrationTest extends AbstractIntegrationTest {
 
         assertThat(response.headers().firstValue("X-Correlation-Id")).isPresent();
     }
+
+    @Test
+    void malformedQueryParamReturns400NotFramework500() throws Exception {
+        // public endpoint (SPEC-0010); a non-UUID movieId is a type mismatch, must be 400 not 500.
+        HttpResponse<String> response = get("/api/screenings?movieId=not-a-uuid");
+
+        assertThat(response.statusCode()).isEqualTo(400);
+        assertThat(response.body()).contains("\"code\":\"validation.error\"").contains("movieId");
+    }
 }

@@ -11,9 +11,9 @@ Related ADRs: 0001
 > - `GET /api/reservations/{id}` (the 0014 endpoint) now returns the enriched `ReservationView`:
 >   `movieTitle`, `roomName`, `startsAt`, `paymentDeadlineAt`, the seats/tickets and a `refund`
 >   summary (`{amountCents, status}`) when a refund exists. Scoping owner/OPERATOR/ADMIN unchanged.
-> - Decision: reused error codes — non-owner customer → `auth.forbidden` (403, the existing
->   `ReservationAccessDeniedException`), unknown id → `reservation.not-found` (404). The spec's
->   `booking.not-owner`/`booking.reservation-not-found` stay aspirational (consistent with 0014/0016/0018).
+> - Error codes match the table: non-owner customer → `booking.not-owner` (403,
+>   `ReservationAccessDeniedException`), unknown id → `booking.reservation-not-found` (404). A
+>   non-customer is blocked earlier by the security chain (transport-level `auth.forbidden`).
 > - Decision: `upcoming` without denormalizing (honoring "no schema change") —
 >   `ScreeningCatalog.futureScreeningIds(now)` + `screeningId IN (...)` in the paged query (bounded by a
 >   single cinema's schedule).

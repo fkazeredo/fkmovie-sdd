@@ -143,6 +143,7 @@ class ConfirmationIntegrationTest extends RegistrationIntegrationTestSupport {
         var response = confirm(verifiedCustomerBearer(), reservationId);
 
         assertThat(response.statusCode()).isEqualTo(403);
+        assertThat(response.body()).contains("\"code\":\"booking.not-owner\"");
     }
 
     @Test
