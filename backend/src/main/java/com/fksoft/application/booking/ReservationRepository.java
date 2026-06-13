@@ -5,6 +5,7 @@ import jakarta.persistence.QueryHint;
 import java.time.Instant;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -30,6 +31,10 @@ public interface ReservationRepository extends JpaRepository<Reservation, UUID> 
 
     Page<Reservation> findByUserIdAndStatusAndScreeningIdIn(
             UUID userId, ReservationStatus status, Collection<UUID> screeningIds, Pageable pageable);
+
+    /** The reservation owning a reservation-seat — backs operator ticket lookup (SPEC-0020). */
+    @Query("select r from Reservation r join r.seats s where s.id = :reservationSeatId")
+    Optional<Reservation> findBySeatId(@Param("reservationSeatId") UUID reservationSeatId);
 
     /**
      * Claims PENDING reservations past their hold expiry, skipping rows another sweep already locked

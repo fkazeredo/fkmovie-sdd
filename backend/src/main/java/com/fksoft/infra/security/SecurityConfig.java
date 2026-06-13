@@ -70,6 +70,8 @@ class SecurityConfig {
                         .hasRole("CUSTOMER")
                         .requestMatchers("/api/admin/**")
                         .hasRole("ADMIN")
+                        .requestMatchers("/api/operator/**")
+                        .hasAnyRole("OPERATOR", "ADMIN")
                         .anyRequest()
                         .authenticated())
                 .oauth2ResourceServer(

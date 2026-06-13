@@ -22,14 +22,23 @@ public class UserAccounts {
     /** Reads an account as a stable projection (empty if unknown). */
     @Transactional(readOnly = true)
     public Optional<AccountView> find(UUID userId) {
-        return users.findById(userId)
-                .map(user -> new AccountView(
-                        user.id(),
-                        user.email(),
-                        user.name(),
-                        user.preferredLocale(),
-                        user.role(),
-                        user.status(),
-                        user.isEmailVerified()));
+        return users.findById(userId).map(UserAccounts::toView);
+    }
+
+    /** Reads an account by email — case-insensitive (citext); backs operator lookup (SPEC-0020). */
+    @Transactional(readOnly = true)
+    public Optional<AccountView> findByEmail(String email) {
+        return users.findByEmail(email).map(UserAccounts::toView);
+    }
+
+    private static AccountView toView(User user) {
+        return new AccountView(
+                user.id(),
+                user.email(),
+                user.name(),
+                user.preferredLocale(),
+                user.role(),
+                user.status(),
+                user.isEmailVerified());
     }
 }
