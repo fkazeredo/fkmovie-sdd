@@ -91,7 +91,7 @@ class OutboxSendWorker {
     }
 
     private void handleFailure(OutboxEmail email, EmailSendException failure) {
-        var error = failure.getMessage();
+        var error = describe(failure);
         int failureNumber = email.attempts() + 1;
         if (!failure.isTransient() || failureNumber >= MAX_FAILURES) {
             email.markPermanentlyFailed(error);
@@ -103,11 +103,32 @@ class OutboxSendWorker {
                     .increment();
             events.publishEvent(new EmailPermanentlyFailed(
                     email.id(), email.recipientEmail(), email.templateKey(), error, clock.instant()));
-            log.warn("email dead-lettered id={} template={}", email.id(), email.templateKey());
+            // Log the full failure (with its provider cause) so a dead-letter is diagnosable.
+            log.warn(
+                    "email dead-lettered id={} template={} recipient={}: {}",
+                    email.id(),
+                    email.templateKey(),
+                    email.recipientEmail(),
+                    error,
+                    failure);
         } else {
             email.recordTransientFailure(error, clock.instant().plus(BACKOFF[failureNumber - 1]));
-            log.info("email retry scheduled id={} attempt={}", email.id(), failureNumber);
+            log.warn("email retry scheduled id={} attempt={}: {}", email.id(), failureNumber, error, failure);
         }
+    }
+
+    /**
+     * Failure message plus the root provider cause (e.g. the SMTP server's reply), so the stored
+     * error and the dead-letter log reveal exactly why mail failed instead of a generic message.
+     */
+    private static String describe(EmailSendException failure) {
+        Throwable root = failure;
+        while (root.getCause() != null) {
+            root = root.getCause();
+        }
+        return root == failure || root.getMessage() == null
+                ? failure.getMessage()
+                : failure.getMessage() + ": " + root.getMessage();
     }
 
     private void recordOutcome(Timer.Sample sample, String outcome) {

@@ -5,6 +5,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
@@ -15,6 +16,7 @@ import java.time.ZoneOffset;
 import java.util.Map;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.springframework.context.ApplicationEventPublisher;
 
 /** Backoff state machine + outcome handling of the dispatcher worker (SPEC-0006). */
@@ -90,5 +92,24 @@ class OutboxSendWorkerTest {
 
         assertThat(email.status()).isEqualTo(OutboxStatus.FAILED_PERMANENT);
         assertThat(email.attempts()).isEqualTo(1);
+    }
+
+    @Test
+    void deadLetterPreservesTheProviderCause() {
+        var email = pendingWithAttempts(0);
+        when(repository.findById(any())).thenReturn(Optional.of(email));
+        when(renderer.render(email)).thenReturn(new EmailMessage("to", "s", "h", "t"));
+        var smtpCause = new RuntimeException("535-5.7.8 Username and Password not accepted");
+        doThrow(new EmailSendException("Permanent mail failure", false, smtpCause))
+                .when(sender)
+                .send(any());
+
+        worker.process(email.id());
+
+        var event = ArgumentCaptor.forClass(EmailPermanentlyFailed.class);
+        verify(events).publishEvent(event.capture());
+        assertThat(event.getValue().lastError())
+                .contains("Permanent mail failure")
+                .contains("535-5.7.8 Username and Password not accepted");
     }
 }
