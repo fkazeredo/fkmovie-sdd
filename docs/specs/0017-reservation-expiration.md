@@ -1,7 +1,28 @@
 # 0017 - Reservation Expiration
 
-Status: Draft
+Status: Implemented
 Related ADRs: 0002, 0004
+
+> Implementation notes (backend):
+> - Two sweeps per run in `ReservationExpirationDispatcher` (`@Scheduled`, public so tests trigger it
+>   deterministically) driving `ReservationExpirationWorker`: PENDING past `expires_at` → EXPIRED;
+>   AWAITING_PAYMENT past `payment_deadline_at` → CANCELLED. Held seats → FREE; SOLD never touched.
+> - Concurrency: rows are claimed `FOR UPDATE SKIP LOCKED` (ADR 0004) and processed one per
+>   `REQUIRES_NEW` transaction (a poisoned row never blocks the sweep). The confirm-vs-expire race on
+>   the **same** reservation is resolved by the existing `@Version` optimistic lock + status guards —
+>   the confirm path (0016) is **unchanged**. `OptimisticLockingFailureException` is treated as benign
+>   (a concurrent confirm won the row), not an error.
+> - Idempotent: each row is re-fetched and guarded before transitioning, so a second pass is a no-op.
+> - Realtime reuses the 0013 publishers: the worker emits `SeatsStatusChanged(FREE)` +
+>   `ReservationStatusChanged(EXPIRED|CANCELLED)`; audit events `ReservationExpired` /
+>   `ReservationCancelled(PAYMENT_TIMEOUT)` are published (no consumer yet). No expiry email in v1.
+> - Open Question resolved: defaults confirmed — `app.booking.expiration-interval=PT30S`,
+>   `app.booking.expiration-batch-size=100` (both tunable).
+> - Persistence: only the new index `idx_reservations_status_payment_deadline_at` (V15); the
+>   `(status, expires_at)` index already existed (V12). No entity/schema change.
+> - Tests seed reservations with past timestamps against the real clock (production still reads the
+>   injected `Clock`), avoiding a global clock override; a dedicated test verifies SKIP LOCKED skips a
+>   row locked by another transaction instead of blocking.
 
 ## Goal
 
