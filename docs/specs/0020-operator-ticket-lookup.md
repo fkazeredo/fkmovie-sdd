@@ -1,7 +1,25 @@
 # 0020 - Operator Ticket Lookup and Reprint
 
-Status: Draft
+Status: Implemented
 Related ADRs: 0001
+
+> Implementation notes (backend):
+> - `/api/operator/**` secured to `hasAnyRole("OPERATOR","ADMIN")`. `OperatorLookupService` +
+>   `TicketReprintService` (booking); rules below.
+> - `GET /api/operator/reservations?ticketCode=|reservationId=|email=`: exactly one criterion (else
+>   400 `operator.invalid-search`). Returns a plain list of matching reservations (ticketCode/
+>   reservationId → 0..1; email → the customer's reservations) with movie/start/seat labels and a
+>   **masked** email; each search is audited (operator id + criterion type, never the raw email).
+> - `GET /api/operator/reservations/{id}`: the enriched `ReservationView` (0019) + customer name and
+>   **full** email (`OperatorReservationDetailView`), any owner.
+> - `POST /api/operator/tickets/{ticketId}/reprint`: only VALID tickets of CONFIRMED reservations
+>   (else 409 `booking.ticket-not-reprintable`; unknown → 404 `booking.ticket-not-found`). Records an
+>   audited `ticket_reprints` row, emits `TicketReprinted`, returns the printable payload + reprint
+>   count; **no ticket-state change**. Reuses `ReservationViewBuilder` for the print data.
+> - Reuses: `UserAccounts.findByEmail` (citext), `TicketRepository.findByCode`,
+>   `ReservationRepository.findBySeatId`. Metric `ticket_reprints_total`.
+> - Persistence: `V17` `ticket_reprints(id, ticket_id→tickets, operator_user_id→users, reprinted_at)`
+>   + index on `ticket_id`. Open Question resolved: reprint requires **no** reason field in v1.
 
 ## Goal
 
