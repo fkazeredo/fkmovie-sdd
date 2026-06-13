@@ -67,6 +67,32 @@ npm run lint && npm run lint:styles && npm test && npm run build
 
 The dev proxy (`frontend/proxy.conf.json`) expects the backend on `http://localhost:8080`.
 
+## Run the full local stack (Docker Compose)
+
+One command brings up Postgres, the backend, the frontend and the observability stack
+(metrics + centralized logs). Secrets come from `.env.local` (git-ignored) — Docker injects them
+via `env_file`, so they never appear on the command line.
+
+1. Create `.env.local` (see "Getting started (backend)") with a real `JWT_SECRET`, the mail
+   settings and `PAYMENT_WEBHOOK_SECRET`. A first-run admin is seeded from
+   `BOOTSTRAP_ADMIN_EMAIL` / `BOOTSTRAP_ADMIN_PASSWORD`.
+2. `docker compose up -d --build`
+3. Open:
+   - App API — <http://localhost:8080> (readiness: `/actuator/health/readiness`)
+   - Frontend — <http://localhost:4200>
+   - Grafana (dashboards + logs) — <http://localhost:3000> (admin / admin)
+   - Prometheus — <http://localhost:9090>
+
+Observability: the backend logs structured JSON to stdout (`correlationId` via MDC) — Grafana
+**Alloy** ships container logs to **Loki**, and **Prometheus** scrapes `/actuator/prometheus`.
+View them in Grafana → Dashboards → "fkmovies — Overview" (metrics) and Grafana → Explore → Loki
+(logs, filter by `level` / `logger` / `correlationId`), or raw via `docker compose logs -f backend`.
+
+Stop with `docker compose down` (keeps the named volumes; never use `-v` unless wiping data).
+
+Note: `5432` is assumed taken on the host, so the dev DB is published on `5434` (`DB_PORT` in the
+git-ignored root `.env`); inside the Compose network the backend reaches it as `db:5432`.
+
 ## Adopting in a new project
 
 1. Copy `CLAUDE.md`, `architecture/`, `docs/`, `.claude/` to the repository root.

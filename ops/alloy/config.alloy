@@ -1,0 +1,49 @@
+// Grafana Alloy: collect Docker container stdout, parse the backend's JSON logs, ship to Loki.
+
+discovery.docker "containers" {
+  host = "unix:///var/run/docker.sock"
+}
+
+// Expose the container name (without the leading "/") as the `service` label.
+discovery.relabel "containers" {
+  targets = discovery.docker.containers.targets
+
+  rule {
+    source_labels = ["__meta_docker_container_name"]
+    regex         = "/(.*)"
+    target_label  = "service"
+  }
+}
+
+loki.source.docker "containers" {
+  host       = "unix:///var/run/docker.sock"
+  targets    = discovery.relabel.containers.output
+  forward_to = [loki.process.parse.receiver]
+}
+
+// The backend logs structured JSON (LogstashEncoder): lift level/logger to labels and keep
+// correlationId queryable in the line. Non-JSON lines (other containers) pass through untouched.
+loki.process "parse" {
+  stage.json {
+    expressions = {
+      level         = "level",
+      logger        = "logger",
+      correlationId = "correlationId",
+    }
+  }
+
+  stage.labels {
+    values = {
+      level  = "",
+      logger = "",
+    }
+  }
+
+  forward_to = [loki.write.default.receiver]
+}
+
+loki.write "default" {
+  endpoint {
+    url = "http://loki:3100/loki/api/v1/push"
+  }
+}

@@ -1,5 +1,6 @@
-# Local development infrastructure (spec 0001, ADR 0002).
-# Credentials below are local-dev only and intentionally match .env.example.
+# Local development stack (spec 0001, ADR 0002) + observability (logs + metrics).
+# Secrets come from .env.local (git-ignored), injected by Docker via env_file — never on the CLI.
+# Bring up:  docker compose up -d --build
 services:
   db:
     image: postgres:16
@@ -9,7 +10,7 @@ services:
       POSTGRES_USER: fkmovies
       POSTGRES_PASSWORD: fkmovies
     ports:
-      # Override with DB_PORT when 5432 is taken on the host (keep DB_URL in sync)
+      # Override with DB_PORT (see .env) when 5432 is taken on the host.
       - "${DB_PORT:-5432}:5432"
     volumes:
       - db-data:/var/lib/postgresql/data
@@ -19,5 +20,98 @@ services:
       timeout: 3s
       retries: 10
 
+  backend:
+    build: ./backend
+    container_name: fkmovies-backend
+    env_file:
+      - .env.local
+    environment:
+      # Inside the Compose network the DB is reachable as host "db"; this overrides the
+      # localhost:5434 value from .env.local (which is only valid from the host).
+      DB_URL: jdbc:postgresql://db:5432/fkmovies
+    ports:
+      - "8080:8080"
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:8080/actuator/health/readiness"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 60s
+    restart: unless-stopped
+
+  frontend:
+    build: ./frontend
+    container_name: fkmovies-frontend
+    ports:
+      - "4200:80"
+    depends_on:
+      backend:
+        condition: service_started
+    restart: unless-stopped
+
+  prometheus:
+    image: prom/prometheus:v3.1.0
+    container_name: fkmovies-prometheus
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.retention.time=7d
+    volumes:
+      - ./ops/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus-data:/prometheus
+    ports:
+      - "9090:9090"
+    restart: unless-stopped
+
+  loki:
+    image: grafana/loki:3.4.0
+    container_name: fkmovies-loki
+    command: -config.file=/etc/loki/local-config.yaml
+    volumes:
+      - loki-data:/loki
+    restart: unless-stopped
+
+  alloy:
+    image: grafana/alloy:v1.6.1
+    container_name: fkmovies-alloy
+    command:
+      - run
+      - --server.http.listen-addr=0.0.0.0:12345
+      - --storage.path=/var/lib/alloy/data
+      - /etc/alloy/config.alloy
+    volumes:
+      - ./ops/alloy/config.alloy:/etc/alloy/config.alloy:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - alloy-data:/var/lib/alloy/data
+    depends_on:
+      - loki
+    restart: unless-stopped
+
+  grafana:
+    image: grafana/grafana:11.5.0
+    container_name: fkmovies-grafana
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: admin
+      GF_AUTH_ANONYMOUS_ENABLED: "true"
+      GF_AUTH_ANONYMOUS_ORG_ROLE: Viewer
+      GF_USERS_DEFAULT_THEME: dark
+    volumes:
+      - ./ops/grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./ops/grafana/dashboards:/var/lib/grafana/dashboards:ro
+      - grafana-data:/var/lib/grafana
+    ports:
+      - "3000:3000"
+    depends_on:
+      - prometheus
+      - loki
+    restart: unless-stopped
+
 volumes:
   db-data:
+  prometheus-data:
+  loki-data:
+  alloy-data:
+  grafana-data:
