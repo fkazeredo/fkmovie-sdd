@@ -54,6 +54,14 @@ public class Ticket {
         return new Ticket(reservationSeatId, code, issuedAt);
     }
 
+    /** Cancels the ticket on reservation cancellation (SPEC-0018): {@code VALID → CANCELLED}. */
+    public void cancel() {
+        if (status != TicketStatus.VALID) {
+            throw new IllegalStateException("Ticket " + id + " is not VALID: " + status);
+        }
+        status = TicketStatus.CANCELLED;
+    }
+
     public UUID id() {
         return id;
     }

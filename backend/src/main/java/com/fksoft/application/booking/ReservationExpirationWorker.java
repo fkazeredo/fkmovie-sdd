@@ -86,7 +86,7 @@ class ReservationExpirationWorker {
         var seatIds = releaseHeldSeats(reservation);
         publish(reservation, seatIds, ReservationStatus.CANCELLED);
         events.publishEvent(new ReservationCancelled(
-                reservation.id(), reservation.userId(), CancellationReason.PAYMENT_TIMEOUT, clock.instant()));
+                reservation.id(), reservation.userId(), CancellationReason.PAYMENT_TIMEOUT, false, clock.instant()));
         meterRegistry.counter("reservations_payment_timeout_total").increment();
         log.info("reservation payment timed out reservationId={} seats={}", reservationId, seatIds.size());
     }

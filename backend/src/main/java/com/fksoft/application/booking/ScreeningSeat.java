@@ -94,6 +94,17 @@ public class ScreeningSeat {
         status = ScreeningSeatStatus.FREE;
     }
 
+    /**
+     * Returns a sold seat to inventory on customer cancellation (SPEC-0018): {@code SOLD → FREE}. The
+     * deliberate, audited exception to 0016's "SOLD never becomes FREE" (which governs the payment flow).
+     */
+    public void releaseFromSold() {
+        if (status != ScreeningSeatStatus.SOLD) {
+            throw new IllegalStateException("Seat " + id + " is not SOLD: " + status);
+        }
+        status = ScreeningSeatStatus.FREE;
+    }
+
     @PrePersist
     @PreUpdate
     void touch() {

@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title th:text="#{email.cancellation.subject}">Reservation cancelled</title>
+  </head>
+  <body>
+    <p th:text="#{email.cancellation.greeting(${name})}">Hello,</p>
+    <p th:text="#{email.cancellation.body}">Your reservation has been cancelled.</p>
+    <p th:if="${refundRequested == 'true'}" th:text="#{email.cancellation.refund(${refundAmount})}">
+      A refund is being processed.
+    </p>
+    <p th:text="#{email.cancellation.footer}">We hope to see you again soon.</p>
+  </body>
+</html>

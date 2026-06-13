@@ -1,9 +1,10 @@
 package com.fksoft.application.booking;
 
 /**
- * Why a reservation was cancelled (SPEC-0017). v1 only the payment-timeout sweep cancels; manual
- * cancellation (SPEC-0018) will add reasons here.
+ * Why a reservation was cancelled: the payment-timeout sweep (SPEC-0017) or the owner's own
+ * cancellation (SPEC-0018). Operator/admin cancellation is a future reason.
  */
 public enum CancellationReason {
-    PAYMENT_TIMEOUT
+    PAYMENT_TIMEOUT,
+    CUSTOMER
 }

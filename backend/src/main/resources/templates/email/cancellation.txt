@@ -1,0 +1,7 @@
+[# th:text="#{email.cancellation.greeting(${name})}"]Hello,[/]
+
+[# th:text="#{email.cancellation.body}"]Your reservation has been cancelled.[/]
+
+[# th:if="${refundRequested == 'true'}" th:text="#{email.cancellation.refund(${refundAmount})}"]A refund is being processed.[/]
+
+[# th:text="#{email.cancellation.footer}"]We hope to see you again soon.[/]

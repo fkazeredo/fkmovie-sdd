@@ -40,6 +40,29 @@ class EmailRendererTest {
         assertThat(message.htmlBody()).contains("Hello Frank");
     }
 
+    private OutboxEmail cancellation(String locale, boolean refund) {
+        return new OutboxEmail(
+                EmailTemplate.CANCELLATION,
+                "to@test.local",
+                locale,
+                Map.of("name", "Frank", "refundRequested", String.valueOf(refund), "refundAmount", "45.00"),
+                java.time.Instant.EPOCH);
+    }
+
+    @Test
+    void rendersCancellationWithRefundLine() {
+        var message = renderer.render(cancellation("pt-BR", true));
+        assertThat(message.subject()).isEqualTo("Sua reserva fkmovies foi cancelada");
+        assertThat(message.textBody()).contains("Olá Frank").contains("R$ 45.00");
+    }
+
+    @Test
+    void rendersCancellationWithoutRefundOmitsRefundLine() {
+        var message = renderer.render(cancellation("en", false));
+        assertThat(message.subject()).isEqualTo("Your fkmovies reservation was cancelled");
+        assertThat(message.textBody()).contains("Hello Frank").doesNotContain("refund of R$");
+    }
+
     private static SpringTemplateEngine engine() {
         var engine = new SpringTemplateEngine();
         engine.addTemplateResolver(resolver("*.html", TemplateMode.HTML));

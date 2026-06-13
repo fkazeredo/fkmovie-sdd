@@ -3,7 +3,9 @@ package com.fksoft.application.notification;
 import com.fksoft.application.auth.CustomerRegistered;
 import com.fksoft.application.auth.PasswordResetRequested;
 import com.fksoft.application.auth.UserInvited;
+import com.fksoft.application.booking.ReservationCancellationConfirmed;
 import com.fksoft.application.booking.ReservationConfirmed;
+import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Value;
@@ -67,6 +69,19 @@ class NotificationEventListener {
                 event.email(),
                 event.preferredLocale(),
                 Map.of("name", event.name(), "tickets", ticketLines));
+    }
+
+    @TransactionalEventListener
+    void on(ReservationCancellationConfirmed event) {
+        var refundAmount = String.format(Locale.US, "%.2f", event.refundAmountCents() / 100.0);
+        outbox.enqueue(
+                EmailTemplate.CANCELLATION,
+                event.email(),
+                event.preferredLocale(),
+                Map.of(
+                        "name", event.name(),
+                        "refundRequested", String.valueOf(event.refundRequested()),
+                        "refundAmount", refundAmount));
     }
 
     private String link(String path, String token) {
