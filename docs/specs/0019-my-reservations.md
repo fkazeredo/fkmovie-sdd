@@ -1,7 +1,25 @@
 # 0019 - My Reservations
 
-Status: Draft
+Status: Implemented
 Related ADRs: 0001
+
+> Implementation notes (backend):
+> - `GET /api/me/reservations` (`MyReservationsService` + controller): owner-scoped (caller id, never a
+>   param), newest-first, `PageResponse` envelope, `size` clamped to 50 (default 20). Filters `status`
+>   and `upcoming`. Item: `{reservationId, status, movieTitle, roomName, startsAt, totalCents,
+>   seatLabels}`, assembled in batch via the read facades. Metric `my_reservations_list_latency`.
+> - `GET /api/reservations/{id}` (the 0014 endpoint) now returns the enriched `ReservationView`:
+>   `movieTitle`, `roomName`, `startsAt`, `paymentDeadlineAt`, the seats/tickets and a `refund`
+>   summary (`{amountCents, status}`) when a refund exists. Scoping owner/OPERATOR/ADMIN unchanged.
+> - Decision: reused error codes — non-owner customer → `auth.forbidden` (403, the existing
+>   `ReservationAccessDeniedException`), unknown id → `reservation.not-found` (404). The spec's
+>   `booking.not-owner`/`booking.reservation-not-found` stay aspirational (consistent with 0014/0016/0018).
+> - Decision: `upcoming` without denormalizing (honoring "no schema change") —
+>   `ScreeningCatalog.futureScreeningIds(now)` + `screeningId IN (...)` in the paged query (bounded by a
+>   single cinema's schedule).
+> - New reusable read facades: screening `MovieCatalog` (`MovieView`) + `ScreeningCatalog.findAll`/
+>   `futureScreeningIds`; payment `PaymentLedger` (`RefundView.latestRefund`). booking reads through
+>   them (no module cycle). Persistence: only the new index `idx_reservations_user_created_at` (V16).
 
 ## Goal
 
