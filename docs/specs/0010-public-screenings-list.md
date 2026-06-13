@@ -1,7 +1,21 @@
 # 0010 - Public Screenings List
 
-Status: Draft
+Status: Implemented
 Related ADRs: 0001
+
+> Implementation notes (backend):
+> - `GET /api/screenings` (`PublicScreeningsService` + controller), public (permitAll). `PageResponse`
+>   envelope, `size` clamped to 100 (default 20), sorted by `startsAt` asc. Lists only SCHEDULED
+>   screenings of ACTIVE movies with `startsAt > now` (joined in `ScreeningRepository.searchPublic`).
+> - Filters: `date` (yyyy-MM-dd, calendar day in America/Sao_Paulo → `[dayStart, dayEnd)` UTC window) and
+>   `movieId`. Malformed date → `screening.invalid-filter` (400). The query uses an explicit non-null
+>   `[from, to)` window (wide when no date) to avoid nullable JPQL binds (0009 lesson).
+> - `fromPriceCents` = `PriceCalculator.cheapestFull(ctx)` — the floor full price across seat types
+>   (decision: global "cheapest possible", computed inside pricing, no cinema coupling).
+> - DTO `PublicScreeningView` (movieTitle/ageRating/posterUrl/roomName/startsAt/durationMinutes/
+>   fromPriceCents); movie via `MovieRepository` (same module), roomName via `CinemaCatalog`. New module
+>   edges screening→cinema/pricing (acyclic). No schema change.
+> - Metrics: `public_screenings_list_total`, `public_screenings_list_latency`.
 
 ## Goal
 
