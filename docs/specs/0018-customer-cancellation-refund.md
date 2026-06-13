@@ -1,7 +1,26 @@
 # 0018 - Customer Cancellation and Refund
 
-Status: Draft
+Status: Implemented
 Related ADRs: 0006
+
+> Implementation notes (backend):
+> - `POST /api/reservations/{id}/cancel` (200) → `ReservationCancellationService`. PENDING/
+>   AWAITING_PAYMENT release HELD seats (no refund); CONFIRMED, while `startsAt - now >= 2h`
+>   (`app.booking.cancellation-window-hours`, default 2, `>=` boundary open), cancels tickets
+>   (VALID→CANCELLED), returns SOLD seats to inventory (`ScreeningSeat.releaseFromSold` — the audited
+>   exception to 0016's "SOLD never becomes FREE") and requests a full refund via the gateway port.
+>   The refund settles asynchronously and never gates the cancellation.
+> - `CancellationPublisher` emits realtime FREE/CANCELLED (the 0013 publishers send the STOMP), the
+>   audit `ReservationCancelled(reason=CUSTOMER, refundRequested)` and a contact-carrying
+>   `ReservationCancellationConfirmed` consumed by notification.
+> - Decision: **one** cancellation email at cancel time (mentions the refund when applicable);
+>   `RefundSucceeded` needs no booking action (the `payments` table is the ledger); `RefundFailed`
+>   raises an ERROR audit + `refunds_failed_total` (`RefundEventListener`).
+> - Decision: reused existing error codes — `auth.forbidden` (403), `reservation.not-found` (404),
+>   `booking.reservation-cancelled` (409, already-cancelled), `booking.reservation-expired` (410) —
+>   plus the one new `booking.cancellation-window-closed` (409). HTTP statuses match the table below.
+> - Metrics: `reservations_cancelled_total{previousStatus}`, `refunds_requested_total`,
+>   `refunds_failed_total`. No schema change. Open Question (refund SLA copy) deferred to 0025.
 
 ## Goal
 
