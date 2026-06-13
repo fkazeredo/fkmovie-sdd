@@ -119,6 +119,22 @@ public class Reservation {
         this.status = ReservationStatus.CANCELLED;
     }
 
+    /** Expires a stale hold (SPEC-0017): PENDING → EXPIRED. */
+    public void expire() {
+        if (status != ReservationStatus.PENDING) {
+            throw new IllegalStateException("Reservation " + id + " is not PENDING: " + status);
+        }
+        this.status = ReservationStatus.EXPIRED;
+    }
+
+    /** Cancels an unpaid reservation past its deadline (SPEC-0017): AWAITING_PAYMENT → CANCELLED. */
+    public void cancelForPaymentTimeout() {
+        if (status != ReservationStatus.AWAITING_PAYMENT) {
+            throw new IllegalStateException("Reservation " + id + " is not AWAITING_PAYMENT: " + status);
+        }
+        this.status = ReservationStatus.CANCELLED;
+    }
+
     @PrePersist
     void onCreate() {
         var now = Instant.now();

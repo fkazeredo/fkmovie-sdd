@@ -30,6 +30,9 @@ app:
       failure-rules-enabled: true
   booking:
     payment-deadline-minutes: 10
+    # The expiration sweep is driven explicitly in tests (deterministic, no scheduler race); a long
+    # interval keeps the @Scheduled poll dormant. Tests call ReservationExpirationDispatcher.sweep().
+    expiration-interval: PT1H
   notification:
     base-url: http://localhost:4200
     poll-interval: PT30S
