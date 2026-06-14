@@ -4,7 +4,7 @@
   "tags": ["fkmovies"],
   "timezone": "browser",
   "schemaVersion": 39,
-  "version": 1,
+  "version": 2,
   "refresh": "10s",
   "time": { "from": "now-1h", "to": "now" },
   "templating": { "list": [] },
@@ -13,70 +13,142 @@
     {
       "id": 1,
       "type": "stat",
-      "title": "Reservations confirmed (total)",
+      "title": "Reservations created (total)",
       "datasource": { "type": "prometheus", "uid": "prometheus" },
       "gridPos": { "h": 4, "w": 6, "x": 0, "y": 0 },
-      "targets": [{ "refId": "A", "expr": "sum(reservations_confirmed_total)" }]
+      "targets": [{ "refId": "A", "expr": "sum(reservations_total)" }]
     },
     {
       "id": 2,
       "type": "stat",
-      "title": "Reservations created (total)",
+      "title": "Reservations confirmed (total)",
       "datasource": { "type": "prometheus", "uid": "prometheus" },
       "gridPos": { "h": 4, "w": 6, "x": 6, "y": 0 },
-      "targets": [{ "refId": "A", "expr": "sum(reservations_created_total)" }]
+      "targets": [{ "refId": "A", "expr": "sum(reservations_confirmed_total)" }]
     },
     {
       "id": 3,
       "type": "stat",
-      "title": "WebSocket connections (active)",
+      "title": "Refunds (total)",
       "datasource": { "type": "prometheus", "uid": "prometheus" },
       "gridPos": { "h": 4, "w": 6, "x": 12, "y": 0 },
-      "targets": [{ "refId": "A", "expr": "sum(ws_connections_active)" }]
+      "targets": [{ "refId": "A", "expr": "sum(payments_total{kind=\"REFUND\"}) or vector(0)" }]
     },
     {
       "id": 4,
       "type": "stat",
-      "title": "Payments (total by status)",
+      "title": "WebSocket connections (active)",
       "datasource": { "type": "prometheus", "uid": "prometheus" },
       "gridPos": { "h": 4, "w": 6, "x": 18, "y": 0 },
-      "targets": [{ "refId": "A", "expr": "sum by (status) (payments_total)", "legendFormat": "{{status}}" }]
+      "targets": [{ "refId": "A", "expr": "sum(ws_connections_active)" }]
     },
     {
       "id": 5,
       "type": "timeseries",
-      "title": "HTTP request rate (req/s)",
+      "title": "HTTP request rate by route (req/s)",
       "datasource": { "type": "prometheus", "uid": "prometheus" },
       "gridPos": { "h": 8, "w": 12, "x": 0, "y": 4 },
-      "targets": [{ "refId": "A", "expr": "sum by (uri) (rate(http_server_requests_seconds_count[1m]))", "legendFormat": "{{uri}}" }]
+      "fieldConfig": { "defaults": { "unit": "reqps" }, "overrides": [] },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum by (uri) (rate(http_server_requests_seconds_count[1m]))",
+          "legendFormat": "{{uri}}"
+        }
+      ]
     },
     {
       "id": 6,
       "type": "timeseries",
-      "title": "JVM heap used (bytes)",
+      "title": "HTTP latency p95 by route (s)",
+      "description": "95th percentile request duration per route (requires HTTP histogram buckets).",
       "datasource": { "type": "prometheus", "uid": "prometheus" },
       "gridPos": { "h": 8, "w": 12, "x": 12, "y": 4 },
-      "targets": [{ "refId": "A", "expr": "sum(jvm_memory_used_bytes{area=\"heap\"})", "legendFormat": "heap used" }]
+      "fieldConfig": { "defaults": { "unit": "s" }, "overrides": [] },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "histogram_quantile(0.95, sum by (le, uri) (rate(http_server_requests_seconds_bucket[5m])))",
+          "legendFormat": "{{uri}}"
+        }
+      ]
     },
     {
       "id": 7,
       "type": "timeseries",
-      "title": "Reservation lifecycle (rate /5m)",
+      "title": "HTTP 5xx error rate by route (err/s)",
       "datasource": { "type": "prometheus", "uid": "prometheus" },
-      "gridPos": { "h": 8, "w": 24, "x": 0, "y": 12 },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 12 },
+      "fieldConfig": { "defaults": { "unit": "reqps", "color": { "mode": "fixed", "fixedColor": "red" } }, "overrides": [] },
       "targets": [
-        { "refId": "A", "expr": "sum(rate(reservations_created_total[5m]))", "legendFormat": "created" },
-        { "refId": "B", "expr": "sum(rate(reservations_confirmed_total[5m]))", "legendFormat": "confirmed" },
-        { "refId": "C", "expr": "sum(rate(reservations_expired_total[5m]))", "legendFormat": "expired" },
-        { "refId": "D", "expr": "sum(rate(reservations_cancelled_total[5m]))", "legendFormat": "cancelled" }
+        {
+          "refId": "A",
+          "expr": "sum by (uri) (rate(http_server_requests_seconds_count{status=~\"5..\"}[5m]))",
+          "legendFormat": "{{uri}}"
+        }
       ]
     },
     {
       "id": 8,
+      "type": "timeseries",
+      "title": "JVM heap used (bytes)",
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 12 },
+      "fieldConfig": { "defaults": { "unit": "decbytes" }, "overrides": [] },
+      "targets": [
+        { "refId": "A", "expr": "sum(jvm_memory_used_bytes{area=\"heap\"})", "legendFormat": "heap used" }
+      ]
+    },
+    {
+      "id": 9,
+      "type": "timeseries",
+      "title": "Reservation lifecycle (rate /5m)",
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 20 },
+      "fieldConfig": { "defaults": { "unit": "ops" }, "overrides": [] },
+      "targets": [
+        { "refId": "A", "expr": "sum(rate(reservations_total[5m]))", "legendFormat": "created" },
+        { "refId": "B", "expr": "sum(rate(reservations_confirm_requested_total[5m]))", "legendFormat": "confirm requested" },
+        { "refId": "C", "expr": "sum(rate(reservations_confirmed_total[5m]))", "legendFormat": "confirmed" },
+        { "refId": "D", "expr": "sum(rate(reservations_rejected_total[5m]))", "legendFormat": "rejected" }
+      ]
+    },
+    {
+      "id": 10,
+      "type": "timeseries",
+      "title": "Payments & refunds (rate /5m by kind/status)",
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 20 },
+      "fieldConfig": { "defaults": { "unit": "ops" }, "overrides": [] },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum by (kind, status) (rate(payments_total[5m]))",
+          "legendFormat": "{{kind}} / {{status}}"
+        }
+      ]
+    },
+    {
+      "id": 11,
+      "type": "timeseries",
+      "title": "Reservation rejections by reason (rate /5m)",
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "gridPos": { "h": 7, "w": 24, "x": 0, "y": 28 },
+      "fieldConfig": { "defaults": { "unit": "ops" }, "overrides": [] },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum by (reason) (rate(reservations_rejected_total[5m]))",
+          "legendFormat": "{{reason}}"
+        }
+      ]
+    },
+    {
+      "id": 12,
       "type": "logs",
       "title": "Backend logs (Loki)",
       "datasource": { "type": "loki", "uid": "loki" },
-      "gridPos": { "h": 12, "w": 24, "x": 0, "y": 20 },
+      "gridPos": { "h": 12, "w": 24, "x": 0, "y": 35 },
       "options": { "showTime": true, "wrapLogMessage": true, "sortOrder": "Descending", "enableLogDetails": true },
       "targets": [{ "refId": "A", "expr": "{service=\"fkmovies-backend\"}" }]
     }

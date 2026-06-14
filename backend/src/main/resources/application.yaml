@@ -77,3 +77,12 @@ management:
       group:
         readiness:
           include: readinessState,db
+  metrics:
+    distribution:
+      # Emit latency histogram buckets for HTTP requests so Grafana can compute per-route
+      # percentiles (p95/p99) via histogram_quantile (SPEC-0026 observability dashboards).
+      percentiles-histogram:
+        http.server.requests: true
+      # Bound the bucket range to keep cardinality sane — API calls are well under 2s.
+      maximum-expected-value:
+        http.server.requests: 2s
