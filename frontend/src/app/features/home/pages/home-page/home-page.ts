@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { RouterLink } from '@angular/router';
 import { TranslatePipe } from '@ngx-translate/core';
 import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
@@ -11,7 +12,7 @@ import { TagModule } from 'primeng/tag';
  */
 @Component({
   selector: 'app-home-page',
-  imports: [CardModule, ButtonModule, TagModule, TranslatePipe],
+  imports: [CardModule, ButtonModule, TagModule, TranslatePipe, RouterLink],
   templateUrl: './home-page.html',
 })
 export class HomePage {}

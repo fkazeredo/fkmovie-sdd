@@ -2,10 +2,36 @@
   "app": {
     "title": "fkmovies"
   },
+  "nav": {
+    "screenings": "Sessões"
+  },
   "home": {
     "welcome": "Bem-vindo ao fkmovies",
-    "subtitle": "Sistema de ingressos de cinema — fundação do frontend (spec 0002).",
+    "subtitle": "Ingressos de cinema: escolha a sessão, os assentos e pronto.",
     "cta": "Explorar sessões",
     "foundation": "Fundação"
+  },
+  "screenings": {
+    "title": "Sessões em cartaz",
+    "subtitle": "Escolha uma sessão para selecionar seus assentos.",
+    "from": "a partir de",
+    "select": "Selecionar assentos",
+    "empty": "Nenhuma sessão disponível no momento.",
+    "error": "Não foi possível carregar as sessões.",
+    "retry": "Tentar novamente"
+  },
+  "seatmap": {
+    "back": "Voltar às sessões",
+    "screen": "Tela",
+    "selected": "assento(s)",
+    "reserve": "Reservar",
+    "loginHint": "Faça login para concluir a reserva (em breve).",
+    "error": "Não foi possível carregar o mapa de assentos.",
+    "legend": {
+      "free": "Livre",
+      "selected": "Selecionado",
+      "held": "Reservado",
+      "sold": "Vendido"
+    }
   }
 }

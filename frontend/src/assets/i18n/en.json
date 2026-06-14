@@ -2,10 +2,36 @@
   "app": {
     "title": "fkmovies"
   },
+  "nav": {
+    "screenings": "Screenings"
+  },
   "home": {
     "welcome": "Welcome to fkmovies",
-    "subtitle": "Cinema ticketing system — frontend foundation (spec 0002).",
+    "subtitle": "Cinema tickets: pick a session, choose your seats, done.",
     "cta": "Browse screenings",
     "foundation": "Foundation"
+  },
+  "screenings": {
+    "title": "Now showing",
+    "subtitle": "Pick a session to choose your seats.",
+    "from": "from",
+    "select": "Choose seats",
+    "empty": "No sessions available right now.",
+    "error": "Could not load the screenings.",
+    "retry": "Try again"
+  },
+  "seatmap": {
+    "back": "Back to screenings",
+    "screen": "Screen",
+    "selected": "seat(s)",
+    "reserve": "Reserve",
+    "loginHint": "Sign in to complete the reservation (coming soon).",
+    "error": "Could not load the seat map.",
+    "legend": {
+      "free": "Available",
+      "selected": "Selected",
+      "held": "Held",
+      "sold": "Sold"
+    }
   }
 }

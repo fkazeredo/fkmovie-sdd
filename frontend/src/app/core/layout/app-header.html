@@ -1,6 +1,14 @@
 <p-toolbar>
   <ng-template #start>
-    <span class="text-xl font-semibold">{{ 'app.title' | translate }}</span>
+    <div class="flex items-center gap-4">
+      <a routerLink="/" class="text-xl font-semibold">{{ 'app.title' | translate }}</a>
+      <a
+        routerLink="/sessoes"
+        class="text-sm text-surface-600 hover:text-primary"
+        routerLinkActive="text-primary font-medium"
+        >{{ 'nav.screenings' | translate }}</a
+      >
+    </div>
   </ng-template>
   <ng-template #end>
     <div class="flex gap-2">
