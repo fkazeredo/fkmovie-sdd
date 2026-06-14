@@ -48,4 +48,9 @@ export class ScreeningsListPage {
   protected dateLabel(iso: string): string {
     return new Date(iso).toLocaleString('pt-BR', { dateStyle: 'medium', timeStyle: 'short' });
   }
+
+  /** Hides a broken poster image so the gradient placeholder behind it shows instead. */
+  protected hideImage(event: Event): void {
+    (event.target as HTMLImageElement).style.visibility = 'hidden';
+  }
 }

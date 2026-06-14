@@ -1,6 +1,22 @@
 // Global SCSS — keep minimal; component styles live with their components and layout
 // utilities come from Tailwind (src/tailwind.css). See ADR 0008.
+:root {
+  color-scheme: dark;
+}
+
+html,
 body {
   margin: 0;
-  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  min-height: 100%;
+}
+
+body {
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  color: #e2e8f0;
+  background:
+    radial-gradient(1100px 520px at 50% -8%, #1e293b 0%, rgba(11, 18, 32, 0) 60%),
+    linear-gradient(180deg, #0b1220 0%, #060912 100%);
+  background-attachment: fixed;
+  background-repeat: no-repeat;
+  min-height: 100vh;
 }

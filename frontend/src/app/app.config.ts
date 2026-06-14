@@ -28,7 +28,10 @@ export const appConfig: ApplicationConfig = {
     providePrimeNG({
       theme: {
         preset: Aura,
-        options: { cssLayer: { name: 'primeng', order: 'theme, base, primeng' } },
+        options: {
+          darkModeSelector: '.app-dark',
+          cssLayer: { name: 'primeng', order: 'theme, base, primeng' },
+        },
       },
     }),
     MessageService,
