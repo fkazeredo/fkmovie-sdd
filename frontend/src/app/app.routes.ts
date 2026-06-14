@@ -19,5 +19,22 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./features/screenings/pages/seat-map-page/seat-map-page').then((m) => m.SeatMapPage),
   },
+  {
+    path: 'login',
+    loadComponent: () =>
+      import('./features/auth/pages/login-page/login-page').then((m) => m.LoginPage),
+  },
+  {
+    path: 'cadastro',
+    loadComponent: () =>
+      import('./features/auth/pages/register-page/register-page').then((m) => m.RegisterPage),
+  },
+  {
+    path: 'verificar-email',
+    loadComponent: () =>
+      import('./features/auth/pages/verify-email-page/verify-email-page').then(
+        (m) => m.VerifyEmailPage,
+      ),
+  },
   { path: '**', redirectTo: '' },
 ];

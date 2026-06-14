@@ -4,14 +4,30 @@
       <a routerLink="/" class="text-xl font-semibold">{{ 'app.title' | translate }}</a>
       <a
         routerLink="/sessoes"
-        class="text-sm text-surface-600 hover:text-primary"
+        class="text-sm text-surface-300 hover:text-primary"
         routerLinkActive="text-primary font-medium"
         >{{ 'nav.screenings' | translate }}</a
       >
+      @if (auth.isAuthenticated()) {
+        <a
+          routerLink="/minhas-reservas"
+          class="text-sm text-surface-300 hover:text-primary"
+          routerLinkActive="text-primary font-medium"
+          >{{ 'nav.myReservations' | translate }}</a
+        >
+      }
+      @if (auth.isStaff()) {
+        <a
+          routerLink="/admin"
+          class="text-sm text-surface-300 hover:text-primary"
+          routerLinkActive="text-primary font-medium"
+          >{{ 'nav.admin' | translate }}</a
+        >
+      }
     </div>
   </ng-template>
   <ng-template #end>
-    <div class="flex gap-2">
+    <div class="flex items-center gap-2">
       <p-button
         label="PT"
         size="small"
@@ -24,6 +40,26 @@
         [outlined]="language.current() !== 'en'"
         (onClick)="language.use('en')"
       />
+      <span class="mx-1 h-5 w-px bg-white/15"></span>
+      @if (auth.isAuthenticated()) {
+        <span class="hidden text-sm text-surface-300 sm:inline">{{ auth.user()?.name }}</span>
+        <p-button
+          [label]="'nav.logout' | translate"
+          icon="pi pi-sign-out"
+          size="small"
+          severity="secondary"
+          [text]="true"
+          (onClick)="logout()"
+        />
+      } @else {
+        <p-button
+          [label]="'nav.login' | translate"
+          size="small"
+          [outlined]="true"
+          routerLink="/login"
+        />
+        <p-button [label]="'nav.register' | translate" size="small" routerLink="/cadastro" />
+      }
     </div>
   </ng-template>
 </p-toolbar>

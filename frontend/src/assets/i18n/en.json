@@ -3,7 +3,12 @@
     "title": "fkmovies"
   },
   "nav": {
-    "screenings": "Screenings"
+    "screenings": "Screenings",
+    "myReservations": "My reservations",
+    "admin": "Admin",
+    "login": "Sign in",
+    "register": "Sign up",
+    "logout": "Sign out"
   },
   "home": {
     "welcome": "Welcome to fkmovies",
@@ -25,13 +30,75 @@
     "screen": "Screen",
     "selected": "seat(s)",
     "reserve": "Reserve",
-    "loginHint": "Sign in to complete the reservation (coming soon).",
+    "reserving": "Reserving...",
+    "loginHint": "Sign in to complete the reservation.",
+    "verifyHint": "Verify your email to complete the reservation.",
     "error": "Could not load the seat map.",
     "legend": {
       "free": "Available",
       "selected": "Selected",
       "held": "Held",
       "sold": "Sold"
+    }
+  },
+  "auth": {
+    "fields": {
+      "name": "Name",
+      "email": "Email",
+      "password": "Password",
+      "confirm": "Confirm password"
+    },
+    "login": {
+      "title": "Sign in",
+      "subtitle": "Sign in to reserve tickets.",
+      "submit": "Sign in",
+      "noAccount": "Don't have an account?",
+      "register": "Sign up"
+    },
+    "register": {
+      "title": "Create account",
+      "subtitle": "Sign up to buy tickets.",
+      "submit": "Sign up",
+      "passwordHint": "At least 8 characters, with one letter and one number.",
+      "mismatch": "Passwords do not match.",
+      "hasAccount": "Already have an account?",
+      "login": "Sign in"
+    },
+    "verify": {
+      "loading": "Confirming your email...",
+      "successTitle": "Email confirmed!",
+      "successBody": "Your account is ready. Enjoy the show!",
+      "continue": "View screenings",
+      "noTokenTitle": "Invalid link",
+      "noTokenBody": "Open the confirmation link sent to your email.",
+      "errorTitle": "Could not confirm",
+      "resendLabel": "Enter your email to resend the confirmation:",
+      "resend": "Resend confirmation",
+      "resent": "If the email exists and is pending, we sent a new link."
+    },
+    "banner": {
+      "unverified": "Verify your email to complete reservations.",
+      "resend": "Resend link",
+      "sent": "Link resent."
+    }
+  },
+  "errors": {
+    "auth": {
+      "invalid-credentials": "Invalid email or password.",
+      "rate-limited": "Too many attempts. Please wait a moment and try again.",
+      "disabled": "This account is disabled.",
+      "forbidden": "You are not allowed to do this.",
+      "unauthenticated": "Please sign in to continue."
+    },
+    "user": {
+      "email-taken": "This email is already registered.",
+      "email-not-verified": "Verify your email before continuing.",
+      "rate-limited": "Too many attempts. Please wait a moment and try again.",
+      "token-expired": "This link has expired. Request a new one.",
+      "token-invalid": "Invalid link."
+    },
+    "network": {
+      "error": "Connection failed. Check your internet and try again."
     }
   }
 }

@@ -1,6 +1,6 @@
 # 0021 - Angular Login and Registration
 
-Status: Draft
+Status: Implemented
 Related ADRs: 0008, 0005
 
 ## Goal
@@ -72,3 +72,36 @@ PrimeNG forms + Tailwind layout. Reactive Forms with typed forms.
 
 - Profile editing, MFA, social login, password strength meter beyond the
   0003 rule.
+
+## Implementation decisions
+
+- **Routes are Portuguese**, for consistency with the already-shipped
+  public routes (`/sessoes`) and the pt-BR default: `/login`, `/cadastro`,
+  `/verificar-email`. The spec's English names (`/register`, `/verify-email`)
+  were a placeholder; the URLs are UX, not a contract. Post-login redirect:
+  CUSTOMER → `returnUrl` or `/sessoes`; OPERATOR → `/operador`; ADMIN →
+  `/admin`.
+- **Email-not-verified banner** lives in the app shell
+  (`core/layout/verify-email-banner`) and offers a one-click resend, instead
+  of a per-page banner — it follows the user across the app until verified.
+- **Rate-limit live countdown deferred.** `auth.rate-limited` /
+  `user.rate-limited` show a static "try again shortly" message; the
+  `Retry-After` header is not yet surfaced (the `ApiError` model does not
+  carry response headers). Tracked here as a follow-up; no behavior change to
+  the backend contract.
+- **Forgot/reset password deferred** to a later slice — not on the
+  register → verify → login → reserve critical path. The backend endpoints
+  (`/api/users/forgot-password`, `/reset-password`) already exist.
+- Backend localizes error `message`; the frontend overrides known `code`s via
+  `errors.<code>` i18n keys (`core/http/error-text.ts`) and falls back to the
+  backend message otherwise.
+
+## Status notes
+
+Implemented in `core/auth` (model, token store, service with shared silent
+refresh, bearer+401-retry interceptor, `authGuard`/`roleGuard`) and
+`features/auth` (login, register, verify-email pages). Tests: auth.service
+(login/register/logout/bootstrap/shared-refresh/verify), interceptor
+(bearer, single-refresh-retry, refresh-fail redirect, no auth-loop), guards
+(role matrix), and the three pages (validation + backend error mapping).
+Frontend suite green (54 tests).

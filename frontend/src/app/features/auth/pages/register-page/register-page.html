@@ -1,0 +1,79 @@
+<main class="mx-auto flex max-w-md flex-col px-6 py-16">
+  <div
+    class="rounded-2xl border border-white/10 bg-white/5 p-8 shadow-xl shadow-black/30 backdrop-blur"
+  >
+    <h1 class="text-2xl font-bold tracking-tight text-white">
+      {{ 'auth.register.title' | translate }}
+    </h1>
+    <p class="mt-1 text-sm text-slate-400">{{ 'auth.register.subtitle' | translate }}</p>
+
+    @if (error()) {
+      <p-message severity="error" styleClass="mt-5 w-full" [text]="errorText()" />
+    }
+
+    <form [formGroup]="form" (ngSubmit)="submit()" class="mt-6 flex flex-col gap-4">
+      <label class="flex flex-col gap-1">
+        <span class="text-sm font-medium text-slate-300">{{ 'auth.fields.name' | translate }}</span>
+        <input pInputText type="text" formControlName="name" autocomplete="name" class="w-full" />
+      </label>
+
+      <label class="flex flex-col gap-1">
+        <span class="text-sm font-medium text-slate-300">{{
+          'auth.fields.email' | translate
+        }}</span>
+        <input
+          pInputText
+          type="email"
+          formControlName="email"
+          autocomplete="email"
+          class="w-full"
+        />
+      </label>
+
+      <label class="flex flex-col gap-1">
+        <span class="text-sm font-medium text-slate-300">{{
+          'auth.fields.password' | translate
+        }}</span>
+        <input
+          pInputText
+          type="password"
+          formControlName="password"
+          autocomplete="new-password"
+          class="w-full"
+        />
+        <span class="text-xs text-slate-500">{{ 'auth.register.passwordHint' | translate }}</span>
+      </label>
+
+      <label class="flex flex-col gap-1">
+        <span class="text-sm font-medium text-slate-300">{{
+          'auth.fields.confirm' | translate
+        }}</span>
+        <input
+          pInputText
+          type="password"
+          formControlName="confirm"
+          autocomplete="new-password"
+          class="w-full"
+        />
+        @if (form.errors?.['passwordMismatch'] && form.get('confirm')?.touched) {
+          <span class="text-xs text-red-400">{{ 'auth.register.mismatch' | translate }}</span>
+        }
+      </label>
+
+      <p-button
+        type="submit"
+        styleClass="mt-2 w-full"
+        [label]="'auth.register.submit' | translate"
+        [loading]="loading()"
+        [disabled]="loading()"
+      />
+    </form>
+
+    <p class="mt-6 text-center text-sm text-slate-400">
+      {{ 'auth.register.hasAccount' | translate }}
+      <a routerLink="/login" class="font-medium text-emerald-400 hover:text-emerald-300">{{
+        'auth.register.login' | translate
+      }}</a>
+    </p>
+  </div>
+</main>

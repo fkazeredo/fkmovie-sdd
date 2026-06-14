@@ -3,7 +3,12 @@
     "title": "fkmovies"
   },
   "nav": {
-    "screenings": "Sessões"
+    "screenings": "Sessões",
+    "myReservations": "Minhas reservas",
+    "admin": "Admin",
+    "login": "Entrar",
+    "register": "Criar conta",
+    "logout": "Sair"
   },
   "home": {
     "welcome": "Bem-vindo ao fkmovies",
@@ -25,13 +30,75 @@
     "screen": "Tela",
     "selected": "assento(s)",
     "reserve": "Reservar",
-    "loginHint": "Faça login para concluir a reserva (em breve).",
+    "reserving": "Reservando...",
+    "loginHint": "Faça login para concluir a reserva.",
+    "verifyHint": "Confirme seu e-mail para concluir a reserva.",
     "error": "Não foi possível carregar o mapa de assentos.",
     "legend": {
       "free": "Livre",
       "selected": "Selecionado",
       "held": "Reservado",
       "sold": "Vendido"
+    }
+  },
+  "auth": {
+    "fields": {
+      "name": "Nome",
+      "email": "E-mail",
+      "password": "Senha",
+      "confirm": "Confirmar senha"
+    },
+    "login": {
+      "title": "Entrar",
+      "subtitle": "Acesse sua conta para reservar ingressos.",
+      "submit": "Entrar",
+      "noAccount": "Ainda não tem conta?",
+      "register": "Criar conta"
+    },
+    "register": {
+      "title": "Criar conta",
+      "subtitle": "Cadastre-se para comprar ingressos.",
+      "submit": "Cadastrar",
+      "passwordHint": "Mínimo de 8 caracteres, com ao menos uma letra e um número.",
+      "mismatch": "As senhas não conferem.",
+      "hasAccount": "Já tem conta?",
+      "login": "Entrar"
+    },
+    "verify": {
+      "loading": "Confirmando seu e-mail...",
+      "successTitle": "E-mail confirmado!",
+      "successBody": "Sua conta está pronta. Boa sessão!",
+      "continue": "Ver sessões",
+      "noTokenTitle": "Link inválido",
+      "noTokenBody": "Abra o link de confirmação enviado para o seu e-mail.",
+      "errorTitle": "Não foi possível confirmar",
+      "resendLabel": "Informe seu e-mail para reenviar a confirmação:",
+      "resend": "Reenviar confirmação",
+      "resent": "Se o e-mail existir e estiver pendente, enviamos um novo link."
+    },
+    "banner": {
+      "unverified": "Confirme seu e-mail para concluir reservas.",
+      "resend": "Reenviar link",
+      "sent": "Link reenviado."
+    }
+  },
+  "errors": {
+    "auth": {
+      "invalid-credentials": "E-mail ou senha inválidos.",
+      "rate-limited": "Muitas tentativas. Aguarde um instante e tente novamente.",
+      "disabled": "Esta conta está desativada.",
+      "forbidden": "Você não tem permissão para esta ação.",
+      "unauthenticated": "Faça login para continuar."
+    },
+    "user": {
+      "email-taken": "Este e-mail já está cadastrado.",
+      "email-not-verified": "Confirme seu e-mail antes de continuar.",
+      "rate-limited": "Muitas tentativas. Aguarde um instante e tente novamente.",
+      "token-expired": "Este link expirou. Solicite um novo.",
+      "token-invalid": "Link inválido."
+    },
+    "network": {
+      "error": "Falha de conexão. Verifique sua internet e tente novamente."
     }
   }
 }
