@@ -1,6 +1,6 @@
 # fkmovies — Cinema Ticketing (built on the Java Architecture Guideline Template)
 
-Cinema ticketing system. See `docs/project.md` for the product overview and `docs/specs/` for features. The repository follows an owner-driven architecture guideline for Java/Spring Boot + Angular, structured for
+Cinema ticketing system. See `docs/project.md` for the product overview, `docs/specs/` for features, and `docs/manual-do-usuario.md` for the end-user manual (PT-BR). The repository follows an owner-driven architecture guideline for Java/Spring Boot + Angular, structured for
 Claude Code. Derived from `architecture.md` v1, restructured around three layers:
 
 1. **Always-loaded invariants** — `CLAUDE.md` (~90 lines). Read automatically every session.
