@@ -1,5 +1,6 @@
 package com.fksoft.application.cinema;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -33,6 +34,15 @@ public class CinemaCatalog {
     @Transactional(readOnly = true)
     public Optional<RoomView> findRoom(UUID roomId) {
         return rooms.findById(roomId).map(room -> new RoomView(room.id(), room.name()));
+    }
+
+    /** All rooms as stable projections, ordered by name (for the admin screening scheduler). */
+    @Transactional(readOnly = true)
+    public List<RoomView> listRooms() {
+        return rooms.findAll().stream()
+                .map(room -> new RoomView(room.id(), room.name()))
+                .sorted(Comparator.comparing(RoomView::name))
+                .toList();
     }
 
     /** Physical seats of a room as a stable projection (empty if the room is unknown). */
