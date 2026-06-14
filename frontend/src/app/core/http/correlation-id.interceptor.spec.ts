@@ -2,7 +2,11 @@ import { HttpClient, provideHttpClient, withInterceptors } from '@angular/common
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 
-import { CORRELATION_ID_HEADER, correlationIdInterceptor } from './correlation-id.interceptor';
+import {
+  CORRELATION_ID_HEADER,
+  correlationIdInterceptor,
+  generateCorrelationId,
+} from './correlation-id.interceptor';
 
 describe('correlationIdInterceptor', () => {
   let http: HttpClient;
@@ -39,5 +43,18 @@ describe('correlationIdInterceptor', () => {
     const second = controller.expectOne('/api/two').request.headers.get(CORRELATION_ID_HEADER);
     expect(first).toBe(second);
     controller.expectNone('/api/none');
+  });
+
+  it('generates a valid uuid in a secure context (randomUUID available)', () => {
+    expect(generateCorrelationId()).toMatch(/^[0-9a-f-]{36}$/);
+  });
+
+  it('falls back to getRandomValues when randomUUID is missing (regression: blank page over HTTP)', () => {
+    const cryptoLike = { getRandomValues: globalThis.crypto.getRandomValues.bind(globalThis.crypto) } as Crypto;
+    expect(generateCorrelationId(cryptoLike)).toMatch(/^[0-9a-f-]{36}$/);
+  });
+
+  it('falls back to Math.random when no Web Crypto is available at all', () => {
+    expect(generateCorrelationId(undefined)).toMatch(/^[0-9a-f-]{36}$/);
   });
 });
