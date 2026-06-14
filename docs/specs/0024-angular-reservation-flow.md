@@ -1,6 +1,6 @@
 # 0024 - Angular Reservation Flow
 
-Status: Draft
+Status: Implemented
 Related ADRs: 0008, 0006
 
 ## Goal
@@ -70,3 +70,38 @@ status-banner). Realtime subscription through `core/realtime` (0023).
 ## Out of Scope
 
 - Card forms (mock gateway needs none). My-reservations list (0025).
+
+## Implementation decisions
+
+- **Polling, not WebSocket, drives the AWAITING_PAYMENT → CONFIRMED
+  transition** (every 2 s via `timer`, stops the moment the status leaves
+  AWAITING_PAYMENT). The spec mandates polling as the fallback; the realtime
+  `/user/queue/reservations` subscription (and `core/realtime`) stays
+  deferred to SPEC-0013/0023. Polling is robust and the mock payment settles
+  in a few seconds, so the UX target ("~3 s spinner → tickets") holds.
+- **FULL tickets only in v1.** The reserve hand-off sends every selected seat
+  as `ticketType: FULL`. HALF (meia-entrada) needs a per-seat category +
+  document selector and the half price, which the seat-map read model
+  (SPEC-0011) does not expose — adding it is a fast follow that also touches
+  0011. The backend fully supports HALF.
+- **Server-anchored countdown** implemented: the reservation GET reads the
+  response `Date` header to estimate the client→server offset
+  (`serverOffsetFrom`); remaining = deadline − (clientNow + offset).
+  Re-syncs on tab focus (`window:focus`) and on the per-second tick; reaching
+  zero while PENDING refetches so the server confirms EXPIRED.
+- Status-driven rendering only (no client-only state machine): a page refresh
+  restores the correct state from the GET payload.
+- Route is `/reservas/:id` (Portuguese, consistent with the rest), guarded by
+  `authGuard`.
+
+## Status notes
+
+Implemented in `features/reservation` (model, `reservations-api.service`
+with server-offset, status-driven `reservation-page` with countdown +
+payment polling) and wired from the seat map's Reserve button (anonymous →
+login with returnUrl; unverified → disabled with hint; verified → create →
+`/reservas/:id`; `booking.seats-unavailable` highlights the stolen seats and
+refetches). Tests: API service (incl. server-offset math), the status
+matrix, countdown math, confirm/cancel, the 2 s polling fallback
+(fake timers), and the seat-map reserve paths. Frontend suite green
+(72 tests).

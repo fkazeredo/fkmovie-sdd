@@ -1,0 +1,165 @@
+<main class="mx-auto max-w-3xl px-6 py-10">
+  @if (loading()) {
+    <div class="flex justify-center py-24">
+      <p-progressSpinner strokeWidth="3" ariaLabel="loading" />
+    </div>
+  } @else if (!reservation()) {
+    <div class="rounded-2xl border border-red-500/30 bg-red-500/10 p-10 text-center">
+      <i class="pi pi-exclamation-triangle mb-3 text-3xl text-red-400"></i>
+      <p class="font-medium text-red-200">{{ 'reservation.loadError' | translate }}</p>
+      <p class="mt-1 text-sm text-red-300/70">{{ errorText() }}</p>
+      <div class="mt-4">
+        <p-button [label]="'screenings.title' | translate" routerLink="/sessoes" />
+      </div>
+    </div>
+  } @else {
+    @let r = reservation()!;
+    <header class="mb-6">
+      <a routerLink="/sessoes" class="text-sm text-slate-400 hover:text-primary">
+        <i class="pi pi-arrow-left mr-1"></i>{{ 'seatmap.back' | translate }}
+      </a>
+      <h1 class="mt-2 text-2xl font-bold tracking-tight text-white">{{ r.movieTitle }}</h1>
+      <p class="text-slate-400">
+        <i class="pi pi-map-marker mr-1"></i>{{ r.roomName }} · <i class="pi pi-calendar mx-1"></i
+        >{{ dateLabel(r.startsAt) }}
+      </p>
+    </header>
+
+    @if (error()) {
+      <div class="mb-5 rounded-xl border border-red-500/30 bg-red-500/10 p-4 text-sm text-red-200">
+        {{ errorText() }}
+      </div>
+    }
+
+    <!-- Seats + total: shown for every state so the user always sees what they reserved. -->
+    <section class="rounded-2xl border border-white/10 bg-white/5 p-5 backdrop-blur">
+      <h2 class="mb-3 text-sm font-semibold uppercase tracking-wide text-slate-400">
+        {{ 'reservation.seats' | translate }}
+      </h2>
+      <ul class="divide-y divide-white/5">
+        @for (s of r.seats; track s.seatId) {
+          <li class="flex items-center justify-between py-2 text-sm">
+            <span class="font-medium text-white">{{ s.row }}{{ s.number }}</span>
+            <span class="text-slate-400">{{ priceLabel(s.priceCents) }}</span>
+          </li>
+        }
+      </ul>
+      <div class="mt-3 flex items-center justify-between border-t border-white/10 pt-3">
+        <span class="text-sm text-slate-400">{{ 'reservation.total' | translate }}</span>
+        <span class="text-xl font-bold text-emerald-400">{{ priceLabel(r.totalCents) }}</span>
+      </div>
+    </section>
+
+    @switch (r.status) {
+      @case ('PENDING') {
+        <section
+          class="mt-5 rounded-2xl border border-amber-400/20 bg-amber-400/10 p-5 text-center"
+        >
+          <p class="text-sm text-amber-200">{{ 'reservation.holdNotice' | translate }}</p>
+          <p class="mt-1 font-mono text-3xl font-bold text-amber-100" aria-live="polite">
+            {{ countdownLabel() }}
+          </p>
+        </section>
+        <div class="mt-5 flex flex-col gap-3 sm:flex-row sm:justify-end">
+          <p-button
+            [label]="'reservation.cancel' | translate"
+            icon="pi pi-times"
+            severity="secondary"
+            [outlined]="true"
+            [disabled]="acting()"
+            (onClick)="cancel()"
+          />
+          <p-button
+            [label]="'reservation.confirm' | translate"
+            icon="pi pi-check"
+            [loading]="acting()"
+            [disabled]="acting()"
+            (onClick)="confirm()"
+          />
+        </div>
+      }
+      @case ('AWAITING_PAYMENT') {
+        <section
+          class="mt-5 flex flex-col items-center gap-4 rounded-2xl border border-white/10 bg-white/5 p-8 text-center"
+        >
+          <p-progressSpinner strokeWidth="3" ariaLabel="processing payment" />
+          <p class="font-medium text-white">{{ 'reservation.processing' | translate }}</p>
+          <p class="text-sm text-slate-400">{{ 'reservation.processingHint' | translate }}</p>
+          @if (countdownLabel()) {
+            <p class="font-mono text-sm text-slate-500">{{ countdownLabel() }}</p>
+          }
+        </section>
+      }
+      @case ('CONFIRMED') {
+        <section class="mt-5 rounded-2xl border border-emerald-400/20 bg-emerald-400/10 p-5">
+          <div class="mb-4 flex items-center gap-2 text-emerald-300">
+            <i class="pi pi-check-circle text-xl"></i>
+            <h2 class="text-lg font-semibold">{{ 'reservation.confirmedTitle' | translate }}</h2>
+          </div>
+          <ul class="flex flex-col gap-3">
+            @for (t of r.tickets; track t.ticketId) {
+              <li
+                class="flex items-center justify-between rounded-xl border border-white/10 bg-slate-900/50 px-4 py-3"
+              >
+                <div>
+                  <p class="text-xs uppercase tracking-wide text-slate-500">
+                    {{ 'reservation.seat' | translate }}
+                  </p>
+                  <p class="text-lg font-semibold text-white">{{ t.seatLabel }}</p>
+                </div>
+                <div class="text-right">
+                  <p class="text-xs uppercase tracking-wide text-slate-500">
+                    {{ 'reservation.ticketCode' | translate }}
+                  </p>
+                  <p class="font-mono text-emerald-300">{{ t.code }}</p>
+                </div>
+              </li>
+            }
+          </ul>
+          <div class="mt-5 flex justify-end">
+            <p-button
+              [label]="'reservation.myReservations' | translate"
+              icon="pi pi-list"
+              routerLink="/minhas-reservas"
+            />
+          </div>
+        </section>
+      }
+      @case ('CANCELLED') {
+        <section class="mt-5 rounded-2xl border border-white/10 bg-white/5 p-8 text-center">
+          <i class="pi pi-ban mb-3 text-4xl text-slate-400"></i>
+          <h2 class="text-lg font-semibold text-white">
+            {{ 'reservation.cancelledTitle' | translate }}
+          </h2>
+          @if (r.refund) {
+            <p class="mt-2 text-sm text-slate-400">
+              {{ 'reservation.refund' | translate }}: {{ priceLabel(r.refund.amountCents) }}
+            </p>
+          }
+          <div class="mt-5">
+            <p-button
+              [label]="'screenings.title' | translate"
+              routerLink="/sessoes"
+              [outlined]="true"
+            />
+          </div>
+        </section>
+      }
+      @case ('EXPIRED') {
+        <section class="mt-5 rounded-2xl border border-white/10 bg-white/5 p-8 text-center">
+          <i class="pi pi-clock mb-3 text-4xl text-slate-400"></i>
+          <h2 class="text-lg font-semibold text-white">
+            {{ 'reservation.expiredTitle' | translate }}
+          </h2>
+          <p class="mt-2 text-sm text-slate-400">{{ 'reservation.expiredBody' | translate }}</p>
+          <div class="mt-5">
+            <p-button
+              [label]="'reservation.chooseAgain' | translate"
+              [routerLink]="['/sessoes', r.screeningId, 'assentos']"
+            />
+          </div>
+        </section>
+      }
+    }
+  }
+</main>

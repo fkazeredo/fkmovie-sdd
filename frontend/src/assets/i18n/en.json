@@ -31,6 +31,8 @@
     "selected": "seat(s)",
     "reserve": "Reserve",
     "reserving": "Reserving...",
+    "loginToReserve": "Sign in to reserve",
+    "seatsTaken": "Some seats were just taken by someone else. They are highlighted; please pick others.",
     "loginHint": "Sign in to complete the reservation.",
     "verifyHint": "Verify your email to complete the reservation.",
     "error": "Could not load the seat map.",
@@ -40,6 +42,25 @@
       "held": "Held",
       "sold": "Sold"
     }
+  },
+  "reservation": {
+    "loadError": "Could not load the reservation.",
+    "seats": "Seats",
+    "seat": "Seat",
+    "total": "Total",
+    "holdNotice": "Your seats are on hold. Complete the purchase before time runs out:",
+    "confirm": "Confirm purchase",
+    "cancel": "Cancel",
+    "processing": "Processing payment...",
+    "processingHint": "Hang on — we're confirming your payment. This takes a few seconds.",
+    "confirmedTitle": "Purchase confirmed!",
+    "ticketCode": "Code",
+    "myReservations": "View my reservations",
+    "cancelledTitle": "Reservation cancelled",
+    "refund": "Refund",
+    "expiredTitle": "Reservation expired",
+    "expiredBody": "Time to complete the purchase ran out. Please choose seats again.",
+    "chooseAgain": "Choose seats"
   },
   "auth": {
     "fields": {

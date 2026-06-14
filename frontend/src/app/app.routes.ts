@@ -1,5 +1,7 @@
 import { Routes } from '@angular/router';
 
+import { authGuard } from './core/auth/auth.guards';
+
 export const routes: Routes = [
   {
     path: '',
@@ -34,6 +36,14 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./features/auth/pages/verify-email-page/verify-email-page').then(
         (m) => m.VerifyEmailPage,
+      ),
+  },
+  {
+    path: 'reservas/:id',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./features/reservation/pages/reservation-page/reservation-page').then(
+        (m) => m.ReservationPage,
       ),
   },
   { path: '**', redirectTo: '' },

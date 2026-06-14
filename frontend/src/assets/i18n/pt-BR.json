@@ -31,6 +31,8 @@
     "selected": "assento(s)",
     "reserve": "Reservar",
     "reserving": "Reservando...",
+    "loginToReserve": "Entrar para reservar",
+    "seatsTaken": "Alguns assentos foram reservados por outra pessoa. Eles estão destacados; escolha outros.",
     "loginHint": "Faça login para concluir a reserva.",
     "verifyHint": "Confirme seu e-mail para concluir a reserva.",
     "error": "Não foi possível carregar o mapa de assentos.",
@@ -40,6 +42,25 @@
       "held": "Reservado",
       "sold": "Vendido"
     }
+  },
+  "reservation": {
+    "loadError": "Não foi possível carregar a reserva.",
+    "seats": "Assentos",
+    "seat": "Assento",
+    "total": "Total",
+    "holdNotice": "Seus assentos estão reservados. Conclua a compra antes do tempo acabar:",
+    "confirm": "Confirmar compra",
+    "cancel": "Cancelar",
+    "processing": "Processando pagamento...",
+    "processingHint": "Aguarde — estamos confirmando seu pagamento. Isso leva alguns segundos.",
+    "confirmedTitle": "Compra confirmada!",
+    "ticketCode": "Código",
+    "myReservations": "Ver minhas reservas",
+    "cancelledTitle": "Reserva cancelada",
+    "refund": "Reembolso",
+    "expiredTitle": "Reserva expirada",
+    "expiredBody": "O tempo para concluir a compra acabou. Escolha os assentos novamente.",
+    "chooseAgain": "Escolher assentos"
   },
   "auth": {
     "fields": {
