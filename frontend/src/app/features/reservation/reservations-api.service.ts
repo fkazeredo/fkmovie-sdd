@@ -1,11 +1,14 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable, map } from 'rxjs';
 
+import { PageResponse } from '../screenings/screening.model';
 import {
   CancellationResult,
   ConfirmationResult,
   CreateReservationSeat,
+  MyReservation,
+  MyReservationsQuery,
   Reservation,
   ReservationSnapshot,
 } from './reservation.model';
@@ -44,5 +47,23 @@ export class ReservationsApiService {
 
   cancel(id: string): Observable<CancellationResult> {
     return this.http.post<CancellationResult>(`/api/reservations/${id}/cancel`, {});
+  }
+
+  /** The authenticated customer's reservation history (backend SPEC-0019). */
+  list(query: MyReservationsQuery = {}): Observable<PageResponse<MyReservation>> {
+    let params = new HttpParams();
+    if (query.status) {
+      params = params.set('status', query.status);
+    }
+    if (query.upcoming != null) {
+      params = params.set('upcoming', String(query.upcoming));
+    }
+    if (query.page != null) {
+      params = params.set('page', String(query.page));
+    }
+    if (query.size != null) {
+      params = params.set('size', String(query.size));
+    }
+    return this.http.get<PageResponse<MyReservation>>('/api/me/reservations', { params });
   }
 }

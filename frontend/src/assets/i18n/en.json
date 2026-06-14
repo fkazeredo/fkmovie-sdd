@@ -62,6 +62,31 @@
     "expiredBody": "Time to complete the purchase ran out. Please choose seats again.",
     "chooseAgain": "Choose seats"
   },
+  "reservationStatus": {
+    "PENDING": "Pending",
+    "AWAITING_PAYMENT": "Awaiting payment",
+    "CONFIRMED": "Confirmed",
+    "CANCELLED": "Cancelled",
+    "EXPIRED": "Expired"
+  },
+  "minhasReservas": {
+    "title": "My reservations",
+    "subtitle": "Track and manage your reservations and tickets.",
+    "upcoming": "Upcoming",
+    "allScope": "All",
+    "allStatuses": "All statuses",
+    "empty": "You don't have any reservations yet.",
+    "details": "Details",
+    "cancel": "Cancel",
+    "cancelTitle": "Cancel reservation",
+    "cancelConfirm": "Are you sure you want to cancel this reservation? This cannot be undone.",
+    "cancelYes": "Yes, cancel",
+    "cancelNo": "Back",
+    "cancelledTitle": "Reservation cancelled",
+    "cancelledDetail": "Your reservation has been cancelled.",
+    "refundAck": "Reservation cancelled. Refund of {{amount}} requested.",
+    "cancelFailed": "Could not cancel"
+  },
   "auth": {
     "fields": {
       "name": "Name",

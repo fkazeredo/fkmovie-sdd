@@ -1,6 +1,6 @@
 # 0025 - Angular My Reservations and Cancellation
 
-Status: Draft
+Status: Implemented
 Related ADRs: 0008
 
 ## Goal
@@ -56,3 +56,26 @@ Reuses `reservations-api.service.ts` (adds list call) and the 0024 page.
 ## Out of Scope
 
 - Receipts/exports. Re-booking shortcuts.
+
+## Implementation decisions
+
+- Route is `/minhas-reservas` (Portuguese, matches the header link), guarded
+  by `authGuard`. Detail reuses the SPEC-0024 page at `/reservas/:id`.
+- Filters: a Próximas/Todas scope toggle plus status chips (one per
+  `ReservationStatus` + "all"). Pagination via the SPEC-0019 envelope
+  (10/page, prev/next).
+- Cancel is gated client-side by the SPEC-0018 window (PENDING/
+  AWAITING_PAYMENT always; CONFIRMED only when `startsAt − now ≥ 2h`), with
+  the backend as authority — a `booking.cancellation-window-closed` 409 is
+  caught, shown as an error toast, and the list refreshed. Confirmation uses
+  PrimeNG ConfirmDialog; success shows a refund-aware toast.
+- Refund copy uses placeholder i18n (`minhasReservas.refundAck`) pending the
+  owner's final wording (inherited open question from 0018/0024).
+
+## Status notes
+
+Implemented as `features/reservation/pages/my-reservations-page` reusing
+`reservations-api.service` (added `list`). Tests: list rendering, empty
+state, scope/status filter reloads, the cancel-window matrix, the
+cancel→refund-ack→refresh flow and the 409 window-closed path. Frontend
+suite green (78 tests).

@@ -1,0 +1,130 @@
+<main class="mx-auto max-w-4xl px-6 py-10">
+  <p-confirmDialog />
+  <header class="mb-6">
+    <h1 class="text-2xl font-bold tracking-tight text-white">
+      {{ 'minhasReservas.title' | translate }}
+    </h1>
+    <p class="text-slate-400">{{ 'minhasReservas.subtitle' | translate }}</p>
+  </header>
+
+  <!-- Scope + status filters -->
+  <div class="mb-6 flex flex-col gap-3">
+    <div class="flex gap-2">
+      <p-button
+        [label]="'minhasReservas.upcoming' | translate"
+        size="small"
+        [outlined]="scope() !== 'upcoming'"
+        (onClick)="setScope('upcoming')"
+      />
+      <p-button
+        [label]="'minhasReservas.allScope' | translate"
+        size="small"
+        [outlined]="scope() !== 'all'"
+        (onClick)="setScope('all')"
+      />
+    </div>
+    <div class="flex flex-wrap gap-2">
+      @for (s of statuses; track s) {
+        <button
+          type="button"
+          class="rounded-full border px-3 py-1 text-xs font-medium transition"
+          [class]="
+            status() === s
+              ? 'border-primary bg-primary/20 text-primary'
+              : 'border-white/15 text-slate-400 hover:border-white/30'
+          "
+          (click)="setStatus(s)"
+        >
+          {{ (s ? 'reservationStatus.' + s : 'minhasReservas.allStatuses') | translate }}
+        </button>
+      }
+    </div>
+  </div>
+
+  @if (loading()) {
+    <div class="flex justify-center py-20">
+      <p-progressSpinner strokeWidth="3" ariaLabel="loading" />
+    </div>
+  } @else if (error()) {
+    <div class="rounded-2xl border border-red-500/30 bg-red-500/10 p-8 text-center text-red-200">
+      <i class="pi pi-exclamation-triangle mb-2 text-2xl"></i>
+      <p>{{ errorText() }}</p>
+      <div class="mt-4">
+        <p-button [label]="'screenings.retry' | translate" (onClick)="load()" />
+      </div>
+    </div>
+  } @else if (!page() || page()!.content.length === 0) {
+    <div class="rounded-2xl border border-dashed border-white/15 p-16 text-center text-slate-400">
+      <i class="pi pi-ticket mb-3 text-4xl text-slate-500"></i>
+      <p>{{ 'minhasReservas.empty' | translate }}</p>
+      <div class="mt-4"><p-button [label]="'home.cta' | translate" routerLink="/sessoes" /></div>
+    </div>
+  } @else {
+    @let p = page()!;
+    <ul class="flex flex-col gap-3">
+      @for (r of p.content; track r.reservationId) {
+        <li
+          class="flex flex-col gap-3 rounded-2xl border border-white/10 bg-white/5 p-4 backdrop-blur sm:flex-row sm:items-center sm:justify-between"
+        >
+          <div class="min-w-0">
+            <div class="flex items-center gap-2">
+              <h2 class="truncate text-lg font-semibold text-white">{{ r.movieTitle }}</h2>
+              <p-tag
+                [severity]="statusSeverity(r.status)"
+                [value]="'reservationStatus.' + r.status | translate"
+              />
+            </div>
+            <p class="mt-1 text-sm text-slate-400">
+              <i class="pi pi-map-marker mr-1"></i>{{ r.roomName }} ·
+              <i class="pi pi-calendar mx-1"></i>{{ dateLabel(r.startsAt) }}
+            </p>
+            <p class="mt-1 text-sm text-slate-500">
+              <i class="pi pi-th-large mr-1"></i>{{ r.seatLabels.join(', ') }} ·
+              <span class="font-medium text-emerald-400">{{ priceLabel(r.totalCents) }}</span>
+            </p>
+          </div>
+          <div class="flex shrink-0 gap-2">
+            <p-button
+              [label]="'minhasReservas.details' | translate"
+              icon="pi pi-arrow-right"
+              iconPos="right"
+              size="small"
+              [outlined]="true"
+              [routerLink]="['/reservas', r.reservationId]"
+            />
+            @if (cancelEligible(r)) {
+              <p-button
+                [label]="'minhasReservas.cancel' | translate"
+                icon="pi pi-times"
+                size="small"
+                severity="danger"
+                [text]="true"
+                (onClick)="cancel(r)"
+              />
+            }
+          </div>
+        </li>
+      }
+    </ul>
+
+    @if (p.totalPages > 1) {
+      <div class="mt-6 flex items-center justify-center gap-4">
+        <p-button
+          icon="pi pi-chevron-left"
+          [rounded]="true"
+          [text]="true"
+          [disabled]="p.page === 0"
+          (onClick)="goToPage(p.page - 1)"
+        />
+        <span class="text-sm text-slate-400">{{ p.page + 1 }} / {{ p.totalPages }}</span>
+        <p-button
+          icon="pi pi-chevron-right"
+          [rounded]="true"
+          [text]="true"
+          [disabled]="p.page + 1 >= p.totalPages"
+          (onClick)="goToPage(p.page + 1)"
+        />
+      </div>
+    }
+  }
+</main>

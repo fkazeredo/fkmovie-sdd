@@ -46,5 +46,13 @@ export const routes: Routes = [
         (m) => m.ReservationPage,
       ),
   },
+  {
+    path: 'minhas-reservas',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./features/reservation/pages/my-reservations-page/my-reservations-page').then(
+        (m) => m.MyReservationsPage,
+      ),
+  },
   { path: '**', redirectTo: '' },
 ];

@@ -62,6 +62,31 @@
     "expiredBody": "O tempo para concluir a compra acabou. Escolha os assentos novamente.",
     "chooseAgain": "Escolher assentos"
   },
+  "reservationStatus": {
+    "PENDING": "Pendente",
+    "AWAITING_PAYMENT": "Aguardando pagamento",
+    "CONFIRMED": "Confirmada",
+    "CANCELLED": "Cancelada",
+    "EXPIRED": "Expirada"
+  },
+  "minhasReservas": {
+    "title": "Minhas reservas",
+    "subtitle": "Acompanhe e gerencie suas reservas e ingressos.",
+    "upcoming": "Próximas",
+    "allScope": "Todas",
+    "allStatuses": "Todos os status",
+    "empty": "Você ainda não tem reservas.",
+    "details": "Detalhes",
+    "cancel": "Cancelar",
+    "cancelTitle": "Cancelar reserva",
+    "cancelConfirm": "Tem certeza de que deseja cancelar esta reserva? Esta ação não pode ser desfeita.",
+    "cancelYes": "Sim, cancelar",
+    "cancelNo": "Voltar",
+    "cancelledTitle": "Reserva cancelada",
+    "cancelledDetail": "Sua reserva foi cancelada.",
+    "refundAck": "Reserva cancelada. Reembolso de {{amount}} solicitado.",
+    "cancelFailed": "Não foi possível cancelar"
+  },
   "auth": {
     "fields": {
       "name": "Nome",

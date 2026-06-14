@@ -76,3 +76,22 @@ export interface ReservationSnapshot {
   reservation: Reservation;
   serverOffsetMs: number;
 }
+
+/** One row of the customer's reservation history (`MyReservationView`, backend SPEC-0019). */
+export interface MyReservation {
+  reservationId: string;
+  status: ReservationStatus;
+  movieTitle: string;
+  roomName: string;
+  startsAt: string;
+  totalCents: number;
+  seatLabels: string[];
+}
+
+/** Query for the customer's reservation history (backend SPEC-0019). */
+export interface MyReservationsQuery {
+  status?: ReservationStatus;
+  upcoming?: boolean;
+  page?: number;
+  size?: number;
+}
