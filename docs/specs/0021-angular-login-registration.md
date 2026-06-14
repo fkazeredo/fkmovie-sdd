@@ -76,9 +76,12 @@ PrimeNG forms + Tailwind layout. Reactive Forms with typed forms.
 ## Implementation decisions
 
 - **Routes are Portuguese**, for consistency with the already-shipped
-  public routes (`/sessoes`) and the pt-BR default: `/login`, `/cadastro`,
-  `/verificar-email`. The spec's English names (`/register`, `/verify-email`)
-  were a placeholder; the URLs are UX, not a contract. Post-login redirect:
+  public routes (`/sessoes`) and the pt-BR default: `/login`, `/cadastro`.
+  **Exception — `/verify-email` stays English** because the backend builds
+  that exact link (`NotificationEventListener` →
+  `${APP_BASE_URL}/verify-email?token=…`); the path is a backend↔frontend
+  contract, not UX. A `/verificar-email` redirect alias is kept. (A routes
+  contract test, `app.routes.spec.ts`, guards this.) Post-login redirect:
   CUSTOMER → `returnUrl` or `/sessoes`; OPERATOR → `/operador`; ADMIN →
   `/admin`.
 - **Email-not-verified banner** lives in the app shell

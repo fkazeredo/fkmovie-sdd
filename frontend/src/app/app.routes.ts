@@ -32,12 +32,14 @@ export const routes: Routes = [
       import('./features/auth/pages/register-page/register-page').then((m) => m.RegisterPage),
   },
   {
-    path: 'verificar-email',
+    // Path dictated by the backend's email link (NotificationEventListener builds `/verify-email`).
+    path: 'verify-email',
     loadComponent: () =>
       import('./features/auth/pages/verify-email-page/verify-email-page').then(
         (m) => m.VerifyEmailPage,
       ),
   },
+  { path: 'verificar-email', redirectTo: 'verify-email' },
   {
     path: 'reservas/:id',
     canActivate: [authGuard],
