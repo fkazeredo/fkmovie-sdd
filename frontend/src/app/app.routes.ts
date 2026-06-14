@@ -1,6 +1,6 @@
 import { Routes } from '@angular/router';
 
-import { authGuard } from './core/auth/auth.guards';
+import { authGuard, roleGuard } from './core/auth/auth.guards';
 
 export const routes: Routes = [
   {
@@ -54,6 +54,43 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./features/reservation/pages/my-reservations-page/my-reservations-page').then(
         (m) => m.MyReservationsPage,
+      ),
+  },
+  {
+    path: 'admin',
+    canActivate: [roleGuard('ADMIN')],
+    loadComponent: () => import('./features/admin/admin-layout').then((m) => m.AdminLayout),
+    children: [
+      { path: '', pathMatch: 'full', redirectTo: 'filmes' },
+      {
+        path: 'filmes',
+        loadComponent: () =>
+          import('./features/admin/pages/movies-page/movies-page').then((m) => m.MoviesPage),
+      },
+      {
+        path: 'sessoes',
+        loadComponent: () =>
+          import('./features/admin/pages/screenings-admin-page/screenings-admin-page').then(
+            (m) => m.ScreeningsAdminPage,
+          ),
+      },
+    ],
+  },
+  {
+    path: 'operator',
+    pathMatch: 'full',
+    canActivate: [roleGuard('OPERATOR', 'ADMIN')],
+    loadComponent: () =>
+      import('./features/operator/pages/operator-search-page/operator-search-page').then(
+        (m) => m.OperatorSearchPage,
+      ),
+  },
+  {
+    path: 'operator/tickets/:ticketId/print',
+    canActivate: [roleGuard('OPERATOR', 'ADMIN')],
+    loadComponent: () =>
+      import('./features/operator/pages/ticket-print-page/ticket-print-page').then(
+        (m) => m.TicketPrintPage,
       ),
   },
   { path: '**', redirectTo: '' },

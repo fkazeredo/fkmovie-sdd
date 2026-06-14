@@ -1,0 +1,74 @@
+<main class="mx-auto max-w-lg px-6 py-10">
+  @if (loading()) {
+    <div class="flex justify-center py-20">
+      <p-progressSpinner strokeWidth="3" ariaLabel="loading" />
+    </div>
+  } @else if (error()) {
+    <div class="rounded-2xl border border-red-500/30 bg-red-500/10 p-8 text-center text-red-200">
+      <p>{{ errorText() }}</p>
+      <div class="mt-4 no-print">
+        <p-button [label]="'operator.back' | translate" routerLink="/operator" [outlined]="true" />
+      </div>
+    </div>
+  } @else if (ticket(); as t) {
+    <article
+      class="ticket rounded-2xl border border-white/15 bg-white p-8 text-slate-900 shadow-xl"
+    >
+      <header
+        class="mb-4 flex items-center justify-between border-b border-dashed border-slate-300 pb-4"
+      >
+        <span class="text-lg font-bold tracking-tight">fkmovies</span>
+        <span class="text-xs uppercase tracking-widest text-slate-500">{{
+          'operator.ticket' | translate
+        }}</span>
+      </header>
+      <h1 class="text-2xl font-bold">{{ t.movieTitle }}</h1>
+      <dl class="mt-4 grid grid-cols-2 gap-3 text-sm">
+        <div>
+          <dt class="text-xs uppercase tracking-wide text-slate-500">
+            {{ 'admin.screenings.room' | translate }}
+          </dt>
+          <dd class="font-medium">{{ t.roomName }}</dd>
+        </div>
+        <div>
+          <dt class="text-xs uppercase tracking-wide text-slate-500">
+            {{ 'reservation.seat' | translate }}
+          </dt>
+          <dd class="font-medium">{{ t.seatLabel }}</dd>
+        </div>
+        <div class="col-span-2">
+          <dt class="text-xs uppercase tracking-wide text-slate-500">
+            {{ 'admin.screenings.when' | translate }}
+          </dt>
+          <dd class="font-medium">{{ dateLabel(t.startsAt) }}</dd>
+        </div>
+        <div class="col-span-2">
+          <dt class="text-xs uppercase tracking-wide text-slate-500">
+            {{ 'operator.customer' | translate }}
+          </dt>
+          <dd class="font-medium">{{ t.customerName }}</dd>
+        </div>
+      </dl>
+      <div class="mt-6 rounded-xl border border-slate-300 bg-slate-50 p-4 text-center">
+        <p class="text-xs uppercase tracking-wide text-slate-500">
+          {{ 'reservation.ticketCode' | translate }}
+        </p>
+        <p class="font-mono text-2xl font-bold tracking-wider">{{ t.ticketCode }}</p>
+      </div>
+      @if (t.reprintCount > 0) {
+        <p class="mt-3 text-center text-xs text-slate-500">
+          {{ 'operator.reprintCount' | translate }}: {{ t.reprintCount }}
+        </p>
+      }
+    </article>
+    <div class="mt-6 flex justify-center gap-2 no-print">
+      <p-button
+        [label]="'operator.back' | translate"
+        routerLink="/operator"
+        severity="secondary"
+        [outlined]="true"
+      />
+      <p-button [label]="'operator.print' | translate" icon="pi pi-print" (onClick)="print()" />
+    </div>
+  }
+</main>

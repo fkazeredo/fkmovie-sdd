@@ -1,0 +1,153 @@
+<section class="mx-auto max-w-6xl px-6 py-8">
+  <p-confirmDialog />
+  <div class="mb-6 flex items-center justify-between">
+    <div>
+      <h1 class="text-2xl font-bold tracking-tight text-white">
+        {{ 'admin.screenings.title' | translate }}
+      </h1>
+      <p class="text-slate-400">{{ 'admin.screenings.subtitle' | translate }}</p>
+    </div>
+    <p-button
+      [label]="'admin.screenings.new' | translate"
+      icon="pi pi-plus"
+      (onClick)="openCreate()"
+    />
+  </div>
+
+  @if (loading()) {
+    <div class="flex justify-center py-20">
+      <p-progressSpinner strokeWidth="3" ariaLabel="loading" />
+    </div>
+  } @else if (error()) {
+    <div class="rounded-2xl border border-red-500/30 bg-red-500/10 p-8 text-center text-red-200">
+      {{ errorText() }}
+    </div>
+  } @else {
+    <div class="overflow-hidden rounded-2xl border border-white/10 bg-white/5 backdrop-blur">
+      <table class="w-full text-sm">
+        <thead
+          class="border-b border-white/10 text-left text-xs uppercase tracking-wide text-slate-400"
+        >
+          <tr>
+            <th class="px-4 py-3">{{ 'admin.screenings.movie' | translate }}</th>
+            <th class="px-4 py-3">{{ 'admin.screenings.room' | translate }}</th>
+            <th class="px-4 py-3">{{ 'admin.screenings.when' | translate }}</th>
+            <th class="px-4 py-3">{{ 'admin.screenings.price' | translate }}</th>
+            <th class="px-4 py-3">{{ 'admin.movies.status' | translate }}</th>
+            <th class="px-4 py-3 text-right">{{ 'admin.actions' | translate }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (s of screenings(); track s.id) {
+            <tr class="border-b border-white/5 last:border-0">
+              <td class="px-4 py-3 font-medium text-white">{{ movieTitle(s.movieId) }}</td>
+              <td class="px-4 py-3 text-slate-300">{{ roomName(s.roomId) }}</td>
+              <td class="px-4 py-3 text-slate-300">{{ dateLabel(s.startsAt) }}</td>
+              <td class="px-4 py-3 text-emerald-400">{{ priceLabel(s.basePriceCents) }}</td>
+              <td class="px-4 py-3">
+                <p-tag
+                  [severity]="s.status === 'SCHEDULED' ? 'success' : 'danger'"
+                  [value]="'admin.screeningStatus.' + s.status | translate"
+                />
+              </td>
+              <td class="px-4 py-3 text-right">
+                @if (s.status === 'SCHEDULED') {
+                  <p-button
+                    [label]="'admin.screenings.cancel' | translate"
+                    icon="pi pi-times"
+                    [text]="true"
+                    size="small"
+                    severity="danger"
+                    (onClick)="cancel(s)"
+                  />
+                }
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="6" class="px-4 py-10 text-center text-slate-400">
+                {{ 'admin.screenings.empty' | translate }}
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+
+  <p-dialog
+    [header]="'admin.screenings.new' | translate"
+    [visible]="dialogOpen()"
+    (visibleChange)="dialogOpen.set($event)"
+    [modal]="true"
+    [style]="{ width: '32rem' }"
+  >
+    <form [formGroup]="form" (ngSubmit)="save()" class="flex flex-col gap-4 pt-2">
+      <label class="flex flex-col gap-1">
+        <span class="text-sm font-medium text-slate-300">{{
+          'admin.screenings.movie' | translate
+        }}</span>
+        <select
+          formControlName="movieId"
+          class="w-full rounded-md border border-surface-600 bg-surface-900 px-3 py-2 text-white"
+        >
+          <option value="" disabled>{{ 'admin.screenings.pickMovie' | translate }}</option>
+          @for (m of activeMovies(); track m.id) {
+            <option [value]="m.id">{{ m.title }}</option>
+          }
+        </select>
+      </label>
+      <label class="flex flex-col gap-1">
+        <span class="text-sm font-medium text-slate-300">{{
+          'admin.screenings.room' | translate
+        }}</span>
+        <select
+          formControlName="roomId"
+          class="w-full rounded-md border border-surface-600 bg-surface-900 px-3 py-2 text-white"
+        >
+          <option value="" disabled>{{ 'admin.screenings.pickRoom' | translate }}</option>
+          @for (r of rooms(); track r.id) {
+            <option [value]="r.id">{{ r.name }}</option>
+          }
+        </select>
+      </label>
+      <label class="flex flex-col gap-1">
+        <span class="text-sm font-medium text-slate-300">{{
+          'admin.screenings.when' | translate
+        }}</span>
+        <input
+          type="datetime-local"
+          formControlName="startsAtLocal"
+          class="w-full rounded-md border border-surface-600 bg-surface-900 px-3 py-2 text-white"
+        />
+        <span class="text-xs text-slate-500">{{ 'admin.screenings.tzHint' | translate }}</span>
+      </label>
+      <label class="flex flex-col gap-1">
+        <span class="text-sm font-medium text-slate-300"
+          >{{ 'admin.screenings.price' | translate }} (R$)</span
+        >
+        <input
+          pInputText
+          type="number"
+          step="0.01"
+          formControlName="basePriceReais"
+          class="w-full"
+        />
+      </label>
+      <div class="mt-2 flex justify-end gap-2">
+        <p-button
+          [label]="'admin.cancel' | translate"
+          severity="secondary"
+          [text]="true"
+          (onClick)="dialogOpen.set(false)"
+        />
+        <p-button
+          type="submit"
+          [label]="'admin.save' | translate"
+          [loading]="saving()"
+          [disabled]="saving()"
+        />
+      </div>
+    </form>
+  </p-dialog>
+</section>

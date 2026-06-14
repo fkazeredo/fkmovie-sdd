@@ -1,0 +1,145 @@
+<section class="mx-auto max-w-6xl px-6 py-8">
+  <p-confirmDialog />
+  <div class="mb-6 flex items-center justify-between">
+    <div>
+      <h1 class="text-2xl font-bold tracking-tight text-white">
+        {{ 'admin.movies.title' | translate }}
+      </h1>
+      <p class="text-slate-400">{{ 'admin.movies.subtitle' | translate }}</p>
+    </div>
+    <p-button [label]="'admin.movies.new' | translate" icon="pi pi-plus" (onClick)="openCreate()" />
+  </div>
+
+  @if (loading()) {
+    <div class="flex justify-center py-20">
+      <p-progressSpinner strokeWidth="3" ariaLabel="loading" />
+    </div>
+  } @else if (error()) {
+    <div class="rounded-2xl border border-red-500/30 bg-red-500/10 p-8 text-center text-red-200">
+      {{ errorText() }}
+    </div>
+  } @else {
+    @let p = page();
+    <div class="overflow-hidden rounded-2xl border border-white/10 bg-white/5 backdrop-blur">
+      <table class="w-full text-sm">
+        <thead
+          class="border-b border-white/10 text-left text-xs uppercase tracking-wide text-slate-400"
+        >
+          <tr>
+            <th class="px-4 py-3">{{ 'admin.movies.titleCol' | translate }}</th>
+            <th class="px-4 py-3">{{ 'admin.movies.duration' | translate }}</th>
+            <th class="px-4 py-3">{{ 'admin.movies.rating' | translate }}</th>
+            <th class="px-4 py-3">{{ 'admin.movies.status' | translate }}</th>
+            <th class="px-4 py-3 text-right">{{ 'admin.actions' | translate }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (m of p?.content ?? []; track m.id) {
+            <tr class="border-b border-white/5 last:border-0">
+              <td class="px-4 py-3 font-medium text-white">{{ m.title }}</td>
+              <td class="px-4 py-3 text-slate-300">{{ m.durationMinutes }} min</td>
+              <td class="px-4 py-3"><p-tag severity="contrast" [value]="m.ageRating" /></td>
+              <td class="px-4 py-3">
+                <p-tag
+                  [severity]="m.status === 'ACTIVE' ? 'success' : 'secondary'"
+                  [value]="'admin.movieStatus.' + m.status | translate"
+                />
+              </td>
+              <td class="px-4 py-3 text-right">
+                <p-button
+                  icon="pi pi-pencil"
+                  [text]="true"
+                  size="small"
+                  [rounded]="true"
+                  (onClick)="openEdit(m)"
+                />
+                <p-button
+                  [icon]="m.status === 'ACTIVE' ? 'pi pi-inbox' : 'pi pi-undo'"
+                  [text]="true"
+                  size="small"
+                  [rounded]="true"
+                  severity="secondary"
+                  (onClick)="toggleArchive(m)"
+                />
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="5" class="px-4 py-10 text-center text-slate-400">
+                {{ 'admin.movies.empty' | translate }}
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+
+  <p-dialog
+    [header]="(editing() ? 'admin.movies.edit' : 'admin.movies.new') | translate"
+    [visible]="dialogOpen()"
+    (visibleChange)="dialogOpen.set($event)"
+    [modal]="true"
+    [style]="{ width: '32rem' }"
+  >
+    <form [formGroup]="form" (ngSubmit)="save()" class="flex flex-col gap-4 pt-2">
+      <label class="flex flex-col gap-1">
+        <span class="text-sm font-medium text-slate-300">{{
+          'admin.movies.titleCol' | translate
+        }}</span>
+        <input pInputText formControlName="title" class="w-full" />
+      </label>
+      <div class="flex gap-4">
+        <label class="flex flex-1 flex-col gap-1">
+          <span class="text-sm font-medium text-slate-300">{{
+            'admin.movies.duration' | translate
+          }}</span>
+          <input pInputText type="number" formControlName="durationMinutes" class="w-full" />
+        </label>
+        <label class="flex flex-1 flex-col gap-1">
+          <span class="text-sm font-medium text-slate-300">{{
+            'admin.movies.rating' | translate
+          }}</span>
+          <select
+            formControlName="ageRating"
+            class="w-full rounded-md border border-surface-600 bg-surface-900 px-3 py-2 text-white"
+          >
+            @for (r of ageRatings; track r) {
+              <option [value]="r">{{ r }}</option>
+            }
+          </select>
+        </label>
+      </div>
+      <label class="flex flex-col gap-1">
+        <span class="text-sm font-medium text-slate-300">{{
+          'admin.movies.synopsis' | translate
+        }}</span>
+        <textarea
+          formControlName="synopsis"
+          rows="3"
+          class="w-full rounded-md border border-surface-600 bg-surface-900 px-3 py-2 text-white"
+        ></textarea>
+      </label>
+      <label class="flex flex-col gap-1">
+        <span class="text-sm font-medium text-slate-300">{{
+          'admin.movies.poster' | translate
+        }}</span>
+        <input pInputText formControlName="posterUrl" class="w-full" />
+      </label>
+      <div class="mt-2 flex justify-end gap-2">
+        <p-button
+          [label]="'admin.cancel' | translate"
+          severity="secondary"
+          [text]="true"
+          (onClick)="dialogOpen.set(false)"
+        />
+        <p-button
+          type="submit"
+          [label]="'admin.save' | translate"
+          [loading]="saving()"
+          [disabled]="saving()"
+        />
+      </div>
+    </form>
+  </p-dialog>
+</section>

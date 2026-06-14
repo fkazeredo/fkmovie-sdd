@@ -6,6 +6,7 @@
     "screenings": "Screenings",
     "myReservations": "My reservations",
     "admin": "Admin",
+    "operator": "Operator",
     "login": "Sign in",
     "register": "Sign up",
     "logout": "Sign out"
@@ -127,6 +128,68 @@
       "resend": "Resend link",
       "sent": "Link resent."
     }
+  },
+  "admin": {
+    "actions": "Actions",
+    "save": "Save",
+    "cancel": "Cancel",
+    "saveFailed": "Could not save",
+    "movieStatus": { "ACTIVE": "Active", "ARCHIVED": "Archived" },
+    "screeningStatus": { "SCHEDULED": "Scheduled", "CANCELLED": "Cancelled" },
+    "movies": {
+      "title": "Movies",
+      "subtitle": "Manage the movie catalog.",
+      "new": "New movie",
+      "edit": "Edit movie",
+      "titleCol": "Title",
+      "duration": "Duration (min)",
+      "rating": "Rating",
+      "status": "Status",
+      "synopsis": "Synopsis",
+      "poster": "Poster URL",
+      "empty": "No movies yet.",
+      "saved": "Movie saved.",
+      "archive": "Archive movie",
+      "unarchive": "Reactivate movie",
+      "archiveConfirm": "Archive this movie? It will no longer be available for new screenings.",
+      "unarchiveConfirm": "Reactivate this movie?"
+    },
+    "screenings": {
+      "title": "Screenings",
+      "subtitle": "Schedule and manage screenings.",
+      "new": "New screening",
+      "movie": "Movie",
+      "room": "Room",
+      "when": "Date and time",
+      "price": "Base price",
+      "pickMovie": "Select a movie",
+      "pickRoom": "Select a room",
+      "tzHint": "Brasília time (America/Sao_Paulo).",
+      "empty": "No screenings scheduled.",
+      "saved": "Screening scheduled.",
+      "cancel": "Cancel screening",
+      "cancelConfirm": "Cancel this screening?",
+      "cancelled": "Screening cancelled."
+    }
+  },
+  "operator": {
+    "title": "Operator console",
+    "subtitle": "Find a reservation and reprint tickets.",
+    "search": "Search",
+    "criterion": {
+      "ticketCode": "Ticket code",
+      "reservationId": "Reservation ID",
+      "email": "Email"
+    },
+    "customer": "Customer",
+    "openDetail": "View details",
+    "noResults": "No reservations found.",
+    "noTickets": "This reservation has no issued tickets yet.",
+    "reprint": "Reprint",
+    "reprintCount": "Reprints",
+    "ticket": "Ticket",
+    "print": "Print",
+    "back": "Back"
   },
   "errors": {
     "auth": {

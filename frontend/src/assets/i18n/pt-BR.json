@@ -6,6 +6,7 @@
     "screenings": "Sessões",
     "myReservations": "Minhas reservas",
     "admin": "Admin",
+    "operator": "Operador",
     "login": "Entrar",
     "register": "Criar conta",
     "logout": "Sair"
@@ -127,6 +128,68 @@
       "resend": "Reenviar link",
       "sent": "Link reenviado."
     }
+  },
+  "admin": {
+    "actions": "Ações",
+    "save": "Salvar",
+    "cancel": "Cancelar",
+    "saveFailed": "Não foi possível salvar",
+    "movieStatus": { "ACTIVE": "Ativo", "ARCHIVED": "Arquivado" },
+    "screeningStatus": { "SCHEDULED": "Agendada", "CANCELLED": "Cancelada" },
+    "movies": {
+      "title": "Filmes",
+      "subtitle": "Gerencie o catálogo de filmes.",
+      "new": "Novo filme",
+      "edit": "Editar filme",
+      "titleCol": "Título",
+      "duration": "Duração (min)",
+      "rating": "Classificação",
+      "status": "Status",
+      "synopsis": "Sinopse",
+      "poster": "URL do pôster",
+      "empty": "Nenhum filme cadastrado.",
+      "saved": "Filme salvo.",
+      "archive": "Arquivar filme",
+      "unarchive": "Reativar filme",
+      "archiveConfirm": "Arquivar este filme? Ele deixará de aparecer para novas sessões.",
+      "unarchiveConfirm": "Reativar este filme?"
+    },
+    "screenings": {
+      "title": "Sessões",
+      "subtitle": "Agende e gerencie as sessões.",
+      "new": "Nova sessão",
+      "movie": "Filme",
+      "room": "Sala",
+      "when": "Data e hora",
+      "price": "Preço base",
+      "pickMovie": "Selecione um filme",
+      "pickRoom": "Selecione uma sala",
+      "tzHint": "Horário de Brasília (America/Sao_Paulo).",
+      "empty": "Nenhuma sessão agendada.",
+      "saved": "Sessão agendada.",
+      "cancel": "Cancelar sessão",
+      "cancelConfirm": "Cancelar esta sessão?",
+      "cancelled": "Sessão cancelada."
+    }
+  },
+  "operator": {
+    "title": "Console do operador",
+    "subtitle": "Localize uma reserva e reimprima ingressos.",
+    "search": "Buscar",
+    "criterion": {
+      "ticketCode": "Código do ingresso",
+      "reservationId": "ID da reserva",
+      "email": "E-mail"
+    },
+    "customer": "Cliente",
+    "openDetail": "Ver detalhes",
+    "noResults": "Nenhuma reserva encontrada.",
+    "noTickets": "Esta reserva ainda não tem ingressos emitidos.",
+    "reprint": "Reimprimir",
+    "reprintCount": "Reimpressões",
+    "ticket": "Ingresso",
+    "print": "Imprimir",
+    "back": "Voltar"
   },
   "errors": {
     "auth": {

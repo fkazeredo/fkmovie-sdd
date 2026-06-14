@@ -18,6 +18,14 @@
       }
       @if (auth.isStaff()) {
         <a
+          routerLink="/operator"
+          class="text-sm text-surface-300 hover:text-primary"
+          routerLinkActive="text-primary font-medium"
+          >{{ 'nav.operator' | translate }}</a
+        >
+      }
+      @if (auth.isAdmin()) {
+        <a
           routerLink="/admin"
           class="text-sm text-surface-300 hover:text-primary"
           routerLinkActive="text-primary font-medium"
