@@ -105,8 +105,9 @@ So the control system has three layers (see [CLAUDE.md](CLAUDE.md)):
 3. **Deterministic enforcement** - rules a tool can check are *code, not prose*:
    - [`ArchitectureTest.java`](backend/src/test/java/com/fksoft/architecture/ArchitectureTest.java)
      (ArchUnit) and [`ModularityTests.java`](backend/src/test/java/com/fksoft/architecture/ModularityTests.java)
-     (Spring Modulith) fail the build on boundary violations, `@Data` entities, `*Impl`
-     naming, field injection, controller->repository access, and cross-module persistence leaks.
+     (Spring Modulith) fail the build on boundary violations, `@Data`/`@Setter` entities,
+     `*Impl` naming, field injection, controller->repository access, and cross-module
+     persistence leaks.
    - Spotless + Checkstyle (formatting and style as a build fact).
    - `.claude/settings.json` denies destructive commands and protects secrets.
 

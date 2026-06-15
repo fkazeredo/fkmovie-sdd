@@ -55,8 +55,8 @@ domain behavior and results. It **MUST NOT** become a dumping ground for busines
 domain rules live in entities, value objects, enums with behavior, policies or domain
 services. **MUST NOT** create explicit `UseCase` classes by default.
 
-Lombok is the pragmatic default for component boilerplate: `@RequiredArgsConstructor` for
-constructor injection (over `final` fields; no field `@Autowired`) and `@Slf4j` for loggers.
+Lombok is the pragmatic default for component boilerplate (ADR 0013): `@RequiredArgsConstructor`
+for constructor injection (over `final` fields; no field `@Autowired`) and `@Slf4j` for loggers.
 Keep a hand-written constructor only when params carry `@Value`/`@Qualifier` or the constructor
 has logic.
 
@@ -65,7 +65,7 @@ has logic.
 JPA entities **MAY** be domain entities; no artificial domain/persistence separation by
 default. Anemic models are not acceptable: entities **MUST** protect invariants and expose
 meaningful methods. Entities **MAY** use Lombok `@Getter` and
-`@NoArgsConstructor(access = PROTECTED)` for boilerplate (the project sets
+`@NoArgsConstructor(access = PROTECTED)` for boilerplate (ADR 0013; the project sets
 `lombok.accessors.fluent = true`, so getters stay `title()`), but **NEVER** `@Data` or
 `@Setter` — they mutate only through meaningful business methods (both ArchUnit-enforced).
 Separate persistence models only for concrete reasons (complex legacy mapping, read models
