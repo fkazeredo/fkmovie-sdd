@@ -1,22 +1,22 @@
 package com.fksoft.application.auth;
 
-import com.fksoft.shared.error.BusinessException;
-import java.util.Map;
-import org.springframework.http.HttpStatus;
+import com.fksoft.shared.error.DomainException;
+import com.fksoft.shared.error.RateLimited;
+import java.time.Duration;
 
-/** Lockout active (SPEC-0003); carries {@code Retry-After} so clients can back off correctly. */
-public class LoginRateLimitedException extends BusinessException {
+/** Lockout active (SPEC-0003); states how long to wait so clients can back off correctly. */
+public class LoginRateLimitedException extends DomainException implements RateLimited {
 
     private final long retryAfterSeconds;
 
     public LoginRateLimitedException(long retryAfterSeconds) {
-        super(HttpStatus.TOO_MANY_REQUESTS, "auth.rate-limited");
+        super("auth.rate-limited");
         this.retryAfterSeconds = retryAfterSeconds;
     }
 
     @Override
-    public Map<String, String> httpHeaders() {
-        return Map.of("Retry-After", String.valueOf(retryAfterSeconds));
+    public Duration retryAfter() {
+        return Duration.ofSeconds(retryAfterSeconds);
     }
 
     public long retryAfterSeconds() {

@@ -1,12 +1,11 @@
 package com.fksoft.application.booking;
 
-import com.fksoft.shared.error.BusinessException;
-import org.springframework.http.HttpStatus;
+import com.fksoft.shared.error.DomainException;
 
 /** The user already holds an active reservation for this screening (SPEC-0014). */
-public class ActiveReservationExistsException extends BusinessException {
+public class ActiveReservationExistsException extends DomainException {
 
     public ActiveReservationExistsException() {
-        super(HttpStatus.CONFLICT, "booking.active-reservation-exists");
+        super("booking.active-reservation-exists");
     }
 }

@@ -1,21 +1,21 @@
 package com.fksoft.application.auth;
 
-import com.fksoft.shared.error.BusinessException;
-import java.util.Map;
-import org.springframework.http.HttpStatus;
+import com.fksoft.shared.error.DomainException;
+import com.fksoft.shared.error.RateLimited;
+import java.time.Duration;
 
-/** Resend-verification / forgot-password abuse (SPEC-0004: 1/min); carries Retry-After. */
-public class RegistrationRateLimitedException extends BusinessException {
+/** Resend-verification / forgot-password abuse (SPEC-0004: 1/min); states the wait before retry. */
+public class RegistrationRateLimitedException extends DomainException implements RateLimited {
 
     private final long retryAfterSeconds;
 
     public RegistrationRateLimitedException(long retryAfterSeconds) {
-        super(HttpStatus.TOO_MANY_REQUESTS, "user.rate-limited");
+        super("user.rate-limited");
         this.retryAfterSeconds = retryAfterSeconds;
     }
 
     @Override
-    public Map<String, String> httpHeaders() {
-        return Map.of("Retry-After", String.valueOf(retryAfterSeconds));
+    public Duration retryAfter() {
+        return Duration.ofSeconds(retryAfterSeconds);
     }
 }

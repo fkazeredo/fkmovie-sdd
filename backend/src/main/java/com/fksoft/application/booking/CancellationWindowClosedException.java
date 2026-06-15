@@ -1,12 +1,11 @@
 package com.fksoft.application.booking;
 
-import com.fksoft.shared.error.BusinessException;
-import org.springframework.http.HttpStatus;
+import com.fksoft.shared.error.DomainException;
 
 /** A confirmed reservation is too close to the session start to self-cancel (SPEC-0018): 409. */
-public class CancellationWindowClosedException extends BusinessException {
+public class CancellationWindowClosedException extends DomainException {
 
     public CancellationWindowClosedException() {
-        super(HttpStatus.CONFLICT, "booking.cancellation-window-closed");
+        super("booking.cancellation-window-closed");
     }
 }

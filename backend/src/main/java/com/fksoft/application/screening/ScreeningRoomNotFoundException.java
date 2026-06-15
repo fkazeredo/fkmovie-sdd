@@ -1,12 +1,11 @@
 package com.fksoft.application.screening;
 
-import com.fksoft.shared.error.BusinessException;
-import org.springframework.http.HttpStatus;
+import com.fksoft.shared.error.DomainException;
 
 /** The referenced room does not exist (SPEC-0009). */
-public class ScreeningRoomNotFoundException extends BusinessException {
+public class ScreeningRoomNotFoundException extends DomainException {
 
     public ScreeningRoomNotFoundException() {
-        super(HttpStatus.NOT_FOUND, "screening.room-not-found");
+        super("screening.room-not-found");
     }
 }

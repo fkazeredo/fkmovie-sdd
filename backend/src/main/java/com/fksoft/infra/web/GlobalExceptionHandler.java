@@ -1,11 +1,15 @@
-package com.fksoft.shared.error;
+package com.fksoft.infra.web;
 
+import com.fksoft.shared.error.DomainException;
+import com.fksoft.shared.error.ErrorDetails;
+import com.fksoft.shared.error.RateLimited;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.dao.OptimisticLockingFailureException;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
@@ -17,9 +21,11 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 /**
- * Global error handling for every REST endpoint (architecture/backend.md): translates
- * exceptions into the standard {@link ApiErrorResponse} payload with i18n-resolved
- * messages. Unhandled exceptions become {@code internal.error} and are logged at ERROR.
+ * Global error handling for every REST endpoint (architecture/backend.md, ADR 0011): translates
+ * exceptions into the standard {@link ApiErrorResponse} payload with i18n-resolved messages. Domain
+ * exceptions are transport-agnostic — this presentation layer owns the HTTP status ({@link
+ * HttpErrorMapping}), the {@code Retry-After} header ({@link RateLimited}) and the response {@code
+ * fields} ({@link ErrorDetails}). Unhandled exceptions become {@code internal.error}, logged at ERROR.
  */
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -32,16 +38,29 @@ public class GlobalExceptionHandler {
         this.messageSource = messageSource;
     }
 
-    /** Business errors: status, stable code and optional headers defined by the exception. */
-    @ExceptionHandler(BusinessException.class)
-    public ResponseEntity<ApiErrorResponse> handleBusiness(BusinessException exception) {
+    /** Domain errors: status from the registry; optional Retry-After / fields from domain data. */
+    @ExceptionHandler(DomainException.class)
+    public ResponseEntity<ApiErrorResponse> handleDomain(DomainException exception) {
         var body = new ApiErrorResponse(
                 exception.code(),
-                messageSource.getMessage(exception.code(), exception.messageArgs(), LocaleContextHolder.getLocale()),
-                exception.fields());
-        var response = ResponseEntity.status(exception.status());
-        exception.httpHeaders().forEach(response::header);
+                messageSource.getMessage(exception.code(), exception.args(), LocaleContextHolder.getLocale()),
+                fieldsOf(exception));
+        var response = ResponseEntity.status(HttpErrorMapping.statusOf(exception.getClass()));
+        if (exception instanceof RateLimited rateLimited) {
+            response.header(
+                    HttpHeaders.RETRY_AFTER,
+                    String.valueOf(rateLimited.retryAfter().toSeconds()));
+        }
         return response.body(body);
+    }
+
+    private static List<ApiErrorResponse.FieldViolation> fieldsOf(DomainException exception) {
+        if (exception instanceof ErrorDetails details) {
+            return details.details().stream()
+                    .map(detail -> new ApiErrorResponse.FieldViolation(detail.key(), detail.value()))
+                    .toList();
+        }
+        return List.of();
     }
 
     /** Bean Validation failures on request bodies: 400 with one entry per invalid field. */

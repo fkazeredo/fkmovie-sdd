@@ -1,12 +1,11 @@
 package com.fksoft.application.booking;
 
-import com.fksoft.shared.error.BusinessException;
-import org.springframework.http.HttpStatus;
+import com.fksoft.shared.error.DomainException;
 
 /** The reservation was cancelled and cannot be confirmed (SPEC-0016). */
-public class ReservationCancelledException extends BusinessException {
+public class ReservationCancelledException extends DomainException {
 
     public ReservationCancelledException() {
-        super(HttpStatus.CONFLICT, "booking.reservation-cancelled");
+        super("booking.reservation-cancelled");
     }
 }

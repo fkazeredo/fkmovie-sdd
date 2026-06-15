@@ -1,12 +1,11 @@
 package com.fksoft.application.auth;
 
-import com.fksoft.shared.error.BusinessException;
-import org.springframework.http.HttpStatus;
+import com.fksoft.shared.error.DomainException;
 
 /** Wrong email or password; deliberately indistinguishable to avoid user enumeration. */
-public class InvalidCredentialsException extends BusinessException {
+public class InvalidCredentialsException extends DomainException {
 
     public InvalidCredentialsException() {
-        super(HttpStatus.UNAUTHORIZED, "auth.invalid-credentials");
+        super("auth.invalid-credentials");
     }
 }

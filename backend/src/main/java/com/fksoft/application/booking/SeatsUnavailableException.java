@@ -1,28 +1,26 @@
 package com.fksoft.application.booking;
 
-import com.fksoft.shared.error.ApiErrorResponse;
-import com.fksoft.shared.error.BusinessException;
+import com.fksoft.shared.error.DomainException;
+import com.fksoft.shared.error.ErrorDetails;
 import java.util.List;
 import java.util.UUID;
-import org.springframework.http.HttpStatus;
 
 /**
  * One or more selected seats cannot be held (SPEC-0014): not FREE, or not part of the screening.
- * The response lists the offending seat ids under {@code fields} (all-or-nothing).
+ * Carries the offending seat ids as domain details (all-or-nothing); the presentation renders them
+ * into the response {@code fields}.
  */
-public class SeatsUnavailableException extends BusinessException {
+public class SeatsUnavailableException extends DomainException implements ErrorDetails {
 
     private final transient List<UUID> seatIds;
 
     public SeatsUnavailableException(List<UUID> seatIds) {
-        super(HttpStatus.CONFLICT, "booking.seats-unavailable");
+        super("booking.seats-unavailable");
         this.seatIds = List.copyOf(seatIds);
     }
 
     @Override
-    public List<ApiErrorResponse.FieldViolation> fields() {
-        return seatIds.stream()
-                .map(id -> new ApiErrorResponse.FieldViolation("seatId", id.toString()))
-                .toList();
+    public List<Detail> details() {
+        return seatIds.stream().map(id -> new Detail("seatId", id.toString())).toList();
     }
 }

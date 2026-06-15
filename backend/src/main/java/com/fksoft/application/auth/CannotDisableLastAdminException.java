@@ -1,12 +1,11 @@
 package com.fksoft.application.auth;
 
-import com.fksoft.shared.error.BusinessException;
-import org.springframework.http.HttpStatus;
+import com.fksoft.shared.error.DomainException;
 
 /** Disabling would leave the system with no active admin (SPEC-0005). */
-public class CannotDisableLastAdminException extends BusinessException {
+public class CannotDisableLastAdminException extends DomainException {
 
     public CannotDisableLastAdminException() {
-        super(HttpStatus.CONFLICT, "user.cannot-disable-last-admin");
+        super("user.cannot-disable-last-admin");
     }
 }

@@ -1,12 +1,11 @@
 package com.fksoft.application.booking;
 
-import com.fksoft.shared.error.BusinessException;
-import org.springframework.http.HttpStatus;
+import com.fksoft.shared.error.DomainException;
 
 /** The reservation is already confirmed (SPEC-0016). */
-public class AlreadyConfirmedException extends BusinessException {
+public class AlreadyConfirmedException extends DomainException {
 
     public AlreadyConfirmedException() {
-        super(HttpStatus.CONFLICT, "booking.already-confirmed");
+        super("booking.already-confirmed");
     }
 }

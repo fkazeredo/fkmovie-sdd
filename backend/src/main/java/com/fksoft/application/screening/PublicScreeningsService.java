@@ -4,7 +4,6 @@ import com.fksoft.application.cinema.CinemaCatalog;
 import com.fksoft.application.cinema.RoomView;
 import com.fksoft.application.pricing.PriceCalculator;
 import com.fksoft.application.pricing.ScreeningPricingContext;
-import com.fksoft.shared.pagination.PageResponse;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Timer;
 import java.time.Duration;
@@ -17,6 +16,8 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -55,7 +56,7 @@ public class PublicScreeningsService {
 
     /** Lists upcoming sessions (SPEC-0010); size clamped to 100, sorted by start ascending. */
     @Transactional(readOnly = true)
-    public PageResponse<PublicScreeningView> list(String date, UUID movieId, int page, int size) {
+    public Page<PublicScreeningView> list(String date, UUID movieId, int page, int size) {
         var sample = Timer.start(meterRegistry);
         try {
             var now = Instant.now();
@@ -63,12 +64,7 @@ public class PublicScreeningsService {
             var pageable = PageRequest.of(Math.max(page, 0), clampSize(size), Sort.by(Sort.Direction.ASC, "startsAt"));
             var result = screenings.searchPublic(now, window.from(), window.to(), movieId, pageable);
             meterRegistry.counter("public_screenings_list_total").increment();
-            return new PageResponse<>(
-                    assemble(result.getContent()),
-                    result.getNumber(),
-                    result.getSize(),
-                    result.getTotalElements(),
-                    result.getTotalPages());
+            return new PageImpl<>(assemble(result.getContent()), pageable, result.getTotalElements());
         } finally {
             sample.stop(Timer.builder("public_screenings_list_latency")
                     .publishPercentileHistogram()

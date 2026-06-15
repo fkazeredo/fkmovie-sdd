@@ -77,10 +77,15 @@ depend on controller validation to remain valid.
 
 ## Errors and i18n
 
-Business errors are explicit, specific exceptions (`OrderCannotBeCancelledException`), with a
-stable error code and message arguments — never a hardcoded user-facing message as source of
-truth. Every API **MUST** have a global `@RestControllerAdvice` handler and a predictable
-error structure:
+Business errors are explicit, specific exceptions (`OrderCannotBeCancelledException`) that extend
+the pure **`DomainException`** (kernel `shared.error`) carrying only domain data: a stable `code`
+(== i18n key) + optional message args, and — when needed — extra domain data via the kernel
+interfaces `ErrorDetails` (e.g. the unavailable seat ids) or `RateLimited` (a retry duration).
+**Domain exceptions carry NO transport concern** (no `HttpStatus`, no headers, no response DTO) —
+ADR 0011. The **presentation layer** (`com.fksoft.infra.web`) owns the HTTP mapping: a
+`@RestControllerAdvice` `GlobalExceptionHandler` + an `HttpErrorMapping` registry (exception
+type → status; build-time test enforces completeness) renders the response and sets `Retry-After`.
+Every API **MUST** have a global handler and a predictable error structure:
 
 ```json
 { "code": "order.cannot-be-cancelled", "message": "...", "fields": [] }

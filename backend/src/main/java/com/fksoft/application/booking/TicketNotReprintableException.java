@@ -1,12 +1,11 @@
 package com.fksoft.application.booking;
 
-import com.fksoft.shared.error.BusinessException;
-import org.springframework.http.HttpStatus;
+import com.fksoft.shared.error.DomainException;
 
 /** The ticket cannot be reprinted — not VALID, or its reservation is not CONFIRMED (SPEC-0020): 409. */
-public class TicketNotReprintableException extends BusinessException {
+public class TicketNotReprintableException extends DomainException {
 
     public TicketNotReprintableException() {
-        super(HttpStatus.CONFLICT, "booking.ticket-not-reprintable");
+        super("booking.ticket-not-reprintable");
     }
 }

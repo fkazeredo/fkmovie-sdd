@@ -1,12 +1,11 @@
 package com.fksoft.application.auth;
 
-import com.fksoft.shared.error.BusinessException;
-import org.springframework.http.HttpStatus;
+import com.fksoft.shared.error.DomainException;
 
 /** Change-password presented a wrong current password (SPEC-0003). */
-public class PasswordMismatchException extends BusinessException {
+public class PasswordMismatchException extends DomainException {
 
     public PasswordMismatchException() {
-        super(HttpStatus.UNAUTHORIZED, "auth.password-mismatch");
+        super("auth.password-mismatch");
     }
 }

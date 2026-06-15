@@ -1,16 +1,12 @@
 package com.fksoft.shared.security;
 
-import java.util.UUID;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
-import org.springframework.stereotype.Component;
-
 /**
- * Centralized access to the current user (architecture/security.md): application services
- * MUST use this instead of touching {@code SecurityContextHolder} directly.
+ * Port for the authenticated caller's identity (architecture/security.md): controllers and
+ * application code MUST use this instead of touching {@code SecurityContextHolder} directly. The
+ * adapter that reads the security context lives in {@code com.fksoft.infra.security} (ADR 0010/0011),
+ * so the domain depends only on this interface, never on the framework.
  */
-@Component
-public class UserContextProvider {
+public interface UserContextProvider {
 
     /**
      * Returns the authenticated caller's identity.
@@ -18,13 +14,5 @@ public class UserContextProvider {
      * @throws IllegalStateException when called outside an authenticated request — protected
      *     endpoints are guarded by Spring Security, so this indicates a programming error.
      */
-    public UserContext currentUser() {
-        var authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (!(authentication instanceof JwtAuthenticationToken jwtAuthentication)) {
-            throw new IllegalStateException("No authenticated user in the current context");
-        }
-        var jwt = jwtAuthentication.getToken();
-        return new UserContext(
-                UUID.fromString(jwt.getSubject()), jwt.getClaimAsString("role"), jwt.getClaimAsString("tenantId"));
-    }
+    UserContext currentUser();
 }

@@ -5,6 +5,7 @@ import com.fksoft.application.booking.MyReservationsService;
 import com.fksoft.application.booking.ReservationStatus;
 import com.fksoft.shared.pagination.PageResponse;
 import com.fksoft.shared.security.UserContextProvider;
+import java.util.function.Function;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -30,6 +31,8 @@ class MyReservationsController {
             @RequestParam(defaultValue = "false") boolean upcoming,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size) {
-        return myReservations.list(userContext.currentUser().userId(), status, upcoming, page, size);
+        return PageResponse.from(
+                myReservations.list(userContext.currentUser().userId(), status, upcoming, page, size),
+                Function.identity());
     }
 }

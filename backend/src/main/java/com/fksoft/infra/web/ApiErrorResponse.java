@@ -1,4 +1,4 @@
-package com.fksoft.shared.error;
+package com.fksoft.infra.web;
 
 import java.util.List;
 

@@ -1,4 +1,4 @@
-package com.fksoft.shared.error;
+package com.fksoft.infra.web;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;

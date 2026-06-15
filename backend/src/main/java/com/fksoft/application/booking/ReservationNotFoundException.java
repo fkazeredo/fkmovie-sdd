@@ -1,12 +1,11 @@
 package com.fksoft.application.booking;
 
-import com.fksoft.shared.error.BusinessException;
-import org.springframework.http.HttpStatus;
+import com.fksoft.shared.error.DomainException;
 
 /** Lookup of a reservation that does not exist (SPEC-0014). */
-public class ReservationNotFoundException extends BusinessException {
+public class ReservationNotFoundException extends DomainException {
 
     public ReservationNotFoundException() {
-        super(HttpStatus.NOT_FOUND, "booking.reservation-not-found");
+        super("booking.reservation-not-found");
     }
 }

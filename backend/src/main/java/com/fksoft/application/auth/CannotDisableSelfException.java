@@ -1,12 +1,11 @@
 package com.fksoft.application.auth;
 
-import com.fksoft.shared.error.BusinessException;
-import org.springframework.http.HttpStatus;
+import com.fksoft.shared.error.DomainException;
 
 /** An admin tried to disable their own account (SPEC-0005). */
-public class CannotDisableSelfException extends BusinessException {
+public class CannotDisableSelfException extends DomainException {
 
     public CannotDisableSelfException() {
-        super(HttpStatus.CONFLICT, "user.cannot-disable-self");
+        super("user.cannot-disable-self");
     }
 }

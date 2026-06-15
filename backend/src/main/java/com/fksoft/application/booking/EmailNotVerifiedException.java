@@ -1,12 +1,11 @@
 package com.fksoft.application.booking;
 
-import com.fksoft.shared.error.BusinessException;
-import org.springframework.http.HttpStatus;
+import com.fksoft.shared.error.DomainException;
 
 /** The customer must verify their email before reserving (SPEC-0014). */
-public class EmailNotVerifiedException extends BusinessException {
+public class EmailNotVerifiedException extends DomainException {
 
     public EmailNotVerifiedException() {
-        super(HttpStatus.FORBIDDEN, "user.email-not-verified");
+        super("user.email-not-verified");
     }
 }

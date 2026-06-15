@@ -1,12 +1,12 @@
 package com.fksoft.application.booking;
 
 import com.fksoft.application.screening.ScreeningCatalog;
-import com.fksoft.shared.pagination.PageResponse;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Timer;
 import java.time.Clock;
 import java.util.UUID;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -45,8 +45,7 @@ public class MyReservationsService {
 
     /** Lists the caller's reservations (SPEC-0019); size clamped to 50, newest first. */
     @Transactional(readOnly = true)
-    public PageResponse<MyReservationView> list(
-            UUID callerId, ReservationStatus status, boolean upcoming, int page, int size) {
+    public Page<MyReservationView> list(UUID callerId, ReservationStatus status, boolean upcoming, int page, int size) {
         var sample = Timer.start(meterRegistry);
         try {
             var pageable =
@@ -55,8 +54,7 @@ public class MyReservationsService {
             var items = summaries.summarize(result.getContent()).stream()
                     .map(MyReservationsService::toView)
                     .toList();
-            return new PageResponse<>(
-                    items, result.getNumber(), result.getSize(), result.getTotalElements(), result.getTotalPages());
+            return new PageImpl<>(items, pageable, result.getTotalElements());
         } finally {
             sample.stop(Timer.builder("my_reservations_list_latency")
                     .publishPercentileHistogram()

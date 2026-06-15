@@ -2,7 +2,7 @@ package com.fksoft.application.booking;
 
 import com.fksoft.application.pricing.PriceCalculator;
 import com.fksoft.application.pricing.ScreeningPricingContext;
-import com.fksoft.shared.error.BusinessException;
+import com.fksoft.shared.error.DomainException;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Timer;
 import java.time.Instant;
@@ -65,7 +65,7 @@ public class ReservationService {
         var sample = Timer.start(meterRegistry);
         try {
             return doReserve(callerId, screeningId, selections);
-        } catch (BusinessException ex) {
+        } catch (DomainException ex) {
             meterRegistry
                     .counter("reservations_rejected_total", "reason", ex.code())
                     .increment();

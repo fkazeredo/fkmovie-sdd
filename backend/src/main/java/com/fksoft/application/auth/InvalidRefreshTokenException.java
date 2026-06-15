@@ -1,12 +1,11 @@
 package com.fksoft.application.auth;
 
-import com.fksoft.shared.error.BusinessException;
-import org.springframework.http.HttpStatus;
+import com.fksoft.shared.error.DomainException;
 
 /** Refresh token missing, unknown or expired (SPEC-0003). */
-public class InvalidRefreshTokenException extends BusinessException {
+public class InvalidRefreshTokenException extends DomainException {
 
     public InvalidRefreshTokenException() {
-        super(HttpStatus.UNAUTHORIZED, "auth.invalid-refresh");
+        super("auth.invalid-refresh");
     }
 }
