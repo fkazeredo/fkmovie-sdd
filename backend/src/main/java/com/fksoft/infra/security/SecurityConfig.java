@@ -1,6 +1,5 @@
 package com.fksoft.infra.security;
 
-import com.fksoft.infra.config.JwtProperties;
 import com.nimbusds.jose.jwk.source.ImmutableSecret;
 import java.nio.charset.StandardCharsets;
 import javax.crypto.spec.SecretKeySpec;

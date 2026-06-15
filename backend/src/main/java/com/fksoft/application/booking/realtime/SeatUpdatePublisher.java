@@ -15,7 +15,7 @@ import org.springframework.transaction.event.TransactionalEventListener;
 /**
  * Publishes seat-status changes to the public topic (SPEC-0013, ADR 0009). Reacts AFTER_COMMIT to the
  * booking domain event and resolves each seat's row/number through the cinema facade — it only reads
- * and sends, never changing seat state. The realtime transport lives in {@code infra.realtime}; this
+ * and sends, never changing seat state. The realtime transport lives in {@code infra.socket}; this
  * publisher uses the generic {@code SimpMessagingTemplate}.
  */
 @Component

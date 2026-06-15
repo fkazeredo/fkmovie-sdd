@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
  * comparison is constant-time.
  */
 @Component
-class PaymentSigner {
+public class PaymentSigner {
 
     private final byte[] secret;
 
@@ -22,7 +22,8 @@ class PaymentSigner {
         this.secret = secret.getBytes(StandardCharsets.UTF_8);
     }
 
-    String sign(String body) {
+    /** Returns the hex HMAC-SHA256 signature of the body, using the configured webhook secret. */
+    public String sign(String body) {
         try {
             var mac = Mac.getInstance("HmacSHA256");
             mac.init(new SecretKeySpec(secret, "HmacSHA256"));

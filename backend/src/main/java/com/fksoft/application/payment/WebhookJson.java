@@ -11,12 +11,12 @@ import org.springframework.stereotype.Component;
  * receives.
  */
 @Component
-class WebhookJson {
+public class WebhookJson {
 
     private final ObjectMapper mapper =
             new ObjectMapper().findAndRegisterModules().disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
 
-    String write(WebhookPayload payload) {
+    public String write(WebhookPayload payload) {
         try {
             return mapper.writeValueAsString(payload);
         } catch (Exception ex) {

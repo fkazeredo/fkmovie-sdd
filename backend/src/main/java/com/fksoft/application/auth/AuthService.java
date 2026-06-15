@@ -22,7 +22,7 @@ public class AuthService {
 
     private final UserRepository users;
     private final RefreshTokenService refreshTokens;
-    private final AccessTokenIssuer accessTokens;
+    private final AccessTokens accessTokens;
     private final LoginRateLimiter rateLimiter;
     private final PasswordEncoder passwordEncoder;
     private final ApplicationEventPublisher events;
@@ -32,7 +32,7 @@ public class AuthService {
     public AuthService(
             UserRepository users,
             RefreshTokenService refreshTokens,
-            AccessTokenIssuer accessTokens,
+            AccessTokens accessTokens,
             LoginRateLimiter rateLimiter,
             PasswordEncoder passwordEncoder,
             ApplicationEventPublisher events,
@@ -82,7 +82,7 @@ public class AuthService {
         }
 
         rateLimiter.recordSuccess(normalizedEmail, ip, now);
-        var access = accessTokens.issueFor(user, now);
+        var access = accessTokens.issue(user.id().toString(), user.role().name(), user.tenantId(), now);
         var refresh = refreshTokens.issueFor(user.id(), ip, userAgent, now);
         events.publishEvent(new UserLoggedIn(user.id(), ip, userAgent, now));
         countLogin("success");
@@ -108,7 +108,7 @@ public class AuthService {
         }
         var user = users.findById(rotation.userId()).orElseThrow(InvalidRefreshTokenException::new);
         user.requireActive();
-        var access = accessTokens.issueFor(user, now);
+        var access = accessTokens.issue(user.id().toString(), user.role().name(), user.tenantId(), now);
         meterRegistry.counter("auth.refresh", "outcome", "success").increment();
         return new AuthResult(
                 access.token(), access.expiresAt(), rotation.issued().rawToken(), user);

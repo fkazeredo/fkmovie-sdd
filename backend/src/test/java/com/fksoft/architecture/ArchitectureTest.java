@@ -131,8 +131,10 @@ class ArchitectureTest {
     }
 
     /**
-     * SPEC-0006: the notification module's outbox is module-internal — other modules trigger
-     * email by publishing events, never by touching {@code OutboxEmail}/its repository.
+     * SPEC-0006 / ADR 0010: the notification module's outbox is internal to the module — other
+     * business modules trigger email by publishing events, never by touching {@code OutboxEmail}/
+     * its repository. The centralized {@code com.fksoft.infra} layer is exempt: its email adapter
+     * (SMTP sender, renderer, outbox dispatch worker) legitimately operates the module's outbox.
      */
     @Test
     void otherModulesMustNotTouchNotificationPersistence() {
@@ -141,7 +143,7 @@ class ArchitectureTest {
                         .or(CanBeAnnotated.Predicates.annotatedWith("jakarta.persistence.Entity")));
         noClasses()
                 .that()
-                .resideOutsideOfPackage("com.fksoft.application.notification..")
+                .resideOutsideOfPackages("com.fksoft.application.notification..", "com.fksoft.infra..")
                 .should()
                 .dependOnClassesThat(notificationPersistence)
                 .allowEmptyShould(true)
@@ -226,9 +228,11 @@ class ArchitectureTest {
     }
 
     /**
-     * SPEC-0015: the payment module's ledger ({@code Payment}/{@code MockPaymentJob}/{@code
-     * PaymentWebhookEvent} and their repositories) is module-internal. Other modules use the
-     * {@code PaymentGateway} port and react to its events, never these classes.
+     * SPEC-0015 / ADR 0010: the payment module's ledger ({@code Payment}/{@code MockPaymentJob}/
+     * {@code PaymentWebhookEvent} and their repositories) is internal to the module. Other business
+     * modules use the {@code PaymentGateway} port and react to its events, never these classes. The
+     * centralized {@code com.fksoft.infra} layer is exempt: its mock-gateway integration adapter
+     * legitimately writes the ledger and the mock delivery queue.
      */
     @Test
     void otherModulesMustNotTouchPaymentPersistence() {
@@ -237,7 +241,7 @@ class ArchitectureTest {
                         .or(CanBeAnnotated.Predicates.annotatedWith("jakarta.persistence.Entity")));
         noClasses()
                 .that()
-                .resideOutsideOfPackage("com.fksoft.application.payment..")
+                .resideOutsideOfPackages("com.fksoft.application.payment..", "com.fksoft.infra..")
                 .should()
                 .dependOnClassesThat(paymentPersistence)
                 .allowEmptyShould(true)

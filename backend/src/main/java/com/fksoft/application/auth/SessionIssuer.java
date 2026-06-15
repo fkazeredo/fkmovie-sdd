@@ -7,16 +7,16 @@ import org.springframework.stereotype.Component;
 @Component
 class SessionIssuer {
 
-    private final AccessTokenIssuer accessTokens;
+    private final AccessTokens accessTokens;
     private final RefreshTokenService refreshTokens;
 
-    SessionIssuer(AccessTokenIssuer accessTokens, RefreshTokenService refreshTokens) {
+    SessionIssuer(AccessTokens accessTokens, RefreshTokenService refreshTokens) {
         this.accessTokens = accessTokens;
         this.refreshTokens = refreshTokens;
     }
 
     AuthService.AuthResult issueSession(User user, String ip, String userAgent, Instant now) {
-        var access = accessTokens.issueFor(user, now);
+        var access = accessTokens.issue(user.id().toString(), user.role().name(), user.tenantId(), now);
         var refresh = refreshTokens.issueFor(user.id(), ip, userAgent, now);
         return new AuthService.AuthResult(access.token(), access.expiresAt(), refresh.rawToken(), user);
     }

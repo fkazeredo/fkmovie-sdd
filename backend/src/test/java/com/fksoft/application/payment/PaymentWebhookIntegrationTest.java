@@ -3,6 +3,7 @@ package com.fksoft.application.payment;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.fksoft.AbstractIntegrationTest;
+import com.fksoft.infra.integration.MockPaymentDispatcher;
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;

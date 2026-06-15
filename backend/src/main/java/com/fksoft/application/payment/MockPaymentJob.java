@@ -37,30 +37,30 @@ public class MockPaymentJob {
         // JPA
     }
 
-    MockPaymentJob(UUID paymentId, Instant deliverAt, PaymentOutcome outcome) {
+    public MockPaymentJob(UUID paymentId, Instant deliverAt, PaymentOutcome outcome) {
         this.id = UUID.randomUUID();
         this.paymentId = paymentId;
         this.deliverAt = deliverAt;
         this.outcome = outcome;
     }
 
-    void markDelivered(Instant now) {
+    public void markDelivered(Instant now) {
         this.deliveredAt = now;
     }
 
-    boolean isDelivered() {
+    public boolean isDelivered() {
         return deliveredAt != null;
     }
 
-    UUID id() {
+    public UUID id() {
         return id;
     }
 
-    UUID paymentId() {
+    public UUID paymentId() {
         return paymentId;
     }
 
-    PaymentOutcome outcome() {
+    public PaymentOutcome outcome() {
         return outcome;
     }
 }

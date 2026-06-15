@@ -20,11 +20,11 @@ public enum EmailTemplate {
         this.subjectKey = subjectKey;
     }
 
-    String templateName() {
+    public String templateName() {
         return templateName;
     }
 
-    String subjectKey() {
+    public String subjectKey() {
         return subjectKey;
     }
 }

@@ -12,7 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Customer self-service flows (SPEC-0004): register, resend verification, verify email,
- * forgot password and reset password. Reuses the auth module's {@link AccessTokenIssuer} and
+ * forgot password and reset password. Reuses the auth module's {@link AccessTokens} port and
  * {@link RefreshTokenService} (same aggregate) for register auto-login and for revoking every
  * session on password reset.
  */
@@ -23,7 +23,7 @@ public class CustomerRegistrationService {
 
     private final UserRepository users;
     private final VerificationTokenService tokens;
-    private final AccessTokenIssuer accessTokens;
+    private final AccessTokens accessTokens;
     private final RefreshTokenService refreshTokens;
     private final PasswordEncoder passwordEncoder;
     private final ApplicationEventPublisher events;
@@ -33,7 +33,7 @@ public class CustomerRegistrationService {
     public CustomerRegistrationService(
             UserRepository users,
             VerificationTokenService tokens,
-            AccessTokenIssuer accessTokens,
+            AccessTokens accessTokens,
             RefreshTokenService refreshTokens,
             PasswordEncoder passwordEncoder,
             ApplicationEventPublisher events,
@@ -69,7 +69,7 @@ public class CustomerRegistrationService {
         events.publishEvent(new CustomerRegistered(
                 user.id(), user.email(), user.name(), user.preferredLocale(), verificationToken, now));
 
-        var access = accessTokens.issueFor(user, now);
+        var access = accessTokens.issue(user.id().toString(), user.role().name(), user.tenantId(), now);
         var refresh = refreshTokens.issueFor(user.id(), ip, userAgent, now);
         meterRegistry.counter("users.registered").increment();
         log.info("customer registered userId={}", user.id());
