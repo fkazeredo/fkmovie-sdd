@@ -1,5 +1,6 @@
 package com.fksoft.domain.pricing;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionalEventListener;
 
@@ -8,13 +9,10 @@ import org.springframework.transaction.event.TransactionalEventListener;
  * so the reload reads the persisted values; the next quote sees the new config.
  */
 @Component
+@RequiredArgsConstructor
 class PricingConfigReloadListener {
 
     private final PricingConfig config;
-
-    PricingConfigReloadListener(PricingConfig config) {
-        this.config = config;
-    }
 
     @TransactionalEventListener
     void on(PricingConfigChanged event) {

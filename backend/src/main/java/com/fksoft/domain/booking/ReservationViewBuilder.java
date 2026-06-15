@@ -15,6 +15,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 /**
@@ -24,6 +25,7 @@ import org.springframework.stereotype.Component;
  * and {@code GET /api/reservations/{id}}.
  */
 @Component
+@RequiredArgsConstructor
 class ReservationViewBuilder {
 
     private final CinemaCatalog cinema;
@@ -32,21 +34,6 @@ class ReservationViewBuilder {
     private final PaymentLedger paymentLedger;
     private final ScreeningSeatRepository screeningSeats;
     private final TicketRepository tickets;
-
-    ReservationViewBuilder(
-            CinemaCatalog cinema,
-            ScreeningCatalog screenings,
-            MovieCatalog movies,
-            PaymentLedger paymentLedger,
-            ScreeningSeatRepository screeningSeats,
-            TicketRepository tickets) {
-        this.cinema = cinema;
-        this.screenings = screenings;
-        this.movies = movies;
-        this.paymentLedger = paymentLedger;
-        this.screeningSeats = screeningSeats;
-        this.tickets = tickets;
-    }
 
     ReservationView build(Reservation reservation) {
         var screening = screenings

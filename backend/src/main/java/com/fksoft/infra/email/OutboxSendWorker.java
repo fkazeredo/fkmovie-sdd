@@ -13,8 +13,7 @@ import java.time.Clock;
 import java.time.Duration;
 import java.util.List;
 import java.util.UUID;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.PageRequest;
@@ -29,9 +28,8 @@ import org.springframework.transaction.annotation.Transactional;
  * poll (safe restart).
  */
 @Component
+@Slf4j
 class OutboxSendWorker {
-
-    private static final Logger log = LoggerFactory.getLogger(OutboxSendWorker.class);
 
     /** Backoff before each retry; the 6th failure dead-letters instead of waiting again. */
     static final Duration[] BACKOFF = {

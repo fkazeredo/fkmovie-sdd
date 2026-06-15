@@ -3,8 +3,8 @@ package com.fksoft.domain.auth;
 import io.micrometer.core.instrument.MeterRegistry;
 import java.time.Instant;
 import java.util.UUID;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -17,9 +17,9 @@ import org.springframework.transaction.annotation.Transactional;
  * session on password reset.
  */
 @Service
+@Slf4j
+@RequiredArgsConstructor
 public class CustomerRegistrationService {
-
-    private static final Logger log = LoggerFactory.getLogger(CustomerRegistrationService.class);
 
     private final UserRepository users;
     private final VerificationTokenService tokens;
@@ -28,24 +28,6 @@ public class CustomerRegistrationService {
     private final PasswordEncoder passwordEncoder;
     private final ApplicationEventPublisher events;
     private final MeterRegistry meterRegistry;
-
-    /** Collaborators injected by Spring — constructor injection only (CLAUDE.md). */
-    public CustomerRegistrationService(
-            UserRepository users,
-            VerificationTokenService tokens,
-            AccessTokens accessTokens,
-            RefreshTokenService refreshTokens,
-            PasswordEncoder passwordEncoder,
-            ApplicationEventPublisher events,
-            MeterRegistry meterRegistry) {
-        this.users = users;
-        this.tokens = tokens;
-        this.accessTokens = accessTokens;
-        this.refreshTokens = refreshTokens;
-        this.passwordEncoder = passwordEncoder;
-        this.events = events;
-        this.meterRegistry = meterRegistry;
-    }
 
     /**
      * Registers a CUSTOMER (unverified) and auto-logs them in. A verification email is

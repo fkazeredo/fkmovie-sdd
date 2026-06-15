@@ -1,8 +1,7 @@
 package com.fksoft.domain.auth;
 
 import java.time.Instant;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
@@ -16,9 +15,8 @@ import org.springframework.transaction.annotation.Transactional;
  * admin exists yet — idempotent, so the env vars are ignored after the first admin is created.
  */
 @Component
+@Slf4j
 class BootstrapAdmin implements ApplicationRunner {
-
-    private static final Logger log = LoggerFactory.getLogger(BootstrapAdmin.class);
 
     private final UserRepository users;
     private final PasswordEncoder passwordEncoder;

@@ -8,6 +8,9 @@ import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
 import java.time.Instant;
 import java.util.UUID;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 /**
  * A physical screening room (SPEC-0007). The cinema has a fixed set of rooms, seed-managed in
@@ -17,6 +20,8 @@ import java.util.UUID;
  */
 @Entity
 @Table(name = "cinema_rooms")
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class CinemaRoom {
 
     @Id
@@ -33,10 +38,6 @@ public class CinemaRoom {
 
     @Column(name = "updated_at", nullable = false)
     private Instant updatedAt;
-
-    protected CinemaRoom() {
-        // JPA
-    }
 
     /** Creates a room in the default tenant; rooms are seed-managed in v1. */
     public CinemaRoom(String name) {
@@ -55,13 +56,5 @@ public class CinemaRoom {
     @PreUpdate
     void onUpdate() {
         updatedAt = Instant.now();
-    }
-
-    public UUID id() {
-        return id;
-    }
-
-    public String name() {
-        return name;
     }
 }

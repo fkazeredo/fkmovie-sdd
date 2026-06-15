@@ -2,8 +2,8 @@ package com.fksoft.domain.payment;
 
 import io.micrometer.core.instrument.MeterRegistry;
 import java.time.Clock;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,9 +15,9 @@ import org.springframework.transaction.annotation.Transactional;
  * booking to react to. The module never touches reservations (ADR 0006 boundary).
  */
 @Service
+@Slf4j
+@RequiredArgsConstructor
 public class PaymentWebhookHandler {
-
-    private static final Logger log = LoggerFactory.getLogger(PaymentWebhookHandler.class);
 
     private final PaymentSigner signer;
     private final WebhookJson json;
@@ -26,23 +26,6 @@ public class PaymentWebhookHandler {
     private final ApplicationEventPublisher events;
     private final MeterRegistry meterRegistry;
     private final Clock clock;
-
-    PaymentWebhookHandler(
-            PaymentSigner signer,
-            WebhookJson json,
-            PaymentRepository payments,
-            PaymentWebhookEventRepository webhookEvents,
-            ApplicationEventPublisher events,
-            MeterRegistry meterRegistry,
-            Clock clock) {
-        this.signer = signer;
-        this.json = json;
-        this.payments = payments;
-        this.webhookEvents = webhookEvents;
-        this.events = events;
-        this.meterRegistry = meterRegistry;
-        this.clock = clock;
-    }
 
     /**
      * @throws InvalidWebhookSignatureException bad/missing signature (401);

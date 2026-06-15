@@ -5,6 +5,9 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import java.math.BigDecimal;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 /**
  * Admin-configurable price multiplier for a weekday (SPEC-0012). The key {@code dayOfWeek} is the
@@ -12,6 +15,8 @@ import java.math.BigDecimal;
  */
 @Entity
 @Table(name = "pricing_weekday")
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class PricingWeekday {
 
     @Id
@@ -21,10 +26,6 @@ public class PricingWeekday {
     @Column(nullable = false)
     private BigDecimal multiplier;
 
-    protected PricingWeekday() {
-        // JPA
-    }
-
     PricingWeekday(Integer dayOfWeek, BigDecimal multiplier) {
         this.dayOfWeek = dayOfWeek;
         this.multiplier = multiplier;
@@ -32,13 +33,5 @@ public class PricingWeekday {
 
     void changeMultiplier(BigDecimal multiplier) {
         this.multiplier = multiplier;
-    }
-
-    public Integer dayOfWeek() {
-        return dayOfWeek;
-    }
-
-    public BigDecimal multiplier() {
-        return multiplier;
     }
 }

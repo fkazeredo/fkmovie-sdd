@@ -86,6 +86,22 @@ class ArchitectureTest {
                 .check(PRODUCTION_CLASSES);
     }
 
+    /**
+     * No {@code @Setter} on JPA entities — Lombok is welcome for boilerplate ({@code @Getter},
+     * {@code @NoArgsConstructor}), but entities mutate only through meaningful business methods,
+     * never uncontrolled setters (architecture/backend.md).
+     */
+    @Test
+    void noLombokSetterOnEntities() {
+        noClasses()
+                .that()
+                .areAnnotatedWith("jakarta.persistence.Entity")
+                .should()
+                .beAnnotatedWith("lombok.Setter")
+                .allowEmptyShould(true)
+                .check(PRODUCTION_CLASSES);
+    }
+
     /** Avoid {@code ServiceImpl}-style naming (architecture/backend.md). */
     @Test
     void noImplSuffix() {

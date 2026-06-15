@@ -5,6 +5,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.Base64;
 import java.util.UUID;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 /**
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Component;
  * resend rate limits (verification/reset 1/min; invitation 1/5min).
  */
 @Component
+@RequiredArgsConstructor
 class VerificationTokenService {
 
     static final Duration VERIFICATION_TTL = Duration.ofHours(24);
@@ -26,15 +28,6 @@ class VerificationTokenService {
     private final PasswordResetTokenRepository resetTokens;
     private final InvitationTokenRepository invitationTokens;
     private final SecureRandom secureRandom = new SecureRandom();
-
-    VerificationTokenService(
-            EmailVerificationTokenRepository verificationTokens,
-            PasswordResetTokenRepository resetTokens,
-            InvitationTokenRepository invitationTokens) {
-        this.verificationTokens = verificationTokens;
-        this.resetTokens = resetTokens;
-        this.invitationTokens = invitationTokens;
-    }
 
     String issueEmailVerification(UUID userId, Instant now) {
         var raw = generateRawToken();

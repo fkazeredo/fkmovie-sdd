@@ -6,6 +6,9 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import java.time.Instant;
 import java.util.UUID;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 /**
  * Single-use invitation token (SPEC-0005). Only the SHA-256 hash is stored; valid for 24h
@@ -13,6 +16,8 @@ import java.util.UUID;
  */
 @Entity
 @Table(name = "invitation_tokens")
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class InvitationToken {
 
     @Id
@@ -33,10 +38,6 @@ public class InvitationToken {
     @Column(name = "created_at", nullable = false)
     private Instant createdAt;
 
-    protected InvitationToken() {
-        // JPA
-    }
-
     /** Created unconsumed; only the SHA-256 hash of the raw token is persisted. */
     public InvitationToken(UUID userId, String tokenHash, Instant expiresAt, Instant createdAt) {
         this.id = UUID.randomUUID();
@@ -56,13 +57,5 @@ public class InvitationToken {
 
     public void consume(Instant now) {
         this.consumedAt = now;
-    }
-
-    public UUID userId() {
-        return userId;
-    }
-
-    public Instant createdAt() {
-        return createdAt;
     }
 }

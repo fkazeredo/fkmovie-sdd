@@ -2,6 +2,7 @@ package com.fksoft.domain.booking;
 
 import java.time.Instant;
 import java.time.ZoneOffset;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 /**
@@ -9,13 +10,10 @@ import org.springframework.stereotype.Component;
  * comes from a single global Postgres sequence (unique, concurrency-safe, no annual reset).
  */
 @Component
+@RequiredArgsConstructor
 class TicketCodeGenerator {
 
     private final TicketRepository tickets;
-
-    TicketCodeGenerator(TicketRepository tickets) {
-        this.tickets = tickets;
-    }
 
     String next(Instant issuedAt) {
         var year = issuedAt.atZone(ZoneOffset.UTC).getYear();

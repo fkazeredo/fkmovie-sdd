@@ -6,8 +6,8 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,22 +19,16 @@ import org.springframework.transaction.annotation.Transactional;
  * in-memory snapshot reloads after commit. Changes affect only future quotes.
  */
 @Service
+@Slf4j
+@RequiredArgsConstructor
 public class PricingAdminService {
 
-    private static final Logger log = LoggerFactory.getLogger(PricingAdminService.class);
     private static final BigDecimal MIN_MULTIPLIER = new BigDecimal("0.10");
     private static final BigDecimal MAX_MULTIPLIER = new BigDecimal("2.00");
 
     private final PricingSeatTypeRepository seatTypes;
     private final PricingWeekdayRepository weekdays;
     private final ApplicationEventPublisher events;
-
-    PricingAdminService(
-            PricingSeatTypeRepository seatTypes, PricingWeekdayRepository weekdays, ApplicationEventPublisher events) {
-        this.seatTypes = seatTypes;
-        this.weekdays = weekdays;
-        this.events = events;
-    }
 
     @Transactional(readOnly = true)
     public List<SeatTypeSurchargeResponse> listSeatTypes() {

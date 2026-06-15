@@ -11,8 +11,8 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
@@ -25,9 +25,10 @@ import org.springframework.transaction.annotation.Transactional;
  * opens a PENDING reservation — making double booking impossible.
  */
 @Service
+@Slf4j
+@RequiredArgsConstructor
 public class ReservationService {
 
-    private static final Logger log = LoggerFactory.getLogger(ReservationService.class);
     private static final List<ReservationStatus> ACTIVE_STATUSES =
             List.of(ReservationStatus.PENDING, ReservationStatus.AWAITING_PAYMENT);
 
@@ -38,23 +39,6 @@ public class ReservationService {
     private final ReservationViewBuilder viewBuilder;
     private final ApplicationEventPublisher events;
     private final MeterRegistry meterRegistry;
-
-    ReservationService(
-            ReservationRepository reservations,
-            ScreeningSeatRepository screeningSeats,
-            ReservationPolicy policy,
-            PriceCalculator pricing,
-            ReservationViewBuilder viewBuilder,
-            ApplicationEventPublisher events,
-            MeterRegistry meterRegistry) {
-        this.reservations = reservations;
-        this.screeningSeats = screeningSeats;
-        this.policy = policy;
-        this.pricing = pricing;
-        this.viewBuilder = viewBuilder;
-        this.events = events;
-        this.meterRegistry = meterRegistry;
-    }
 
     /**
      * Holds the selected seats for the caller (SPEC-0014): all-or-nothing, price snapshotted,

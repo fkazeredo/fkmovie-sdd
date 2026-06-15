@@ -3,8 +3,7 @@ package com.fksoft.infra.socket;
 import io.micrometer.core.instrument.Gauge;
 import io.micrometer.core.instrument.MeterRegistry;
 import java.util.concurrent.atomic.AtomicInteger;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
@@ -25,9 +24,8 @@ import org.springframework.web.socket.messaging.SessionDisconnectEvent;
  * route correctly. An invalid or missing token rejects the connection.
  */
 @Component
+@Slf4j
 public class StompAuthChannelInterceptor implements ChannelInterceptor {
-
-    private static final Logger log = LoggerFactory.getLogger(StompAuthChannelInterceptor.class);
 
     private final JwtDecoder jwtDecoder;
     private final MeterRegistry meterRegistry;

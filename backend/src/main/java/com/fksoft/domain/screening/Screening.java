@@ -11,6 +11,9 @@ import jakarta.persistence.Table;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.UUID;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 /**
  * A movie scheduled in a room at a time (SPEC-0009). {@code endsAt} is derived and stored
@@ -19,6 +22,8 @@ import java.util.UUID;
  */
 @Entity
 @Table(name = "screenings")
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Screening {
 
     @Id
@@ -51,10 +56,6 @@ public class Screening {
 
     @Column(name = "updated_at", nullable = false)
     private Instant updatedAt;
-
-    protected Screening() {
-        // JPA
-    }
 
     private Screening(
             UUID movieId, UUID roomId, Instant startsAt, int durationMinutes, int bufferMinutes, int basePriceCents) {
@@ -106,33 +107,5 @@ public class Screening {
     @PreUpdate
     void onUpdate() {
         updatedAt = Instant.now();
-    }
-
-    public UUID id() {
-        return id;
-    }
-
-    public UUID movieId() {
-        return movieId;
-    }
-
-    public UUID roomId() {
-        return roomId;
-    }
-
-    public Instant startsAt() {
-        return startsAt;
-    }
-
-    public Instant endsAt() {
-        return endsAt;
-    }
-
-    public int basePriceCents() {
-        return basePriceCents;
-    }
-
-    public ScreeningStatus status() {
-        return status;
     }
 }

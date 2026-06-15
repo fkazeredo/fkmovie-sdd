@@ -115,6 +115,14 @@
       <artifactId>logstash-logback-encoder</artifactId>
       <version>${logstash-logback-encoder.version}</version>
     </dependency>
+    <!-- Lombok: boilerplate reduction (@Slf4j, @RequiredArgsConstructor, entity @Getter).
+         Version managed by spring-boot-starter-parent; compile-only (optional), excluded from
+         the repackaged jar. NEVER @Data/@Setter on @Entity (ArchUnit-enforced). -->
+    <dependency>
+      <groupId>org.projectlombok</groupId>
+      <artifactId>lombok</artifactId>
+      <optional>true</optional>
+    </dependency>
 
     <dependency>
       <groupId>org.springframework.boot</groupId>
@@ -157,6 +165,28 @@
       <plugin>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-maven-plugin</artifactId>
+        <configuration>
+          <excludes>
+            <exclude>
+              <groupId>org.projectlombok</groupId>
+              <artifactId>lombok</artifactId>
+            </exclude>
+          </excludes>
+        </configuration>
+      </plugin>
+      <!-- Lombok annotation processor on the compiler path (explicit for Java 21 / Boot 4). -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <annotationProcessorPaths>
+            <path>
+              <groupId>org.projectlombok</groupId>
+              <artifactId>lombok</artifactId>
+              <version>${lombok.version}</version>
+            </path>
+          </annotationProcessorPaths>
+        </configuration>
       </plugin>
       <!-- Spotless: formatting as a build fact. `mvn spotless:apply` to fix,
            `spotless:check` bound to verify so CI blocks unformatted code. -->

@@ -2,6 +2,7 @@ package com.fksoft.domain.notification;
 
 import java.time.Clock;
 import java.util.Map;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -12,15 +13,11 @@ import org.springframework.transaction.annotation.Transactional;
  * actual sending. Enqueue is the public contract, send is implementation.
  */
 @Service
+@RequiredArgsConstructor
 class EmailOutbox {
 
     private final OutboxEmailRepository repository;
     private final Clock clock;
-
-    EmailOutbox(OutboxEmailRepository repository, Clock clock) {
-        this.repository = repository;
-        this.clock = clock;
-    }
 
     /**
      * Persists a PENDING email due immediately. REQUIRES_NEW because the only caller is an

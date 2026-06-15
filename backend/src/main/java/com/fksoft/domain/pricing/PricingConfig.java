@@ -4,6 +4,7 @@ import jakarta.annotation.PostConstruct;
 import java.time.DayOfWeek;
 import java.util.Map;
 import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -14,17 +15,13 @@ import org.springframework.transaction.annotation.Transactional;
  * readers always see a consistent, fully-built snapshot.
  */
 @Component
+@RequiredArgsConstructor
 class PricingConfig {
 
     private final PricingSeatTypeRepository seatTypes;
     private final PricingWeekdayRepository weekdays;
 
     private volatile PricingSnapshot snapshot = new PricingSnapshot(Map.of(), Map.of());
-
-    PricingConfig(PricingSeatTypeRepository seatTypes, PricingWeekdayRepository weekdays) {
-        this.seatTypes = seatTypes;
-        this.weekdays = weekdays;
-    }
 
     @PostConstruct
     void load() {

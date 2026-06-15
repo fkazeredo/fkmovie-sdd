@@ -6,6 +6,9 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import java.time.Instant;
 import java.util.UUID;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 /**
  * Idempotency ledger for processed webhooks (SPEC-0015). A {@code (payment_id, event_type)} is
@@ -13,6 +16,8 @@ import java.util.UUID;
  */
 @Entity
 @Table(name = "payment_webhook_events")
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class PaymentWebhookEvent {
 
     @Id
@@ -26,10 +31,6 @@ public class PaymentWebhookEvent {
 
     @Column(name = "received_at", nullable = false)
     private Instant receivedAt;
-
-    protected PaymentWebhookEvent() {
-        // JPA
-    }
 
     PaymentWebhookEvent(UUID paymentId, String eventType, Instant receivedAt) {
         this.id = UUID.randomUUID();

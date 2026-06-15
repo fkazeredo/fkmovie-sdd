@@ -8,6 +8,9 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import java.time.Instant;
 import java.util.UUID;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 /**
  * A scheduled webhook delivery for the mock gateway (SPEC-0015, ADR 0006). The worker delivers the
@@ -15,6 +18,8 @@ import java.util.UUID;
  */
 @Entity
 @Table(name = "mock_payment_jobs")
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class MockPaymentJob {
 
     @Id
@@ -33,10 +38,6 @@ public class MockPaymentJob {
     @Column(name = "delivered_at")
     private Instant deliveredAt;
 
-    protected MockPaymentJob() {
-        // JPA
-    }
-
     public MockPaymentJob(UUID paymentId, Instant deliverAt, PaymentOutcome outcome) {
         this.id = UUID.randomUUID();
         this.paymentId = paymentId;
@@ -50,17 +51,5 @@ public class MockPaymentJob {
 
     public boolean isDelivered() {
         return deliveredAt != null;
-    }
-
-    public UUID id() {
-        return id;
-    }
-
-    public UUID paymentId() {
-        return paymentId;
-    }
-
-    public PaymentOutcome outcome() {
-        return outcome;
     }
 }

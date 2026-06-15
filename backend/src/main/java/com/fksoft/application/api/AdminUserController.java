@@ -10,6 +10,7 @@ import com.fksoft.infra.security.UserContextProvider;
 import com.fksoft.infra.web.PageResponse;
 import jakarta.validation.Valid;
 import java.util.UUID;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -28,15 +29,11 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping("/api/admin/users")
+@RequiredArgsConstructor
 class AdminUserController {
 
     private final UserManagementService userManagement;
     private final UserContextProvider userContext;
-
-    AdminUserController(UserManagementService userManagement, UserContextProvider userContext) {
-        this.userManagement = userManagement;
-        this.userContext = userContext;
-    }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)

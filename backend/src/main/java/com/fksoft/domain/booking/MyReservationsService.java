@@ -5,6 +5,7 @@ import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Timer;
 import java.time.Clock;
 import java.util.UUID;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -19,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
  * {@link ReservationSummaryAssembler} (no per-row N+1).
  */
 @Service
+@RequiredArgsConstructor
 public class MyReservationsService {
 
     private static final int DEFAULT_SIZE = 20;
@@ -29,19 +31,6 @@ public class MyReservationsService {
     private final ScreeningCatalog screenings;
     private final MeterRegistry meterRegistry;
     private final Clock clock;
-
-    MyReservationsService(
-            ReservationRepository reservations,
-            ReservationSummaryAssembler summaries,
-            ScreeningCatalog screenings,
-            MeterRegistry meterRegistry,
-            Clock clock) {
-        this.reservations = reservations;
-        this.summaries = summaries;
-        this.screenings = screenings;
-        this.meterRegistry = meterRegistry;
-        this.clock = clock;
-    }
 
     /** Lists the caller's reservations (SPEC-0019); size clamped to 50, newest first. */
     @Transactional(readOnly = true)

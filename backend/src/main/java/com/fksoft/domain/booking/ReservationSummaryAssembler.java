@@ -15,6 +15,7 @@ import java.util.Objects;
 import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 /**
@@ -24,23 +25,13 @@ import org.springframework.stereotype.Component;
  * Shared by the "my reservations" list and the operator search.
  */
 @Component
+@RequiredArgsConstructor
 class ReservationSummaryAssembler {
 
     private final ScreeningCatalog screenings;
     private final MovieCatalog movies;
     private final CinemaCatalog cinema;
     private final ScreeningSeatRepository screeningSeats;
-
-    ReservationSummaryAssembler(
-            ScreeningCatalog screenings,
-            MovieCatalog movies,
-            CinemaCatalog cinema,
-            ScreeningSeatRepository screeningSeats) {
-        this.screenings = screenings;
-        this.movies = movies;
-        this.cinema = cinema;
-        this.screeningSeats = screeningSeats;
-    }
 
     List<ReservationSummary> summarize(List<Reservation> rows) {
         if (rows.isEmpty()) {

@@ -24,8 +24,9 @@ Detailed guidelines live in `architecture/` and are loaded on demand (see Routin
    architecture rules. Never weaken, skip or delete them to make code pass. If a rule seems
    wrong, propose a change and an ADR — do not bypass.
 6. **No loose ends.** No TODOs/FIXMEs without an issue/spec/ADR reference, no commented-out
-   code, no incomplete implementations, no `@Data` on JPA entities, no `*Impl` naming,
-   constructor injection only.
+   code, no incomplete implementations, no `@Data`/`@Setter` on JPA entities (Lombok
+   `@Getter`/`@RequiredArgsConstructor`/`@Slf4j` are welcome for boilerplate), no `*Impl`
+   naming, constructor injection only.
 
 ## Definition of Done (every meaningful change)
 

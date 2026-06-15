@@ -4,6 +4,7 @@ import com.fksoft.infra.web.ApiErrorResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpStatus;
@@ -15,15 +16,11 @@ import tools.jackson.databind.ObjectMapper;
 
 /** Renders 403 responses in the standard {@link ApiErrorResponse} shape (see entry point). */
 @Component
+@RequiredArgsConstructor
 class ApiAccessDeniedHandler implements AccessDeniedHandler {
 
     private final ObjectMapper objectMapper;
     private final MessageSource messageSource;
-
-    ApiAccessDeniedHandler(ObjectMapper objectMapper, MessageSource messageSource) {
-        this.objectMapper = objectMapper;
-        this.messageSource = messageSource;
-    }
 
     @Override
     public void handle(HttpServletRequest request, HttpServletResponse response, AccessDeniedException exception)

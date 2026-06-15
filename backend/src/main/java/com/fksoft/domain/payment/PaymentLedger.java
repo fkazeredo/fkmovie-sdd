@@ -2,6 +2,7 @@ package com.fksoft.domain.payment;
 
 import java.util.Optional;
 import java.util.UUID;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -11,13 +12,10 @@ import org.springframework.transaction.annotation.Transactional;
  * Payment} entity, and never touches reservations.
  */
 @Service
+@RequiredArgsConstructor
 public class PaymentLedger {
 
     private final PaymentRepository payments;
-
-    PaymentLedger(PaymentRepository payments) {
-        this.payments = payments;
-    }
 
     /** The latest refund recorded for a reservation, if any (SPEC-0019). */
     @Transactional(readOnly = true)

@@ -4,6 +4,7 @@ import io.micrometer.core.instrument.MeterRegistry;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Component;
 
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Component;
  * (ADR 0002) — no in-memory or distributed limiter needed.
  */
 @Component
+@RequiredArgsConstructor
 class LoginRateLimiter {
 
     static final int EMAIL_THRESHOLD = 5;
@@ -22,11 +24,6 @@ class LoginRateLimiter {
 
     private final LoginAttemptRepository attempts;
     private final MeterRegistry meterRegistry;
-
-    LoginRateLimiter(LoginAttemptRepository attempts, MeterRegistry meterRegistry) {
-        this.attempts = attempts;
-        this.meterRegistry = meterRegistry;
-    }
 
     /** Records a failed credential evaluation; it counts toward both window dimensions. */
     void recordFailure(String normalizedEmail, String ip, Instant now) {

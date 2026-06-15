@@ -3,6 +3,7 @@ package com.fksoft.application.api;
 import com.fksoft.domain.cinema.CinemaCatalog;
 import com.fksoft.domain.cinema.RoomView;
 import java.util.List;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -14,13 +15,10 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping("/api/admin/rooms")
+@RequiredArgsConstructor
 class RoomAdminController {
 
     private final CinemaCatalog catalog;
-
-    RoomAdminController(CinemaCatalog catalog) {
-        this.catalog = catalog;
-    }
 
     @GetMapping
     List<RoomView> list() {

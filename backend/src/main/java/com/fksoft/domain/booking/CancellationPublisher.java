@@ -5,6 +5,7 @@ import io.micrometer.core.instrument.MeterRegistry;
 import java.time.Clock;
 import java.util.List;
 import java.util.UUID;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 
@@ -15,20 +16,13 @@ import org.springframework.stereotype.Component;
  * the 0013 publishers'.
  */
 @Component
+@RequiredArgsConstructor
 class CancellationPublisher {
 
     private final UserAccounts userAccounts;
     private final ApplicationEventPublisher events;
     private final MeterRegistry meterRegistry;
     private final Clock clock;
-
-    CancellationPublisher(
-            UserAccounts userAccounts, ApplicationEventPublisher events, MeterRegistry meterRegistry, Clock clock) {
-        this.userAccounts = userAccounts;
-        this.events = events;
-        this.meterRegistry = meterRegistry;
-        this.clock = clock;
-    }
 
     void publishCancelled(
             Reservation reservation,

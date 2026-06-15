@@ -8,6 +8,9 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import java.time.Instant;
 import java.util.UUID;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 /**
  * A ticket issued for one held seat on purchase confirmation (SPEC-0016). Its {@code code}
@@ -15,6 +18,8 @@ import java.util.UUID;
  */
 @Entity
 @Table(name = "tickets")
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Ticket {
 
     @Id
@@ -36,10 +41,6 @@ public class Ticket {
     @Column(name = "issued_at", nullable = false)
     private Instant issuedAt;
 
-    protected Ticket() {
-        // JPA
-    }
-
     private Ticket(UUID reservationSeatId, String code, Instant issuedAt) {
         this.id = UUID.randomUUID();
         this.tenantId = "default";
@@ -60,21 +61,5 @@ public class Ticket {
             throw new IllegalStateException("Ticket " + id + " is not VALID: " + status);
         }
         status = TicketStatus.CANCELLED;
-    }
-
-    public UUID id() {
-        return id;
-    }
-
-    public UUID reservationSeatId() {
-        return reservationSeatId;
-    }
-
-    public String code() {
-        return code;
-    }
-
-    public TicketStatus status() {
-        return status;
     }
 }

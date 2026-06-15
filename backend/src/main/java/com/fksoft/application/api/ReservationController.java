@@ -8,6 +8,7 @@ import com.fksoft.infra.security.UserContextProvider;
 import jakarta.validation.Valid;
 import java.util.List;
 import java.util.UUID;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -22,15 +23,11 @@ import org.springframework.web.bind.annotation.RestController;
  * Reading is owner- or staff-only (checked in the service).
  */
 @RestController
+@RequiredArgsConstructor
 class ReservationController {
 
     private final ReservationService reservations;
     private final UserContextProvider userContext;
-
-    ReservationController(ReservationService reservations, UserContextProvider userContext) {
-        this.reservations = reservations;
-        this.userContext = userContext;
-    }
 
     @PostMapping("/api/screenings/{screeningId}/reservations")
     @ResponseStatus(HttpStatus.CREATED)

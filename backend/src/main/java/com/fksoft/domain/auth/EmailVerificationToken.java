@@ -6,6 +6,9 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import java.time.Instant;
 import java.util.UUID;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 /**
  * Single-use email-verification token (SPEC-0004). Only the SHA-256 hash is stored; the raw
@@ -13,6 +16,8 @@ import java.util.UUID;
  */
 @Entity
 @Table(name = "email_verification_tokens")
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class EmailVerificationToken {
 
     @Id
@@ -33,10 +38,6 @@ public class EmailVerificationToken {
     @Column(name = "created_at", nullable = false)
     private Instant createdAt;
 
-    protected EmailVerificationToken() {
-        // JPA
-    }
-
     public EmailVerificationToken(UUID userId, String tokenHash, Instant expiresAt, Instant createdAt) {
         this.id = UUID.randomUUID();
         this.userId = userId;
@@ -55,13 +56,5 @@ public class EmailVerificationToken {
 
     public void consume(Instant now) {
         this.consumedAt = now;
-    }
-
-    public UUID userId() {
-        return userId;
-    }
-
-    public Instant createdAt() {
-        return createdAt;
     }
 }

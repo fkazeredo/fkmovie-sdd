@@ -3,8 +3,8 @@ package com.fksoft.domain.auth;
 import io.micrometer.core.instrument.MeterRegistry;
 import java.time.Instant;
 import java.util.UUID;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -16,9 +16,9 @@ import org.springframework.transaction.annotation.Transactional;
  * the domain rules live in the entities and collaborators.
  */
 @Service
+@Slf4j
+@RequiredArgsConstructor
 public class AuthService {
-
-    private static final Logger log = LoggerFactory.getLogger(AuthService.class);
 
     private final UserRepository users;
     private final RefreshTokenService refreshTokens;
@@ -27,24 +27,6 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final ApplicationEventPublisher events;
     private final MeterRegistry meterRegistry;
-
-    /** Collaborators injected by Spring — constructor injection only (CLAUDE.md). */
-    public AuthService(
-            UserRepository users,
-            RefreshTokenService refreshTokens,
-            AccessTokens accessTokens,
-            LoginRateLimiter rateLimiter,
-            PasswordEncoder passwordEncoder,
-            ApplicationEventPublisher events,
-            MeterRegistry meterRegistry) {
-        this.users = users;
-        this.refreshTokens = refreshTokens;
-        this.accessTokens = accessTokens;
-        this.rateLimiter = rateLimiter;
-        this.passwordEncoder = passwordEncoder;
-        this.events = events;
-        this.meterRegistry = meterRegistry;
-    }
 
     /**
      * Authenticates by email/password and issues a new token pair. Wrong password and unknown

@@ -9,6 +9,7 @@ import io.micrometer.core.instrument.MeterRegistry;
 import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionalEventListener;
@@ -20,23 +21,13 @@ import org.springframework.transaction.event.TransactionalEventListener;
  * publisher uses the generic {@code SimpMessagingTemplate}.
  */
 @Component
+@RequiredArgsConstructor
 class SeatUpdatePublisher {
 
     private final SimpMessagingTemplate messaging;
     private final ScreeningCatalog screenings;
     private final CinemaCatalog cinema;
     private final MeterRegistry meterRegistry;
-
-    SeatUpdatePublisher(
-            SimpMessagingTemplate messaging,
-            ScreeningCatalog screenings,
-            CinemaCatalog cinema,
-            MeterRegistry meterRegistry) {
-        this.messaging = messaging;
-        this.screenings = screenings;
-        this.cinema = cinema;
-        this.meterRegistry = meterRegistry;
-    }
 
     @TransactionalEventListener
     void on(SeatsStatusChanged event) {

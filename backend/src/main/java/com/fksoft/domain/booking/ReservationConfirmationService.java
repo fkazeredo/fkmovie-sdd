@@ -6,8 +6,8 @@ import io.micrometer.core.instrument.MeterRegistry;
 import java.time.Clock;
 import java.time.Duration;
 import java.util.UUID;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,28 +18,15 @@ import org.springframework.transaction.annotation.Transactional;
  * Re-confirming an AWAITING_PAYMENT reservation is idempotent (no second charge).
  */
 @Service
+@Slf4j
+@RequiredArgsConstructor
 public class ReservationConfirmationService {
-
-    private static final Logger log = LoggerFactory.getLogger(ReservationConfirmationService.class);
 
     private final ReservationRepository reservations;
     private final PaymentGateway paymentGateway;
     private final BookingProperties properties;
     private final MeterRegistry meterRegistry;
     private final Clock clock;
-
-    ReservationConfirmationService(
-            ReservationRepository reservations,
-            PaymentGateway paymentGateway,
-            BookingProperties properties,
-            MeterRegistry meterRegistry,
-            Clock clock) {
-        this.reservations = reservations;
-        this.paymentGateway = paymentGateway;
-        this.properties = properties;
-        this.meterRegistry = meterRegistry;
-        this.clock = clock;
-    }
 
     /** Confirms a reservation and starts its payment (SPEC-0016); owner only, idempotent. */
     @Transactional

@@ -6,6 +6,7 @@ import com.fksoft.domain.booking.OperatorReservationView;
 import com.fksoft.infra.security.UserContextProvider;
 import java.util.List;
 import java.util.UUID;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -17,15 +18,11 @@ import org.springframework.web.bind.annotation.RestController;
  * OperatorLookupService}.
  */
 @RestController
+@RequiredArgsConstructor
 class OperatorReservationController {
 
     private final OperatorLookupService lookup;
     private final UserContextProvider userContext;
-
-    OperatorReservationController(OperatorLookupService lookup, UserContextProvider userContext) {
-        this.lookup = lookup;
-        this.userContext = userContext;
-    }
 
     @GetMapping("/api/operator/reservations")
     List<OperatorReservationView> search(

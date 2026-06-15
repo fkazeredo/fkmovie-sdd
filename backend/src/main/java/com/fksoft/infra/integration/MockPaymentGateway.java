@@ -14,8 +14,7 @@ import com.fksoft.domain.payment.RefundRequestResult;
 import io.micrometer.core.instrument.MeterRegistry;
 import java.time.Clock;
 import java.time.Duration;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,9 +26,8 @@ import org.springframework.transaction.annotation.Transactional;
  * for tests/staging and are disabled in prod.
  */
 @Service
+@Slf4j
 class MockPaymentGateway implements PaymentGateway {
-
-    private static final Logger log = LoggerFactory.getLogger(MockPaymentGateway.class);
 
     private final PaymentRepository payments;
     private final MockPaymentJobRepository jobs;

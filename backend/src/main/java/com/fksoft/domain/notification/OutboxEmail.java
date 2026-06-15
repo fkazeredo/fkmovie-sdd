@@ -9,6 +9,9 @@ import jakarta.persistence.Table;
 import java.time.Instant;
 import java.util.Map;
 import java.util.UUID;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
@@ -20,6 +23,8 @@ import org.hibernate.type.SqlTypes;
  */
 @Entity
 @Table(name = "outbox_emails")
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class OutboxEmail {
 
     @Id
@@ -61,10 +66,6 @@ public class OutboxEmail {
     @Column(name = "sent_at")
     private Instant sentAt;
 
-    protected OutboxEmail() {
-        // JPA
-    }
-
     /** Creates a PENDING email due immediately. */
     public OutboxEmail(
             EmailTemplate templateKey, String recipientEmail, String locale, Map<String, String> payload, Instant now) {
@@ -97,37 +98,5 @@ public class OutboxEmail {
         this.attempts++;
         this.status = OutboxStatus.FAILED_PERMANENT;
         this.lastError = error;
-    }
-
-    public UUID id() {
-        return id;
-    }
-
-    public String recipientEmail() {
-        return recipientEmail;
-    }
-
-    public EmailTemplate templateKey() {
-        return templateKey;
-    }
-
-    public String locale() {
-        return locale;
-    }
-
-    public Map<String, String> payload() {
-        return payload;
-    }
-
-    public OutboxStatus status() {
-        return status;
-    }
-
-    public int attempts() {
-        return attempts;
-    }
-
-    public Instant nextAttemptAt() {
-        return nextAttemptAt;
     }
 }

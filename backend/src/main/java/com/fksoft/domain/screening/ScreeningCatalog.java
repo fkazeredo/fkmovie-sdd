@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -14,13 +15,10 @@ import org.springframework.transaction.annotation.Transactional;
  * ScreeningView}, never the {@code Screening} entity (ArchUnit-enforced).
  */
 @Service
+@RequiredArgsConstructor
 public class ScreeningCatalog {
 
     private final ScreeningRepository screenings;
-
-    ScreeningCatalog(ScreeningRepository screenings) {
-        this.screenings = screenings;
-    }
 
     /** Reads a screening as a stable projection (empty if unknown). */
     @Transactional(readOnly = true)

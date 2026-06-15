@@ -6,6 +6,9 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import java.time.Instant;
 import java.util.UUID;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 /**
  * Server-side record of an opaque refresh token (ADR 0005). Only the SHA-256 hash of the
@@ -14,6 +17,8 @@ import java.util.UUID;
  */
 @Entity
 @Table(name = "refresh_tokens")
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class RefreshToken {
 
     @Id
@@ -41,10 +46,6 @@ public class RefreshToken {
 
     @Column(name = "user_agent")
     private String userAgent;
-
-    protected RefreshToken() {
-        // JPA
-    }
 
     /** Created unrevoked; only the SHA-256 hash of the opaque token is ever persisted. */
     public RefreshToken(
@@ -76,29 +77,5 @@ public class RefreshToken {
     public void markReplacedBy(UUID successorId, Instant now) {
         revoke(now);
         this.replacedById = successorId;
-    }
-
-    public UUID id() {
-        return id;
-    }
-
-    public UUID userId() {
-        return userId;
-    }
-
-    public String tokenHash() {
-        return tokenHash;
-    }
-
-    public Instant expiresAt() {
-        return expiresAt;
-    }
-
-    public Instant revokedAt() {
-        return revokedAt;
-    }
-
-    public UUID replacedById() {
-        return replacedById;
     }
 }

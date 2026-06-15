@@ -1,5 +1,6 @@
 package com.fksoft.infra.integration;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -10,13 +11,10 @@ import org.springframework.stereotype.Component;
  * (tests set a long poll interval and trigger it explicitly, avoiding scheduler races).
  */
 @Component
+@RequiredArgsConstructor
 public class MockPaymentDispatcher {
 
     private final MockPaymentDeliveryWorker worker;
-
-    MockPaymentDispatcher(MockPaymentDeliveryWorker worker) {
-        this.worker = worker;
-    }
 
     @Scheduled(fixedDelayString = "${app.payment.mock.poll-interval:PT1S}")
     public void deliverDue() {

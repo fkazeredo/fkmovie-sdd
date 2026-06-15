@@ -3,8 +3,8 @@ package com.fksoft.domain.auth;
 import io.micrometer.core.instrument.MeterRegistry;
 import java.time.Instant;
 import java.util.UUID;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -18,9 +18,9 @@ import org.springframework.transaction.annotation.Transactional;
  * module's token issuer and login machinery (same {@code users} aggregate).
  */
 @Service
+@Slf4j
+@RequiredArgsConstructor
 public class UserManagementService {
-
-    private static final Logger log = LoggerFactory.getLogger(UserManagementService.class);
 
     private final UserRepository users;
     private final VerificationTokenService tokens;
@@ -29,24 +29,6 @@ public class UserManagementService {
     private final PasswordEncoder passwordEncoder;
     private final ApplicationEventPublisher events;
     private final MeterRegistry meterRegistry;
-
-    /** Collaborators injected by Spring — constructor injection only (CLAUDE.md). */
-    public UserManagementService(
-            UserRepository users,
-            VerificationTokenService tokens,
-            UserManagementPolicy policy,
-            SessionIssuer sessionIssuer,
-            PasswordEncoder passwordEncoder,
-            ApplicationEventPublisher events,
-            MeterRegistry meterRegistry) {
-        this.users = users;
-        this.tokens = tokens;
-        this.policy = policy;
-        this.sessionIssuer = sessionIssuer;
-        this.passwordEncoder = passwordEncoder;
-        this.events = events;
-        this.meterRegistry = meterRegistry;
-    }
 
     /**
      * Invites an internal user: creates a DISABLED, password-less account and sends an

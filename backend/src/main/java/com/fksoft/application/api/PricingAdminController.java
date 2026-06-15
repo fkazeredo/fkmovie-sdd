@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -25,15 +26,11 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping("/api/admin/pricing")
+@RequiredArgsConstructor
 class PricingAdminController {
 
     private final PricingAdminService pricing;
     private final UserContextProvider userContext;
-
-    PricingAdminController(PricingAdminService pricing, UserContextProvider userContext) {
-        this.pricing = pricing;
-        this.userContext = userContext;
-    }
 
     @GetMapping("/seat-types")
     List<SeatTypeSurchargeResponse> seatTypes() {

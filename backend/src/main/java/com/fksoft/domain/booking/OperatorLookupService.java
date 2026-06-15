@@ -7,8 +7,8 @@ import java.util.List;
 import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -21,29 +21,17 @@ import org.springframework.transaction.annotation.Transactional;
  * type, never the raw email). Access is restricted to OPERATOR/ADMIN by the security chain.
  */
 @Service
+@Slf4j
+@RequiredArgsConstructor
 public class OperatorLookupService {
 
     private static final int EMAIL_MATCH_LIMIT = 200;
-    private static final Logger log = LoggerFactory.getLogger(OperatorLookupService.class);
 
     private final ReservationRepository reservations;
     private final TicketRepository tickets;
     private final UserAccounts userAccounts;
     private final ReservationSummaryAssembler summaries;
     private final ReservationViewBuilder viewBuilder;
-
-    OperatorLookupService(
-            ReservationRepository reservations,
-            TicketRepository tickets,
-            UserAccounts userAccounts,
-            ReservationSummaryAssembler summaries,
-            ReservationViewBuilder viewBuilder) {
-        this.reservations = reservations;
-        this.tickets = tickets;
-        this.userAccounts = userAccounts;
-        this.summaries = summaries;
-        this.viewBuilder = viewBuilder;
-    }
 
     /** Searches reservations by exactly one criterion (SPEC-0020); emails are masked in the result. */
     @Transactional(readOnly = true)

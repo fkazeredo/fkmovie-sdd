@@ -9,6 +9,9 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import java.util.UUID;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 /**
  * One held seat within a {@link Reservation} (SPEC-0014). Carries the chosen ticket type, the
@@ -17,6 +20,8 @@ import java.util.UUID;
  */
 @Entity
 @Table(name = "reservation_seats")
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ReservationSeat {
 
     @Id
@@ -39,10 +44,6 @@ public class ReservationSeat {
     @Column(name = "price_cents", nullable = false)
     private int priceCents;
 
-    protected ReservationSeat() {
-        // JPA
-    }
-
     ReservationSeat(
             UUID screeningSeatId,
             TicketType ticketType,
@@ -55,21 +56,5 @@ public class ReservationSeat {
         this.halfPriceCategory = halfPriceCategory;
         this.documentReference = documentReference;
         this.priceCents = priceCents;
-    }
-
-    public UUID id() {
-        return id;
-    }
-
-    public UUID screeningSeatId() {
-        return screeningSeatId;
-    }
-
-    public TicketType ticketType() {
-        return ticketType;
-    }
-
-    public int priceCents() {
-        return priceCents;
     }
 }

@@ -6,6 +6,9 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import java.time.Instant;
 import java.util.UUID;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 /**
  * Single-use password-reset token (SPEC-0004). Only the SHA-256 hash is stored; valid for
@@ -13,6 +16,8 @@ import java.util.UUID;
  */
 @Entity
 @Table(name = "password_reset_tokens")
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class PasswordResetToken {
 
     @Id
@@ -36,10 +41,6 @@ public class PasswordResetToken {
     @Column(name = "requested_ip")
     private String requestedIp;
 
-    protected PasswordResetToken() {
-        // JPA
-    }
-
     /** Created unconsumed; only the SHA-256 hash of the raw token is persisted. */
     public PasswordResetToken(UUID userId, String tokenHash, Instant expiresAt, Instant createdAt, String requestedIp) {
         this.id = UUID.randomUUID();
@@ -60,13 +61,5 @@ public class PasswordResetToken {
 
     public void consume(Instant now) {
         this.consumedAt = now;
-    }
-
-    public UUID userId() {
-        return userId;
-    }
-
-    public Instant createdAt() {
-        return createdAt;
     }
 }

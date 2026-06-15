@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 
@@ -19,6 +20,7 @@ import org.springframework.stereotype.Component;
  * SOLD/CONFIRMED signals; on failure, the realtime FREE/CANCELLED signals. The STOMP send is 0013.
  */
 @Component
+@RequiredArgsConstructor
 class ConfirmationPublisher {
 
     private final UserAccounts userAccounts;
@@ -27,21 +29,6 @@ class ConfirmationPublisher {
     private final ScreeningSeatRepository screeningSeats;
     private final ApplicationEventPublisher events;
     private final Clock clock;
-
-    ConfirmationPublisher(
-            UserAccounts userAccounts,
-            CinemaCatalog cinema,
-            ScreeningCatalog screenings,
-            ScreeningSeatRepository screeningSeats,
-            ApplicationEventPublisher events,
-            Clock clock) {
-        this.userAccounts = userAccounts;
-        this.cinema = cinema;
-        this.screenings = screenings;
-        this.screeningSeats = screeningSeats;
-        this.events = events;
-        this.clock = clock;
-    }
 
     void publishConfirmed(Reservation reservation, List<Ticket> issuedTickets) {
         var account = userAccounts

@@ -1,6 +1,7 @@
 package com.fksoft.domain.booking;
 
 import com.fksoft.domain.screening.ScreeningCreated;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionalEventListener;
 
@@ -10,13 +11,10 @@ import org.springframework.transaction.event.TransactionalEventListener;
  * its own transaction (idempotent).
  */
 @Component
+@RequiredArgsConstructor
 class BookingScreeningListener {
 
     private final ScreeningSeatMaterializer materializer;
-
-    BookingScreeningListener(ScreeningSeatMaterializer materializer) {
-        this.materializer = materializer;
-    }
 
     @TransactionalEventListener
     void on(ScreeningCreated event) {

@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -13,13 +14,10 @@ import org.springframework.transaction.annotation.Transactional;
  * list). Returns a stable {@link MovieView}, never the {@code Movie} entity (ArchUnit-enforced).
  */
 @Service
+@RequiredArgsConstructor
 public class MovieCatalog {
 
     private final MovieRepository movies;
-
-    MovieCatalog(MovieRepository movies) {
-        this.movies = movies;
-    }
 
     /** Reads a movie as a stable projection (empty if unknown). */
     @Transactional(readOnly = true)

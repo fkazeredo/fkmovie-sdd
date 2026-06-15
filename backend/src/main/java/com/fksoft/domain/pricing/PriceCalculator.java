@@ -1,6 +1,7 @@
 package com.fksoft.domain.pricing;
 
 import com.fksoft.domain.cinema.SeatType;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 /**
@@ -9,13 +10,10 @@ import org.springframework.stereotype.Service;
  * price) and reservations (snapshot at hold time).
  */
 @Service
+@RequiredArgsConstructor
 public class PriceCalculator {
 
     private final PricingConfig config;
-
-    PriceCalculator(PricingConfig config) {
-        this.config = config;
-    }
 
     /** Quotes a seat: full and half prices plus the amount for {@code ticketType}. */
     public PriceQuote quote(ScreeningPricingContext ctx, SeatType type, TicketType ticketType) {

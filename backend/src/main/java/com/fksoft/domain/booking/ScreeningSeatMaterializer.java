@@ -2,8 +2,8 @@ package com.fksoft.domain.booking;
 
 import com.fksoft.domain.cinema.CinemaCatalog;
 import java.util.UUID;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,17 +15,12 @@ import org.springframework.transaction.annotation.Transactional;
  * {@code UNIQUE(screening_id, seat_id)} constraint makes any race safe.
  */
 @Service
+@Slf4j
+@RequiredArgsConstructor
 class ScreeningSeatMaterializer {
-
-    private static final Logger log = LoggerFactory.getLogger(ScreeningSeatMaterializer.class);
 
     private final ScreeningSeatRepository screeningSeats;
     private final CinemaCatalog cinema;
-
-    ScreeningSeatMaterializer(ScreeningSeatRepository screeningSeats, CinemaCatalog cinema) {
-        this.screeningSeats = screeningSeats;
-        this.cinema = cinema;
-    }
 
     /**
      * Creates the FREE inventory rows. REQUIRES_NEW because the only caller is an AFTER_COMMIT

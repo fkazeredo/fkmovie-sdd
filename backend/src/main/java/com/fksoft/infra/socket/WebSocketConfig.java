@@ -1,5 +1,6 @@
 package com.fksoft.infra.socket;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.ChannelRegistration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
@@ -15,13 +16,10 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
  */
 @Configuration
 @EnableWebSocketMessageBroker
+@RequiredArgsConstructor
 class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     private final StompAuthChannelInterceptor authInterceptor;
-
-    WebSocketConfig(StompAuthChannelInterceptor authInterceptor) {
-        this.authInterceptor = authInterceptor;
-    }
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {

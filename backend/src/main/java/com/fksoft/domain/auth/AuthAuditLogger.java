@@ -1,7 +1,6 @@
 package com.fksoft.domain.auth;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionalEventListener;
 
@@ -10,9 +9,8 @@ import org.springframework.transaction.event.TransactionalEventListener;
  * lines never describe rolled-back work.
  */
 @Component
+@Slf4j
 class AuthAuditLogger {
-
-    private static final Logger log = LoggerFactory.getLogger(AuthAuditLogger.class);
 
     @TransactionalEventListener
     void on(UserLoggedIn event) {

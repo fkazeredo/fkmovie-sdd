@@ -4,8 +4,8 @@ import io.micrometer.core.instrument.MeterRegistry;
 import java.time.Clock;
 import java.util.List;
 import java.util.UUID;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Component;
@@ -20,9 +20,9 @@ import org.springframework.transaction.annotation.Transactional;
  * already moved on (re-fetched and guarded) is a no-op, making repeated runs idempotent.
  */
 @Component
+@Slf4j
+@RequiredArgsConstructor
 class ReservationExpirationWorker {
-
-    private static final Logger log = LoggerFactory.getLogger(ReservationExpirationWorker.class);
 
     private final ReservationRepository reservations;
     private final ScreeningSeatRepository screeningSeats;
@@ -30,21 +30,6 @@ class ReservationExpirationWorker {
     private final MeterRegistry meterRegistry;
     private final BookingProperties properties;
     private final Clock clock;
-
-    ReservationExpirationWorker(
-            ReservationRepository reservations,
-            ScreeningSeatRepository screeningSeats,
-            ApplicationEventPublisher events,
-            MeterRegistry meterRegistry,
-            BookingProperties properties,
-            Clock clock) {
-        this.reservations = reservations;
-        this.screeningSeats = screeningSeats;
-        this.events = events;
-        this.meterRegistry = meterRegistry;
-        this.properties = properties;
-        this.clock = clock;
-    }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     List<UUID> claimExpiredIds() {

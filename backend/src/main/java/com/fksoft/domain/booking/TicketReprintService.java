@@ -4,8 +4,8 @@ import com.fksoft.domain.auth.UserAccounts;
 import io.micrometer.core.instrument.MeterRegistry;
 import java.time.Instant;
 import java.util.UUID;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,9 +16,9 @@ import org.springframework.transaction.annotation.Transactional;
  * never changes the ticket's state. The printable payload reuses the enriched reservation view.
  */
 @Service
+@Slf4j
+@RequiredArgsConstructor
 public class TicketReprintService {
-
-    private static final Logger log = LoggerFactory.getLogger(TicketReprintService.class);
 
     private final TicketRepository tickets;
     private final ReservationRepository reservations;
@@ -27,23 +27,6 @@ public class TicketReprintService {
     private final TicketReprintRepository reprints;
     private final ApplicationEventPublisher events;
     private final MeterRegistry meterRegistry;
-
-    TicketReprintService(
-            TicketRepository tickets,
-            ReservationRepository reservations,
-            ReservationViewBuilder viewBuilder,
-            UserAccounts userAccounts,
-            TicketReprintRepository reprints,
-            ApplicationEventPublisher events,
-            MeterRegistry meterRegistry) {
-        this.tickets = tickets;
-        this.reservations = reservations;
-        this.viewBuilder = viewBuilder;
-        this.userAccounts = userAccounts;
-        this.reprints = reprints;
-        this.events = events;
-        this.meterRegistry = meterRegistry;
-    }
 
     /** Records an audited reprint and returns the printable payload (SPEC-0020); no state change. */
     @Transactional

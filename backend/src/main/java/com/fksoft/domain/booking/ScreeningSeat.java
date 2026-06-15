@@ -11,6 +11,9 @@ import jakarta.persistence.Table;
 import jakarta.persistence.Version;
 import java.time.Instant;
 import java.util.UUID;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 /**
  * A seat's availability for one screening (SPEC-0009, materialized; read model owned by
@@ -20,6 +23,8 @@ import java.util.UUID;
  */
 @Entity
 @Table(name = "screening_seats")
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ScreeningSeat {
 
     @Id
@@ -43,10 +48,6 @@ public class ScreeningSeat {
 
     @Column(name = "updated_at", nullable = false)
     private Instant updatedAt;
-
-    protected ScreeningSeat() {
-        // JPA
-    }
 
     private ScreeningSeat(UUID screeningId, UUID seatId) {
         this.id = UUID.randomUUID();
@@ -109,21 +110,5 @@ public class ScreeningSeat {
     @PreUpdate
     void touch() {
         updatedAt = Instant.now();
-    }
-
-    public UUID id() {
-        return id;
-    }
-
-    public UUID screeningId() {
-        return screeningId;
-    }
-
-    public UUID seatId() {
-        return seatId;
-    }
-
-    public ScreeningSeatStatus status() {
-        return status;
     }
 }

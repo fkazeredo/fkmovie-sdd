@@ -16,6 +16,9 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 /**
  * A customer's hold on one or more seats of a screening (SPEC-0014). Aggregate root over its
@@ -24,6 +27,8 @@ import java.util.UUID;
  */
 @Entity
 @Table(name = "reservations")
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Reservation {
 
     @Id
@@ -66,10 +71,6 @@ public class Reservation {
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "reservation_id", nullable = false)
     private List<ReservationSeat> seats = new ArrayList<>();
-
-    protected Reservation() {
-        // JPA
-    }
 
     private Reservation(UUID userId, UUID screeningId, Instant expiresAt) {
         this.id = UUID.randomUUID();
@@ -145,38 +146,6 @@ public class Reservation {
     @PreUpdate
     void onUpdate() {
         updatedAt = Instant.now();
-    }
-
-    public UUID id() {
-        return id;
-    }
-
-    public UUID userId() {
-        return userId;
-    }
-
-    public UUID screeningId() {
-        return screeningId;
-    }
-
-    public ReservationStatus status() {
-        return status;
-    }
-
-    public int totalCents() {
-        return totalCents;
-    }
-
-    public Instant expiresAt() {
-        return expiresAt;
-    }
-
-    public Instant paymentDeadlineAt() {
-        return paymentDeadlineAt;
-    }
-
-    public UUID paymentId() {
-        return paymentId;
     }
 
     public List<ReservationSeat> seats() {

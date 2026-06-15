@@ -8,8 +8,8 @@ import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 import java.util.function.Consumer;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,9 +21,9 @@ import org.springframework.transaction.annotation.Transactional;
  * via the gateway port. The refund settles asynchronously and never gates the cancellation.
  */
 @Service
+@Slf4j
+@RequiredArgsConstructor
 public class ReservationCancellationService {
-
-    private static final Logger log = LoggerFactory.getLogger(ReservationCancellationService.class);
 
     private final ReservationRepository reservations;
     private final ScreeningSeatRepository screeningSeats;
@@ -32,23 +32,6 @@ public class ReservationCancellationService {
     private final PaymentGateway paymentGateway;
     private final CancellationPublisher publisher;
     private final BookingProperties properties;
-
-    ReservationCancellationService(
-            ReservationRepository reservations,
-            ScreeningSeatRepository screeningSeats,
-            TicketRepository tickets,
-            ScreeningCatalog screenings,
-            PaymentGateway paymentGateway,
-            CancellationPublisher publisher,
-            BookingProperties properties) {
-        this.reservations = reservations;
-        this.screeningSeats = screeningSeats;
-        this.tickets = tickets;
-        this.screenings = screenings;
-        this.paymentGateway = paymentGateway;
-        this.publisher = publisher;
-        this.properties = properties;
-    }
 
     /** Cancels a reservation on the owner's request (SPEC-0018); owner only, state-machine guarded. */
     @Transactional

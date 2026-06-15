@@ -3,8 +3,8 @@ package com.fksoft.domain.screening;
 import io.micrometer.core.instrument.MeterRegistry;
 import java.time.Instant;
 import java.util.UUID;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -17,26 +17,14 @@ import org.springframework.transaction.annotation.Transactional;
  * mutation is audited and metered.
  */
 @Service
+@Slf4j
+@RequiredArgsConstructor
 public class MovieService {
-
-    private static final Logger log = LoggerFactory.getLogger(MovieService.class);
 
     private final MovieRepository movies;
     private final MovieDeletionGuard deletionGuard;
     private final ApplicationEventPublisher events;
     private final MeterRegistry meterRegistry;
-
-    /** Collaborators injected by Spring — constructor injection only (CLAUDE.md). */
-    public MovieService(
-            MovieRepository movies,
-            MovieDeletionGuard deletionGuard,
-            ApplicationEventPublisher events,
-            MeterRegistry meterRegistry) {
-        this.movies = movies;
-        this.deletionGuard = deletionGuard;
-        this.events = events;
-        this.meterRegistry = meterRegistry;
-    }
 
     /** Creates an ACTIVE movie (SPEC-0008). */
     @Transactional

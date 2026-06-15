@@ -6,6 +6,9 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import java.time.Instant;
 import java.util.UUID;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 /**
  * An audited reprint of a ticket by an operator (SPEC-0020). Append-only: one row per reprint, never a
@@ -13,6 +16,8 @@ import java.util.UUID;
  */
 @Entity
 @Table(name = "ticket_reprints")
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class TicketReprint {
 
     @Id
@@ -30,10 +35,6 @@ public class TicketReprint {
     @Column(name = "reprinted_at", nullable = false)
     private Instant reprintedAt;
 
-    protected TicketReprint() {
-        // JPA
-    }
-
     private TicketReprint(UUID ticketId, UUID operatorUserId, Instant reprintedAt) {
         this.id = UUID.randomUUID();
         this.tenantId = "default";
@@ -45,13 +46,5 @@ public class TicketReprint {
     /** Records a reprint of a ticket by an operator (SPEC-0020). */
     public static TicketReprint record(UUID ticketId, UUID operatorUserId, Instant reprintedAt) {
         return new TicketReprint(ticketId, operatorUserId, reprintedAt);
-    }
-
-    public UUID id() {
-        return id;
-    }
-
-    public UUID ticketId() {
-        return ticketId;
     }
 }

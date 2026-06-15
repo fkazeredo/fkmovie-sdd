@@ -10,6 +10,9 @@ import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
 import java.time.Instant;
 import java.util.UUID;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 /**
  * A catalog movie (SPEC-0008). Descriptive data managed by admins; {@code durationMinutes}
@@ -18,6 +21,8 @@ import java.util.UUID;
  */
 @Entity
 @Table(name = "movies")
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Movie {
 
     private static final int TITLE_MAX = 200;
@@ -54,10 +59,6 @@ public class Movie {
 
     @Column(name = "updated_at", nullable = false)
     private Instant updatedAt;
-
-    protected Movie() {
-        // JPA
-    }
 
     /** Creates an ACTIVE movie in the default tenant. */
     public Movie(String title, int durationMinutes, AgeRating ageRating, String synopsis, String posterUrl) {
@@ -109,33 +110,5 @@ public class Movie {
     @PreUpdate
     void onUpdate() {
         updatedAt = Instant.now();
-    }
-
-    public UUID id() {
-        return id;
-    }
-
-    public String title() {
-        return title;
-    }
-
-    public int durationMinutes() {
-        return durationMinutes;
-    }
-
-    public String synopsis() {
-        return synopsis;
-    }
-
-    public String posterUrl() {
-        return posterUrl;
-    }
-
-    public AgeRating ageRating() {
-        return ageRating;
-    }
-
-    public MovieStatus status() {
-        return status;
     }
 }

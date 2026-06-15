@@ -15,8 +15,8 @@ import java.net.http.HttpResponse;
 import java.time.Clock;
 import java.util.List;
 import java.util.UUID;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
@@ -29,9 +29,9 @@ import org.springframework.transaction.annotation.Transactional;
  * application's own endpoint and is then stamped delivered; a failed POST leaves it for the next poll.
  */
 @Component
+@Slf4j
+@RequiredArgsConstructor
 class MockPaymentDeliveryWorker {
-
-    private static final Logger log = LoggerFactory.getLogger(MockPaymentDeliveryWorker.class);
 
     private final MockPaymentJobRepository jobs;
     private final PaymentRepository payments;
@@ -40,21 +40,6 @@ class MockPaymentDeliveryWorker {
     private final WebhookJson json;
     private final Clock clock;
     private final HttpClient httpClient = HttpClient.newHttpClient();
-
-    MockPaymentDeliveryWorker(
-            MockPaymentJobRepository jobs,
-            PaymentRepository payments,
-            PaymentSigner signer,
-            WebhookUrlResolver urlResolver,
-            WebhookJson json,
-            Clock clock) {
-        this.jobs = jobs;
-        this.payments = payments;
-        this.signer = signer;
-        this.urlResolver = urlResolver;
-        this.json = json;
-        this.clock = clock;
-    }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     List<UUID> claimDueIds() {

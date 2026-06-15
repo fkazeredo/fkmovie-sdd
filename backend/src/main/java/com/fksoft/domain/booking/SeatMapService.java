@@ -16,6 +16,7 @@ import java.util.Comparator;
 import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,6 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
  * then prices each seat. Read-only; the realtime channel (SPEC-0013) patches this view.
  */
 @Service
+@RequiredArgsConstructor
 public class SeatMapService {
 
     private final ScreeningCatalog screenings;
@@ -32,19 +34,6 @@ public class SeatMapService {
     private final ScreeningSeatRepository screeningSeats;
     private final PriceCalculator pricing;
     private final MeterRegistry meterRegistry;
-
-    SeatMapService(
-            ScreeningCatalog screenings,
-            CinemaCatalog cinema,
-            ScreeningSeatRepository screeningSeats,
-            PriceCalculator pricing,
-            MeterRegistry meterRegistry) {
-        this.screenings = screenings;
-        this.cinema = cinema;
-        this.screeningSeats = screeningSeats;
-        this.pricing = pricing;
-        this.meterRegistry = meterRegistry;
-    }
 
     /**
      * @throws ScreeningNotFoundException unknown screening (404);

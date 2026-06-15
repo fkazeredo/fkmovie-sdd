@@ -11,6 +11,9 @@ import jakarta.persistence.Table;
 import java.time.Instant;
 import java.util.Locale;
 import java.util.UUID;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 /**
  * Account identified by a unique, case-insensitive email (SPEC-0003). The entity protects
@@ -19,6 +22,8 @@ import java.util.UUID;
  */
 @Entity
 @Table(name = "users")
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class User {
 
     @Id
@@ -62,10 +67,6 @@ public class User {
 
     @Column(name = "updated_at", nullable = false)
     private Instant updatedAt;
-
-    protected User() {
-        // JPA
-    }
 
     /** Creates an ACTIVE user in the default tenant; the email is normalized to lowercase. */
     public User(String email, String passwordHash, String name, Role role) {
@@ -169,41 +170,5 @@ public class User {
     @PreUpdate
     void onUpdate() {
         updatedAt = Instant.now();
-    }
-
-    public UUID id() {
-        return id;
-    }
-
-    public String tenantId() {
-        return tenantId;
-    }
-
-    public String email() {
-        return email;
-    }
-
-    public String passwordHash() {
-        return passwordHash;
-    }
-
-    public String name() {
-        return name;
-    }
-
-    public Role role() {
-        return role;
-    }
-
-    public UserStatus status() {
-        return status;
-    }
-
-    public String preferredLocale() {
-        return preferredLocale;
-    }
-
-    public Instant invitedAt() {
-        return invitedAt;
     }
 }

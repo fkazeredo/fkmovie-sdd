@@ -5,8 +5,8 @@ import com.fksoft.domain.payment.RefundRequest;
 import io.micrometer.core.instrument.MeterRegistry;
 import java.time.Clock;
 import java.util.UUID;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,9 +19,9 @@ import org.springframework.transaction.annotation.Transactional;
  * transaction (REQUIRES_NEW) after the webhook commits.
  */
 @Service
+@Slf4j
+@RequiredArgsConstructor
 class ReservationConfirmer {
-
-    private static final Logger log = LoggerFactory.getLogger(ReservationConfirmer.class);
 
     private final ReservationRepository reservations;
     private final ScreeningSeatRepository screeningSeats;
@@ -30,23 +30,6 @@ class ReservationConfirmer {
     private final ConfirmationPublisher publisher;
     private final MeterRegistry meterRegistry;
     private final Clock clock;
-
-    ReservationConfirmer(
-            ReservationRepository reservations,
-            ScreeningSeatRepository screeningSeats,
-            TicketIssuer ticketIssuer,
-            PaymentGateway paymentGateway,
-            ConfirmationPublisher publisher,
-            MeterRegistry meterRegistry,
-            Clock clock) {
-        this.reservations = reservations;
-        this.screeningSeats = screeningSeats;
-        this.ticketIssuer = ticketIssuer;
-        this.paymentGateway = paymentGateway;
-        this.publisher = publisher;
-        this.meterRegistry = meterRegistry;
-        this.clock = clock;
-    }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     void onPaymentSucceeded(UUID reservationId, int amountCents) {

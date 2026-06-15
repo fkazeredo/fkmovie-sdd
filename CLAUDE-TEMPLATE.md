@@ -27,8 +27,9 @@ the backend and Angular on the frontend; replace `com.company.app` with the real
    CI gates encode these rules executably. Never weaken, skip or delete a gate to make code
    pass. If a rule seems wrong, raise it with the owner and update this file - do not bypass.
 6. **No loose ends.** No TODO/FIXME without a tracked reference; no commented-out code; no
-   incomplete implementations; no `@Data` on JPA entities; no `*Impl` naming; constructor
-   injection only.
+   incomplete implementations; no `@Data`/`@Setter` on JPA entities (Lombok
+   `@Getter`/`@RequiredArgsConstructor`/`@Slf4j` welcome for boilerplate); no `*Impl` naming;
+   constructor injection only.
 
 ## 2. Decision protocol
 
@@ -71,7 +72,9 @@ a library for a trivial problem; significant dependencies are raised with the ow
 - **Backend:** Java (LTS), Spring Boot, Spring Modulith (`detection-strategy=explicitly-annotated`),
   Spring Web MVC, Spring Data JPA, Bean Validation, Spring Security + OAuth2 Resource Server
   (JWT), Spring WebSocket (STOMP) when realtime is needed, Spring Mail, Flyway + PostgreSQL,
-  springdoc-openapi, Micrometer + Prometheus, Actuator, structured JSON logging.
+  springdoc-openapi, Micrometer + Prometheus, Actuator, structured JSON logging, Lombok
+  (boilerplate: `@Slf4j`, `@RequiredArgsConstructor`, entity `@Getter`; `lombok.config` sets
+  fluent accessors).
 - **Test:** JUnit, Testcontainers (Postgres), ArchUnit (core API), `spring-modulith-starter-test`.
   Build with the Maven wrapper only (`./mvnw`); Spotless + Checkstyle bound to `verify`.
 - **Frontend:** Angular (standalone components + signals, no NgModules, no NgRx by default),
@@ -126,15 +129,20 @@ libraries, separate deployables, very large codebases or independent ownership.
 A module service is an **Application Service**: it coordinates flow, transactions, repositories,
 domain behavior and results. It MUST NOT become a dumping ground for business rules - domain
 rules live in entities, value objects, enums-with-behavior, policies or domain services. MUST
-NOT create explicit `UseCase` or `*Impl` classes by default. Constructor injection only.
+NOT create explicit `UseCase` or `*Impl` classes by default. Constructor injection only -
+prefer Lombok `@RequiredArgsConstructor` (over `final` fields, no field `@Autowired`) and
+`@Slf4j` for loggers; keep a hand-written constructor only when params carry `@Value`/`@Qualifier`
+or the constructor has logic.
 
 ### 5.3 Entities & JPA
 
 JPA entities MAY be domain entities - no artificial domain/persistence split by default. Anemic
-models are not acceptable: entities MUST protect invariants and expose meaningful methods. No
-`@Data`, no uncontrolled setters on entities (ArchUnit-enforced). Separate persistence models
-only for concrete reasons (complex legacy mapping, read/write models that diverge, critical
-isolation).
+models are not acceptable: entities MUST protect invariants and expose meaningful methods.
+Entities MAY use Lombok `@Getter` and `@NoArgsConstructor(access = PROTECTED)` for boilerplate
+(set `lombok.accessors.fluent = true` so getters stay `title()`), but **NEVER** `@Data` or
+`@Setter` - they mutate only through meaningful business methods (both ArchUnit-enforced).
+Separate persistence models only for concrete reasons (complex legacy mapping, read/write models
+that diverge, critical isolation).
 
 ### 5.4 DTOs & mapping
 
@@ -416,7 +424,8 @@ JUnit over the ArchUnit core API):
 - `domainMustNotDependOnDeliveryOrInfra` - `domain..` MUST NOT depend on `application..`/`infra..`.
 - `infraMustNotDependOnDelivery` - `infra..` MUST NOT depend on `application..`.
 - `controllersMustNotAccessRepositories` - `..api..` MUST NOT depend on `*Repository`.
-- `noLombokDataOnEntities` - no `@Data` on `@Entity`.
+- `noLombokDataOnEntities` / `noLombokSetterOnEntities` - no `@Data` / `@Setter` on `@Entity`
+  (entities mutate only through business methods; `@Getter`/`@NoArgsConstructor` are fine).
 - `noImplSuffix` - no class name ends in `Impl`.
 - `noFieldInjection` - no field `@Autowired` (constructor injection only).
 - `exceptionsLiveWithTheirDomain` - `*Exception` resides in `domain..`, not `..api..`/`..infra..`.

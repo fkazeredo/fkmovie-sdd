@@ -8,6 +8,7 @@ import com.fksoft.infra.web.PageResponse;
 import jakarta.validation.Valid;
 import java.time.Instant;
 import java.util.UUID;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
@@ -28,15 +29,11 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping("/api/admin/screenings")
+@RequiredArgsConstructor
 class ScreeningAdminController {
 
     private final ScreeningService screeningService;
     private final UserContextProvider userContext;
-
-    ScreeningAdminController(ScreeningService screeningService, UserContextProvider userContext) {
-        this.screeningService = screeningService;
-        this.userContext = userContext;
-    }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)

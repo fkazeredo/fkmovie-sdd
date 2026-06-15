@@ -3,6 +3,7 @@ package com.fksoft.application.realtime;
 import com.fksoft.application.realtime.dto.ReservationStatusMessage;
 import com.fksoft.domain.booking.ReservationStatusChanged;
 import io.micrometer.core.instrument.MeterRegistry;
+import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionalEventListener;
@@ -13,15 +14,11 @@ import org.springframework.transaction.event.TransactionalEventListener;
  * owner receives it.
  */
 @Component
+@RequiredArgsConstructor
 class ReservationStatusPublisher {
 
     private final SimpMessagingTemplate messaging;
     private final MeterRegistry meterRegistry;
-
-    ReservationStatusPublisher(SimpMessagingTemplate messaging, MeterRegistry meterRegistry) {
-        this.messaging = messaging;
-        this.meterRegistry = meterRegistry;
-    }
 
     @TransactionalEventListener
     void on(ReservationStatusChanged event) {

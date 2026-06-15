@@ -4,6 +4,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,15 +17,11 @@ import org.springframework.transaction.annotation.Transactional;
  * {@code CinemaRoom}/{@code Seat} entities or their repositories (enforced by ArchUnit).
  */
 @Service
+@RequiredArgsConstructor
 public class CinemaCatalog {
 
     private final CinemaRoomRepository rooms;
     private final SeatRepository seats;
-
-    CinemaCatalog(CinemaRoomRepository rooms, SeatRepository seats) {
-        this.rooms = rooms;
-        this.seats = seats;
-    }
 
     public boolean roomExists(UUID roomId) {
         return rooms.existsById(roomId);

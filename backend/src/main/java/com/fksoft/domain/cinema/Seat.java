@@ -10,6 +10,9 @@ import jakarta.persistence.Table;
 import java.time.Instant;
 import java.util.UUID;
 import java.util.regex.Pattern;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 /**
  * A physical seat in a {@link CinemaRoom} (SPEC-0007), identified within its room by row
@@ -21,6 +24,8 @@ import java.util.regex.Pattern;
  */
 @Entity
 @Table(name = "seats")
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Seat {
 
     private static final Pattern ROW_PATTERN = Pattern.compile("^[A-Z]{1,2}$");
@@ -43,10 +48,6 @@ public class Seat {
 
     @Column(name = "created_at", nullable = false)
     private Instant createdAt;
-
-    protected Seat() {
-        // JPA
-    }
 
     /**
      * Creates a seat, validating the physical addressing rules (SPEC-0007).
@@ -71,25 +72,5 @@ public class Seat {
     @PrePersist
     void onCreate() {
         createdAt = Instant.now();
-    }
-
-    public UUID id() {
-        return id;
-    }
-
-    public UUID roomId() {
-        return roomId;
-    }
-
-    public String row() {
-        return row;
-    }
-
-    public int number() {
-        return number;
-    }
-
-    public SeatType type() {
-        return type;
     }
 }

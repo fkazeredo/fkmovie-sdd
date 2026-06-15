@@ -5,8 +5,7 @@ import io.micrometer.core.instrument.MeterRegistry;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.UUID;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -22,9 +21,9 @@ import org.springframework.transaction.annotation.Transactional;
  * ScreeningCreated} so the booking module materializes the seat inventory.
  */
 @Service
+@Slf4j
 public class ScreeningService {
 
-    private static final Logger log = LoggerFactory.getLogger(ScreeningService.class);
     private static final Duration MIN_LEAD_TIME = Duration.ofHours(1);
 
     private final ScreeningRepository screenings;

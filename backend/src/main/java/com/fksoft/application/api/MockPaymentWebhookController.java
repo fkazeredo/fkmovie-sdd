@@ -1,6 +1,7 @@
 package com.fksoft.application.api;
 
 import com.fksoft.domain.payment.PaymentWebhookHandler;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -14,13 +15,10 @@ import org.springframework.web.bind.annotation.RestController;
  * 200 on accepted/duplicate; 401 on bad signature, 422 on malformed body (via the handler).
  */
 @RestController
+@RequiredArgsConstructor
 class MockPaymentWebhookController {
 
     private final PaymentWebhookHandler handler;
-
-    MockPaymentWebhookController(PaymentWebhookHandler handler) {
-        this.handler = handler;
-    }
 
     @PostMapping("/api/webhooks/payments/mock")
     @ResponseStatus(HttpStatus.OK)

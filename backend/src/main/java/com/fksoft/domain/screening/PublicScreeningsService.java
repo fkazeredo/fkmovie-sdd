@@ -16,6 +16,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -29,6 +30,7 @@ import org.springframework.transaction.annotation.Transactional;
  * carries the movie/room display info and the "from" price (cheapest full price, pricing 0012).
  */
 @Service
+@RequiredArgsConstructor
 public class PublicScreeningsService {
 
     private static final ZoneId CINEMA_ZONE = ZoneId.of("America/Sao_Paulo");
@@ -40,19 +42,6 @@ public class PublicScreeningsService {
     private final CinemaCatalog cinema;
     private final PriceCalculator pricing;
     private final MeterRegistry meterRegistry;
-
-    PublicScreeningsService(
-            ScreeningRepository screenings,
-            MovieRepository movies,
-            CinemaCatalog cinema,
-            PriceCalculator pricing,
-            MeterRegistry meterRegistry) {
-        this.screenings = screenings;
-        this.movies = movies;
-        this.cinema = cinema;
-        this.pricing = pricing;
-        this.meterRegistry = meterRegistry;
-    }
 
     /** Lists upcoming sessions (SPEC-0010); size clamped to 100, sorted by start ascending. */
     @Transactional(readOnly = true)

@@ -8,6 +8,7 @@ import com.fksoft.infra.security.UserContextProvider;
 import com.fksoft.infra.web.PageResponse;
 import jakarta.validation.Valid;
 import java.util.UUID;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -27,15 +28,11 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping("/api/admin/movies")
+@RequiredArgsConstructor
 class MovieAdminController {
 
     private final MovieService movieService;
     private final UserContextProvider userContext;
-
-    MovieAdminController(MovieService movieService, UserContextProvider userContext) {
-        this.movieService = movieService;
-        this.userContext = userContext;
-    }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)

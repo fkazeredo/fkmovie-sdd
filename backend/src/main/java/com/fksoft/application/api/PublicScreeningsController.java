@@ -5,6 +5,7 @@ import com.fksoft.domain.screening.PublicScreeningsService;
 import com.fksoft.infra.web.PageResponse;
 import java.util.UUID;
 import java.util.function.Function;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -14,13 +15,10 @@ import org.springframework.web.bind.annotation.RestController;
  * and the "from" price live in {@link PublicScreeningsService}; the handshake is permitted in security.
  */
 @RestController
+@RequiredArgsConstructor
 class PublicScreeningsController {
 
     private final PublicScreeningsService publicScreenings;
-
-    PublicScreeningsController(PublicScreeningsService publicScreenings) {
-        this.publicScreenings = publicScreenings;
-    }
 
     @GetMapping("/api/screenings")
     PageResponse<PublicScreeningView> list(

@@ -8,10 +8,15 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import java.time.Instant;
 import java.util.UUID;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 /** Payment ledger entry (SPEC-0015): a charge or refund, settled asynchronously via webhook. */
 @Entity
 @Table(name = "payments")
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Payment {
 
     @Id
@@ -46,10 +51,6 @@ public class Payment {
     @Column(name = "settled_at")
     private Instant settledAt;
 
-    protected Payment() {
-        // JPA
-    }
-
     private Payment(UUID reservationId, int amountCents, PaymentKind kind, Instant now) {
         this.id = UUID.randomUUID();
         this.tenantId = "default";
@@ -74,25 +75,5 @@ public class Payment {
     public void settle(PaymentOutcome outcome, Instant now) {
         this.status = outcome == PaymentOutcome.SUCCEEDED ? PaymentStatus.SUCCEEDED : PaymentStatus.FAILED;
         this.settledAt = now;
-    }
-
-    public UUID id() {
-        return id;
-    }
-
-    public UUID reservationId() {
-        return reservationId;
-    }
-
-    public PaymentKind kind() {
-        return kind;
-    }
-
-    public PaymentStatus status() {
-        return status;
-    }
-
-    public int amountCents() {
-        return amountCents;
     }
 }

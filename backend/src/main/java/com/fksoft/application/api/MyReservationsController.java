@@ -6,6 +6,7 @@ import com.fksoft.domain.booking.ReservationStatus;
 import com.fksoft.infra.security.UserContextProvider;
 import com.fksoft.infra.web.PageResponse;
 import java.util.function.Function;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -15,15 +16,11 @@ import org.springframework.web.bind.annotation.RestController;
  * caller's id, never a parameter); filters and pagination live in {@link MyReservationsService}.
  */
 @RestController
+@RequiredArgsConstructor
 class MyReservationsController {
 
     private final MyReservationsService myReservations;
     private final UserContextProvider userContext;
-
-    MyReservationsController(MyReservationsService myReservations, UserContextProvider userContext) {
-        this.myReservations = myReservations;
-        this.userContext = userContext;
-    }
 
     @GetMapping("/api/me/reservations")
     PageResponse<MyReservationView> list(

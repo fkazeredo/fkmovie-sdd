@@ -13,6 +13,7 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 /**
@@ -22,23 +23,13 @@ import org.springframework.stereotype.Component;
  * ReservationService} so its constructor stays small.
  */
 @Component
+@RequiredArgsConstructor
 class ReservationPolicy {
 
     private final UserAccounts userAccounts;
     private final ScreeningCatalog screenings;
     private final CinemaCatalog cinema;
     private final BookingProperties properties;
-
-    ReservationPolicy(
-            UserAccounts userAccounts,
-            ScreeningCatalog screenings,
-            CinemaCatalog cinema,
-            BookingProperties properties) {
-        this.userAccounts = userAccounts;
-        this.screenings = screenings;
-        this.cinema = cinema;
-        this.properties = properties;
-    }
 
     ReservationContext validateAndResolve(
             UUID callerId, UUID screeningId, Collection<UUID> selectedSeatIds, Instant now) {

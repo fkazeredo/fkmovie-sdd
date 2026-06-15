@@ -1,5 +1,6 @@
 package com.fksoft.infra.email;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -14,13 +15,10 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @ConditionalOnProperty(name = "app.notification.dispatch-enabled", matchIfMissing = true)
+@RequiredArgsConstructor
 class OutboxDispatcher {
 
     private final OutboxSendWorker worker;
-
-    OutboxDispatcher(OutboxSendWorker worker) {
-        this.worker = worker;
-    }
 
     @Scheduled(fixedDelayString = "${app.notification.poll-interval:PT30S}")
     void dispatchPending() {

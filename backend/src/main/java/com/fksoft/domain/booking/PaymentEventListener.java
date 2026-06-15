@@ -2,6 +2,7 @@ package com.fksoft.domain.booking;
 
 import com.fksoft.domain.payment.PaymentFailed;
 import com.fksoft.domain.payment.PaymentSucceeded;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionalEventListener;
 
@@ -10,13 +11,10 @@ import org.springframework.transaction.event.TransactionalEventListener;
  * the webhook transaction; {@link ReservationConfirmer} applies the change in its own transaction.
  */
 @Component
+@RequiredArgsConstructor
 class PaymentEventListener {
 
     private final ReservationConfirmer confirmer;
-
-    PaymentEventListener(ReservationConfirmer confirmer) {
-        this.confirmer = confirmer;
-    }
 
     @TransactionalEventListener
     void on(PaymentSucceeded event) {

@@ -4,8 +4,8 @@ import com.fksoft.domain.error.DomainException;
 import com.fksoft.domain.error.ErrorDetails;
 import com.fksoft.domain.error.RateLimited;
 import java.util.List;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.dao.OptimisticLockingFailureException;
@@ -28,15 +28,11 @@ import org.springframework.web.servlet.resource.NoResourceFoundException;
  * fields} ({@link ErrorDetails}). Unhandled exceptions become {@code internal.error}, logged at ERROR.
  */
 @RestControllerAdvice
+@Slf4j
+@RequiredArgsConstructor
 public class GlobalExceptionHandler {
 
-    private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
-
     private final MessageSource messageSource;
-
-    public GlobalExceptionHandler(MessageSource messageSource) {
-        this.messageSource = messageSource;
-    }
 
     /** Domain errors: status from the registry; optional Retry-After / fields from domain data. */
     @ExceptionHandler(DomainException.class)

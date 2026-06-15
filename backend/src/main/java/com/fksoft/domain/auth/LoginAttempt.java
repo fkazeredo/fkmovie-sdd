@@ -7,6 +7,9 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import java.time.Instant;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 /**
  * Append-only login trail backing the rate limiter (SPEC-0003: 5 failures per email and
@@ -14,6 +17,8 @@ import java.time.Instant;
  */
 @Entity
 @Table(name = "login_attempts")
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class LoginAttempt {
 
     @Id
@@ -32,26 +37,10 @@ public class LoginAttempt {
     @Column(name = "attempted_at", nullable = false)
     private Instant attemptedAt;
 
-    protected LoginAttempt() {
-        // JPA
-    }
-
     public LoginAttempt(String email, String ip, boolean succeeded, Instant attemptedAt) {
         this.email = email;
         this.ip = ip;
         this.succeeded = succeeded;
         this.attemptedAt = attemptedAt;
-    }
-
-    public String email() {
-        return email;
-    }
-
-    public boolean succeeded() {
-        return succeeded;
-    }
-
-    public Instant attemptedAt() {
-        return attemptedAt;
     }
 }

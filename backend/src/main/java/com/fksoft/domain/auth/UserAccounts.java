@@ -2,6 +2,7 @@ package com.fksoft.domain.auth;
 
 import java.util.Optional;
 import java.util.UUID;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -11,13 +12,10 @@ import org.springframework.transaction.annotation.Transactional;
  * AccountView}, never the {@code User} entity (ArchUnit-enforced).
  */
 @Service
+@RequiredArgsConstructor
 public class UserAccounts {
 
     private final UserRepository users;
-
-    UserAccounts(UserRepository users) {
-        this.users = users;
-    }
 
     /** Reads an account as a stable projection (empty if unknown). */
     @Transactional(readOnly = true)
