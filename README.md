@@ -17,32 +17,32 @@
 
 ## TL;DR - the experiment in numbers
 
-Built in **5 days** (2026-06-11 -> 2026-06-15), single author, **60 commits**.
+Built in **5 days** (2026-06-11 -> 2026-06-15), single author, **64 commits**.
 
 | Dimension | Count |
 |---|---:|
 | Feature specs (`SPEC-0000` -> `SPEC-0026`) | **27** |
-| Architecture Decision Records | **12** |
+| Architecture Decision Records | **13** |
 | On-demand architecture guides | **12** |
 | Database migrations (Flyway) | **17** |
 | Business modules (Spring Modulith) | **7** + 1 error kernel |
 | REST controllers | **16** |
-| Automated tests (60 classes) | **210** - **0 failures, 0 skipped** |
-| Architecture rules enforced (ArchUnit) | **14** + Modulith boundary verification |
+| Automated tests (60 classes) | **211** - **0 failures, 0 skipped** |
+| Architecture rules enforced (ArchUnit) | **15** + Modulith boundary verification |
 
 | Lines of code | Count |
 |---|---:|
-| Backend production (Java) | **10,915** |
-| Backend tests (Java) | **5,582** |
+| Backend production (Java) | **10,159** |
+| Backend tests (Java) | **5,598** |
 | Frontend (TypeScript) | **4,449** |
-| Specs + ADRs + architecture docs (Markdown) | **5,788** |
+| Specs + ADRs + architecture docs (Markdown) | **5,157** |
 
-Two ratios that capture the philosophy: **test code ~51% of production code**, and there is
+Two ratios that capture the philosophy: **test code ~55% of production code**, and there is
 **roughly one line of spec/decision/architecture prose for every two lines of production
 code**. The design was written down *before* and *around* the code, not reverse-engineered
 from it.
 
-Commit breakdown: `28 feat / 21 docs / 5 fix / 3 refactor / 1 perf / 1 chore`.
+Commit breakdown: `29 feat / 23 docs / 5 fix / 4 refactor / 1 perf / 1 chore`.
 
 ---
 
@@ -50,15 +50,15 @@ Commit breakdown: `28 feat / 21 docs / 5 fix / 3 refactor / 1 perf / 1 chore`.
 
 By size this is a small-to-mid **production** system, not a toy:
 
-- **~21,000 lines** of application code (Java backend + tests + Angular frontend),
-- **~5,800 lines** of specs, ADRs and architecture documentation,
-- **27 features**, **7 modules**, **17 database migrations**, **210 automated tests**, plus
+- **~20,000 lines** of application code (Java backend + tests + Angular frontend),
+- **~5,200 lines** of specs, ADRs and architecture documentation,
+- **27 features**, **7 modules**, **17 database migrations**, **211 automated tests**, plus
   real production concerns: authentication, payments, realtime, i18n and a full observability
   stack.
 
 So how long would the **same scope at the same quality bar** take to build *conventionally*,
 without Claude Code? Using common software-productivity figures - a sustained net output of
-tested, reviewed production code, and treating the ~5,800 lines of design docs as real work in
+tested, reviewed production code, and treating the ~5,200 lines of design docs as real work in
 their own right - an order-of-magnitude estimate:
 
 | Scenario (no AI agent) | Estimated effort for equivalent scope |
@@ -128,19 +128,22 @@ A few representative moments that show the method working:
   as living contracts - scope, endpoints, status codes, error codes, validation, open
   questions. When a requirement was undecided, it was *mocked and deferred to a harmonizing
   spec* rather than guessed (e.g. the seat read-model before reservations existed).
-- **Decisions were recorded, not implied.** 12 ADRs ([`docs/adr/`](docs/adr/)) capture the
+- **Decisions were recorded, not implied.** 13 ADRs ([`docs/adr/`](docs/adr/)) capture the
   *why*: modular monolith (0001), JWT auth (0005), mock payment via async webhook (0006),
   realtime scoping (0009), a centralized infrastructure layer (0010), transport-free domain
-  exceptions (0011), and a three-layer package architecture (0012).
+  exceptions (0011), a three-layer package architecture (0012), and Lombok for boilerplate (0013).
 - **The architecture was refactored under test, late in the project.** The last three commits
   reshaped the entire backend into `domain` / `application` / `infra` layers (ADR 0012) -
   **~320 files moved**, business exceptions made transport-free, the delivery layer made
   entity-free. Because the boundaries were executable (ArchUnit + Modulith) and the behavior
-  was pinned by 210 tests, a refactor of that size landed **green, behavior-preserving, in one
+  was pinned by 211 tests, a refactor of that size landed **green, behavior-preserving, in one
   pass**. That is the whole thesis in one event: *guardrails make large change safe.*
+- **Pragmatism is also a rule.** A later pass adopted Lombok for boilerplate (`@Slf4j`,
+  `@RequiredArgsConstructor`, entity `@Getter`) - cutting ~750 lines of backend code - while a
+  new ArchUnit rule kept `@Data`/`@Setter` off entities so invariants stay hand-guarded (ADR 0013).
 - **Honest failure handling.** When the full test battery "failed" with 119 errors, the cause
   was a wedged local Docker daemon (Testcontainers couldn't find an engine), not the code -
-  diagnosed, Docker restarted, and the suite then passed **210/0/0**. The guardrails told the
+  diagnosed, Docker restarted, and the suite then passed **211/0/0**. The guardrails told the
   truth instead of hiding it.
 
 ---
@@ -277,7 +280,7 @@ to it.
   *underspecification*; writing the contract first removed the guesswork.
 - **Executable invariants beat documentation.** Boundaries that fail the build (ArchUnit /
   Modulith) survived a 320-file refactor; prose alone would not have.
-- **Tests are the license to refactor.** 210 behavior tests turned a risky restructuring into a
+- **Tests are the license to refactor.** 211 behavior tests turned a risky restructuring into a
   routine one.
 - **The human stays the decision owner.** The agent surfaced conflicts and asked instead of
   inventing - exactly when business rules, contracts, or architecture were at stake.
