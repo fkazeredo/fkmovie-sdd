@@ -6,7 +6,7 @@ Related ADRs: 0009, 0005, 0002
 > Implementation notes (backend):
 > - Open Question resolved: anonymous viewers get **no** realtime in v1 — CONNECT requires a JWT, so
 >   pre-login uses REST polling. `/ws` is plain WebSocket (no SockJS).
-> - Transport in `com.fksoft.infra.realtime` (`WebSocketConfig` + `StompAuthChannelInterceptor`):
+> - Transport in `com.fksoft.infra.socket` (`WebSocketConfig` + `StompAuthChannelInterceptor`):
 >   in-memory broker (`/topic`, `/queue`, `/app`, `/user`); the CONNECT frame is authenticated with
 >   the existing `JwtDecoder` (the STOMP JWT-on-CONNECT promised in 0003 lands here) and the principal
 >   is the userId. The `/ws` handshake is permitAll (auth is on CONNECT, not the HTTP upgrade).
@@ -32,7 +32,7 @@ Realtime is a core product requirement.
 ## Scope
 
 Two parts, in line with ADR 0009: STOMP transport configuration in
-`com.fksoft.infra.realtime`, and the seat-update publisher inside
+`com.fksoft.infra.socket`, and the seat-update publisher inside
 `com.fksoft.application.booking.realtime`. Also the per-user reservation
 status channel used by 0015/0016.
 

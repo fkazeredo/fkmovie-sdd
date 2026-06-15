@@ -12,10 +12,18 @@ secondary criterion. Do not create modules only because a folder seems organized
 Cross-module rules (Spring Modulith / ArchUnit enforced):
 
 - Synchronous collaboration through a public application-level API/facade only.
-- A module **MUST NOT** depend on another module's repositories, internal entities,
+- A module **MUST NOT** depend on another **module's** repositories, internal entities,
   persistence details or implementation classes.
 - Asynchronous reactions through domain events.
 - Boundaries **SHOULD** preserve future microservice extraction.
+
+Module ↔ infra (ADR 0010): a module exposes a **port** (interface in the module) for each
+technical adapter; the implementation lives in `com.fksoft.infra.<concern>` and depends on
+the module (infra → domain is allowed; domain → infra is forbidden). The centralized
+`infra` layer **MAY** read/write a module's own persistence to operate that module's
+technical adapter (e.g. the outbox dispatch worker, the mock payment gateway) — the
+per-module persistence rule exempts `com.fksoft.infra`, but **other business modules are
+still forbidden** from touching it.
 
 Data ownership: in a monolith, a shared database is acceptable — do not pretend to be
 distributed. Modules may read shared data for reports/projections; for commands, respect

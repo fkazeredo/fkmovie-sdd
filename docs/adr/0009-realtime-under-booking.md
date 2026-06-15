@@ -21,7 +21,7 @@ events to a module that does not own those events.
 
 ## Decision
 
-- Transport configuration lives in `com.fksoft.infra.realtime`
+- Transport configuration lives in `com.fksoft.infra.socket`
   (`WebSocketConfig`, channel interceptor for JWT auth on CONNECT). This is
   shared infrastructure, owned by no business module.
 - Business publishing lives **inside the module that owns the business

@@ -12,16 +12,31 @@ acceptable; the project does not pretend Spring does not exist.
 ```txt
 com.company.project
   application
-    order            <- module root = domain/application core
+    order            <- module root = domain/application core (business only)
       Order.java  OrderStatus.java  OrderService.java  OrderRepository.java
       OrderCancelledEvent.java  OrderCannotBeCancelledException.java  OrderAccessPolicy.java
+      OrderImporter.java         <- PORT (interface) for a technical adapter
       api/    OrderController.java  CreateOrderRequest.java  OrderResponse.java
       queue/  OrderCancelledConsumer.java
-      infra/  OrderCsvImporter.java
     customer ...
-  infra      persistence/ messaging/ security/ external/ config/
-  shared     error/ i18n/ observability/ pagination/ validation/
+  infra      <- CENTRALIZED technical layer, by concern (ADR 0010)
+      security/ email/ integration/ time/ i18n/ socket/ observability/ persistence/ config/
+      (Spring config, framework adapters, external/provider clients, schedulers/workers,
+       and the *impls* of module ports such as CsvOrderImporter implements order.OrderImporter)
+  shared     <- kernel: cross-cutting types the DOMAIN imports directly
+      error/ pagination/ security (UserContext)
 ```
+
+**Dependency rule (ADR 0010, ArchUnit-enforced):** `application` (domain) and
+`infra` may depend on the domain; the **domain must NOT depend on `api`
+(controllers/endpoints) or on `infra`**. Technical adapters live in
+`com.fksoft.infra.<concern>` and implement a **port defined in the module**, so
+the domain depends on the port, never on infra. Infra MAY read/write a module's
+own persistence to run that module's technical adapter (outbox dispatch, mock
+gateway); other business modules still must not touch each other's persistence
+(Spring Modulith). `shared` is the kernel — it holds only cross-cutting types the
+domain imports directly (error contracts, pagination, user context); it is NOT a
+dumping ground and is distinct from `infra`.
 
 **MUST NOT** create `domain/application/ports/adapters/in/out` folder trees unless complexity
 truly justifies it. Single Maven project with strong package modularity; multi-module only
@@ -88,8 +103,14 @@ implementations).
 
 ## Shared code
 
-`shared` **MUST NOT** become a dumping ground. Acceptable: error, validation, security,
-observability, pagination, i18n. Prefer small duplication over a bad shared abstraction.
+`shared` is the **kernel**: only cross-cutting types the **domain imports directly** —
+error contracts (`ApiErrorResponse`, `BusinessException`), pagination envelope,
+`UserContext`/`UserContextProvider`. It **MUST NOT** become a dumping ground and is
+distinct from `infra`: anything the domain does NOT import (the web error handler, the
+correlation filter, the i18n `MessageSource` config, mail/JWT/STOMP adapters) is technical
+and lives in `com.fksoft.infra.<concern>` (ADR 0010), not in `shared`. i18n message bundles
+(`messages*.properties`) are resources; the `MessageSource` config is `infra.i18n`. Prefer
+small duplication over a bad shared abstraction.
 
 ## Dates and timezones
 

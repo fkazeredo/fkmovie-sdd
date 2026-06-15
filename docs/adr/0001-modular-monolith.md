@@ -30,11 +30,17 @@ com.fksoft.application
   booking         reservation, screening_seats, tickets, expiration, realtime
   payment         mock gateway port, webhook handler, payment requests
   notification    email port and SMTP/transactional implementations
-com.fksoft.infra
-  persistence  messaging  security  config  realtime (STOMP transport)
-com.fksoft.shared
-  error  i18n  observability  pagination  validation
+com.fksoft.infra        <- centralized technical layer, by concern (ADR 0010)
+  security  email  integration  time  i18n  socket  observability  persistence
+com.fksoft.shared       <- kernel: cross-cutting types the domain imports directly
+  error  pagination  security (UserContext)
 ```
+
+> Updated by **ADR 0010**: technical adapters (SMTP/outbox, JWT encoder, mock
+> payment gateway, STOMP, correlation filter) are centralized under
+> `com.fksoft.infra.<concern>`, implementing module-owned ports. The domain
+> never depends on `infra` or `api`; `infra` and `application` may depend on the
+> domain. `shared` remains the kernel for types the domain imports directly.
 
 Enforce boundaries with **Spring Modulith** (`ModularityTests.verifiesModularStructure()`)
 and **ArchUnit** rules. Cross-module synchronous calls go through public
