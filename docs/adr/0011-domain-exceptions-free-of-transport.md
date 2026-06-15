@@ -2,7 +2,10 @@
 
 ## Status
 
-Accepted (owner decision; refines ADR 0010)
+Accepted (owner decision; refines ADR 0010). **Package locations updated by ADR 0012**: the
+error kernel is now `com.fksoft.domain.error`; identity (`UserContext`/`UserContextProvider`)
+and `PageResponse` moved to `com.fksoft.infra`. The transport-free exception design below is
+unchanged.
 
 ## Context
 
@@ -13,13 +16,15 @@ had leaked into the domain layer; `SeatsUnavailableException` even imported the 
 response type. The owner wants the domain exceptions **pure** (only domain data) and
 the translation to HTTP done in the presentation layer.
 
-Constraint (ADR 0010): controllers live in `com.fksoft.application.<mod>.api`, and the
-ArchUnit rule forbids `application → infra`. So types the controllers import cannot
-live in `infra`.
+Constraint at the time (ADR 0010): controllers lived in `com.fksoft.application.<mod>.api`
+and the ArchUnit rule forbade `application → infra`, so types the controllers import could not
+live in `infra` — which kept the kernel types in `shared`. ADR 0012 later removed that
+constraint (`application → infra` is now allowed) and deleted `shared`; the package note in
+Status reflects the current locations.
 
 ## Decision
 
-- **`DomainException`** (kernel `shared.error`) replaces `BusinessException`: it carries
+- **`DomainException`** (kernel `com.fksoft.domain.error`) replaces `BusinessException`: it carries
   only a stable `code` (== i18n message key) and optional message args. No `HttpStatus`,
   no headers, no response DTO. Extra domain data is exposed via two kernel interfaces,
   `ErrorDetails` (key/value pairs, e.g. unavailable seat ids) and `RateLimited` (a
@@ -32,12 +37,11 @@ live in `infra`.
 - A build-time test (`HttpErrorMappingCompletenessTest`) fails if any `DomainException`
   subclass lacks a status, so the registry's only weakness — a forgotten entry silently
   defaulting to 422 — cannot happen unnoticed.
-- `PageResponse` stays in the kernel (`shared.pagination`) because controllers import it
-  (it can't be `infra` under the `application ↛ infra` rule), but now **only controllers
-  produce it** — the two services that returned it now return Spring `Page<View>`.
-- The current-user accessor becomes a port: `UserContextProvider` is now an interface in
-  `shared.security`, and the `SecurityContextHolder` adapter
-  (`SecurityContextUserProvider`) lives in `infra.security`. `UserContext` dropped its
+- `PageResponse` lives in `com.fksoft.infra.web` (ADR 0012), and **only controllers produce
+  it** — the two services that returned it now return Spring `Page<View>`.
+- The current-user accessor is a port: `UserContextProvider` and `UserContext` live in
+  `com.fksoft.infra.security` with the `SecurityContextHolder` adapter
+  (`SecurityContextUserProvider`); controllers inject the port. `UserContext` dropped its
   unused `tenantId`.
 
 ## Consequences

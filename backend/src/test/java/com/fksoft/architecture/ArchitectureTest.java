@@ -40,43 +40,36 @@ class ArchitectureTest {
                 .check(PRODUCTION_CLASSES);
     }
 
-    /** Services and domain code must not depend on the web delivery layer. */
+    /**
+     * The domain is the pure hexagon core (ADR 0012): it must not depend on the delivery layer
+     * ({@code com.fksoft.application}, i.e. controllers/realtime) nor on infrastructure
+     * ({@code com.fksoft.infra}). Delivery and infra may depend on the domain, never the reverse.
+     */
     @Test
-    void coreMustNotDependOnApiLayer() {
+    void domainMustNotDependOnDeliveryOrInfra() {
         noClasses()
                 .that()
-                .resideOutsideOfPackages("..api..")
+                .resideInAPackage("com.fksoft.domain..")
                 .should()
                 .dependOnClassesThat()
-                .resideInAPackage("..api..")
+                .resideInAnyPackage("com.fksoft.application..", "com.fksoft.infra..")
                 .allowEmptyShould(true)
                 .check(PRODUCTION_CLASSES);
     }
 
-    /** Module/domain core must not depend on its adapters (queue, infra). */
+    /**
+     * Infrastructure is a driven adapter (ADR 0012): it may depend on the domain, but never on the
+     * delivery layer ({@code com.fksoft.application}). Keeps the dependency flow delivery → infra,
+     * not the reverse.
+     */
     @Test
-    void coreMustNotDependOnAdapters() {
+    void infraMustNotDependOnDelivery() {
         noClasses()
                 .that()
-                .resideInAPackage("..application..")
-                .and()
-                .resideOutsideOfPackages("..api..", "..queue..", "..infra..")
-                .should()
-                .dependOnClassesThat()
-                .resideInAnyPackage("..queue..", "..infra..")
-                .allowEmptyShould(true)
-                .check(PRODUCTION_CLASSES);
-    }
-
-    /** Domain/application code must not depend on global infrastructure internals. */
-    @Test
-    void applicationMustNotDependOnGlobalInfra() {
-        noClasses()
-                .that()
-                .resideInAPackage("..application..")
-                .should()
-                .dependOnClassesThat()
                 .resideInAPackage("com.fksoft.infra..")
+                .should()
+                .dependOnClassesThat()
+                .resideInAPackage("com.fksoft.application..")
                 .allowEmptyShould(true)
                 .check(PRODUCTION_CLASSES);
     }
@@ -118,12 +111,12 @@ class ArchitectureTest {
      */
     @Test
     void otherModulesMustNotTouchAuthPersistence() {
-        var authPersistence = JavaClass.Predicates.resideInAPackage("com.fksoft.application.auth..")
+        var authPersistence = JavaClass.Predicates.resideInAPackage("com.fksoft.domain.auth..")
                 .and(JavaClass.Predicates.simpleNameEndingWith("Repository")
                         .or(CanBeAnnotated.Predicates.annotatedWith("jakarta.persistence.Entity")));
         noClasses()
                 .that()
-                .resideOutsideOfPackage("com.fksoft.application.auth..")
+                .resideOutsideOfPackage("com.fksoft.domain.auth..")
                 .should()
                 .dependOnClassesThat(authPersistence)
                 .allowEmptyShould(true)
@@ -138,12 +131,12 @@ class ArchitectureTest {
      */
     @Test
     void otherModulesMustNotTouchNotificationPersistence() {
-        var notificationPersistence = JavaClass.Predicates.resideInAPackage("com.fksoft.application.notification..")
+        var notificationPersistence = JavaClass.Predicates.resideInAPackage("com.fksoft.domain.notification..")
                 .and(JavaClass.Predicates.simpleNameEndingWith("Repository")
                         .or(CanBeAnnotated.Predicates.annotatedWith("jakarta.persistence.Entity")));
         noClasses()
                 .that()
-                .resideOutsideOfPackages("com.fksoft.application.notification..", "com.fksoft.infra..")
+                .resideOutsideOfPackages("com.fksoft.domain.notification..", "com.fksoft.infra..")
                 .should()
                 .dependOnClassesThat(notificationPersistence)
                 .allowEmptyShould(true)
@@ -158,12 +151,12 @@ class ArchitectureTest {
      */
     @Test
     void otherModulesMustNotTouchCinemaPersistence() {
-        var cinemaPersistence = JavaClass.Predicates.resideInAPackage("com.fksoft.application.cinema..")
+        var cinemaPersistence = JavaClass.Predicates.resideInAPackage("com.fksoft.domain.cinema..")
                 .and(JavaClass.Predicates.simpleNameEndingWith("Repository")
                         .or(CanBeAnnotated.Predicates.annotatedWith("jakarta.persistence.Entity")));
         noClasses()
                 .that()
-                .resideOutsideOfPackage("com.fksoft.application.cinema..")
+                .resideOutsideOfPackage("com.fksoft.domain.cinema..")
                 .should()
                 .dependOnClassesThat(cinemaPersistence)
                 .allowEmptyShould(true)
@@ -177,12 +170,12 @@ class ArchitectureTest {
      */
     @Test
     void otherModulesMustNotTouchScreeningPersistence() {
-        var screeningPersistence = JavaClass.Predicates.resideInAPackage("com.fksoft.application.screening..")
+        var screeningPersistence = JavaClass.Predicates.resideInAPackage("com.fksoft.domain.screening..")
                 .and(JavaClass.Predicates.simpleNameEndingWith("Repository")
                         .or(CanBeAnnotated.Predicates.annotatedWith("jakarta.persistence.Entity")));
         noClasses()
                 .that()
-                .resideOutsideOfPackage("com.fksoft.application.screening..")
+                .resideOutsideOfPackage("com.fksoft.domain.screening..")
                 .should()
                 .dependOnClassesThat(screeningPersistence)
                 .allowEmptyShould(true)
@@ -196,12 +189,12 @@ class ArchitectureTest {
      */
     @Test
     void otherModulesMustNotTouchBookingPersistence() {
-        var bookingPersistence = JavaClass.Predicates.resideInAPackage("com.fksoft.application.booking..")
+        var bookingPersistence = JavaClass.Predicates.resideInAPackage("com.fksoft.domain.booking..")
                 .and(JavaClass.Predicates.simpleNameEndingWith("Repository")
                         .or(CanBeAnnotated.Predicates.annotatedWith("jakarta.persistence.Entity")));
         noClasses()
                 .that()
-                .resideOutsideOfPackage("com.fksoft.application.booking..")
+                .resideOutsideOfPackage("com.fksoft.domain.booking..")
                 .should()
                 .dependOnClassesThat(bookingPersistence)
                 .allowEmptyShould(true)
@@ -215,12 +208,12 @@ class ArchitectureTest {
      */
     @Test
     void otherModulesMustNotTouchPricingPersistence() {
-        var pricingPersistence = JavaClass.Predicates.resideInAPackage("com.fksoft.application.pricing..")
+        var pricingPersistence = JavaClass.Predicates.resideInAPackage("com.fksoft.domain.pricing..")
                 .and(JavaClass.Predicates.simpleNameEndingWith("Repository")
                         .or(CanBeAnnotated.Predicates.annotatedWith("jakarta.persistence.Entity")));
         noClasses()
                 .that()
-                .resideOutsideOfPackage("com.fksoft.application.pricing..")
+                .resideOutsideOfPackage("com.fksoft.domain.pricing..")
                 .should()
                 .dependOnClassesThat(pricingPersistence)
                 .allowEmptyShould(true)
@@ -236,26 +229,26 @@ class ArchitectureTest {
      */
     @Test
     void otherModulesMustNotTouchPaymentPersistence() {
-        var paymentPersistence = JavaClass.Predicates.resideInAPackage("com.fksoft.application.payment..")
+        var paymentPersistence = JavaClass.Predicates.resideInAPackage("com.fksoft.domain.payment..")
                 .and(JavaClass.Predicates.simpleNameEndingWith("Repository")
                         .or(CanBeAnnotated.Predicates.annotatedWith("jakarta.persistence.Entity")));
         noClasses()
                 .that()
-                .resideOutsideOfPackages("com.fksoft.application.payment..", "com.fksoft.infra..")
+                .resideOutsideOfPackages("com.fksoft.domain.payment..", "com.fksoft.infra..")
                 .should()
                 .dependOnClassesThat(paymentPersistence)
                 .allowEmptyShould(true)
                 .check(PRODUCTION_CLASSES);
     }
 
-    /** Business exceptions must be specific and meaningful, in business language. */
+    /** Business exceptions live in the domain, never in the delivery or infra layers. */
     @Test
     void exceptionsLiveWithTheirDomain() {
         classes()
                 .that()
                 .haveSimpleNameEndingWith("Exception")
                 .and()
-                .resideInAPackage("..application..")
+                .resideInAPackage("com.fksoft.domain..")
                 .should()
                 .resideOutsideOfPackages("..api..", "..infra..")
                 .allowEmptyShould(true)

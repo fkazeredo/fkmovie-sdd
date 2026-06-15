@@ -1,8 +1,8 @@
 package com.fksoft.infra.email;
 
-import com.fksoft.application.notification.EmailMessage;
-import com.fksoft.application.notification.EmailSendException;
-import com.fksoft.application.notification.EmailSender;
+import com.fksoft.domain.notification.EmailMessage;
+import com.fksoft.domain.notification.EmailSendException;
+import com.fksoft.domain.notification.EmailSender;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import org.springframework.beans.factory.annotation.Value;

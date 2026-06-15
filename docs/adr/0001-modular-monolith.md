@@ -22,25 +22,29 @@ Build the backend as a single Maven project, single Spring Boot application,
 single Postgres database, with internal modules defined by business domain:
 
 ```
-com.fksoft.application
+com.fksoft.domain       <- DOMAIN core, one package per module (ADR 0012)
   auth            users, roles, JWT, login
   cinema          rooms, seats with types
   screening       movies, screenings
   pricing         price catalog and calculation
-  booking         reservation, screening_seats, tickets, expiration, realtime
+  booking         reservation, screening_seats, tickets, expiration
   payment         mock gateway port, webhook handler, payment requests
   notification    email port and SMTP/transactional implementations
+  error           kernel: DomainException, ErrorDetails, RateLimited
+com.fksoft.application  <- DELIVERY (driving adapters): api, api.dto, realtime, realtime.dto
 com.fksoft.infra        <- centralized technical layer, by concern (ADR 0010)
-  security  email  integration  time  i18n  socket  observability  persistence
-com.fksoft.shared       <- kernel: cross-cutting types the domain imports directly
-  error  pagination  security (UserContext)
+  security (UserContext) email integration time i18n socket observability web persistence
 ```
 
 > Updated by **ADR 0010**: technical adapters (SMTP/outbox, JWT encoder, mock
 > payment gateway, STOMP, correlation filter) are centralized under
-> `com.fksoft.infra.<concern>`, implementing module-owned ports. The domain
-> never depends on `infra` or `api`; `infra` and `application` may depend on the
-> domain. `shared` remains the kernel for types the domain imports directly.
+> `com.fksoft.infra.<concern>`, implementing module-owned ports.
+>
+> Updated by **ADR 0012**: the business modules moved to `com.fksoft.domain.<module>`;
+> `com.fksoft.application` now holds only the delivery layer (REST/realtime); the `shared`
+> kernel was deleted (error kernel → `domain.error`, identity + `PageResponse` → `infra`).
+> The domain never depends on `application` or `infra`; both may depend on the domain, and
+> delivery may depend on infra. Spring Modulith modules are now `domain.auth` … `domain.screening`.
 
 Enforce boundaries with **Spring Modulith** (`ModularityTests.verifiesModularStructure()`)
 and **ArchUnit** rules. Cross-module synchronous calls go through public

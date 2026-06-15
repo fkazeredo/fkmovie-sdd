@@ -14,9 +14,9 @@ import org.springframework.modulith.docs.Documenter;
  * implementation classes.
  *
  * <p>Modules are detected via {@code spring.modulith.detection-strategy=explicitly-annotated}
- * (application.yaml): every {@code com.fksoft.application.<module>} package carries
- * {@code @ApplicationModule} on its package-info; {@code infra}/{@code shared} are
- * arrangement code governed by ArchUnit, not modules.
+ * (application.yaml): every {@code com.fksoft.domain.<module>} package carries
+ * {@code @ApplicationModule} on its package-info; the delivery layer ({@code com.fksoft.application})
+ * and {@code com.fksoft.infra} are arrangement code governed by ArchUnit, not modules (ADR 0012).
  */
 class ModularityTests {
 
@@ -31,19 +31,19 @@ class ModularityTests {
     /** Guards the detection strategy: if the property were ignored, verify() would pass vacuously. */
     @Test
     void detectsBusinessModules() {
-        org.assertj.core.api.Assertions.assertThat(modules.getModuleByName("application.auth"))
+        org.assertj.core.api.Assertions.assertThat(modules.getModuleByName("domain.auth"))
                 .isPresent();
-        org.assertj.core.api.Assertions.assertThat(modules.getModuleByName("application.notification"))
+        org.assertj.core.api.Assertions.assertThat(modules.getModuleByName("domain.notification"))
                 .isPresent();
-        org.assertj.core.api.Assertions.assertThat(modules.getModuleByName("application.cinema"))
+        org.assertj.core.api.Assertions.assertThat(modules.getModuleByName("domain.cinema"))
                 .isPresent();
-        org.assertj.core.api.Assertions.assertThat(modules.getModuleByName("application.screening"))
+        org.assertj.core.api.Assertions.assertThat(modules.getModuleByName("domain.screening"))
                 .isPresent();
-        org.assertj.core.api.Assertions.assertThat(modules.getModuleByName("application.booking"))
+        org.assertj.core.api.Assertions.assertThat(modules.getModuleByName("domain.booking"))
                 .isPresent();
-        org.assertj.core.api.Assertions.assertThat(modules.getModuleByName("application.pricing"))
+        org.assertj.core.api.Assertions.assertThat(modules.getModuleByName("domain.pricing"))
                 .isPresent();
-        org.assertj.core.api.Assertions.assertThat(modules.getModuleByName("application.payment"))
+        org.assertj.core.api.Assertions.assertThat(modules.getModuleByName("domain.payment"))
                 .isPresent();
     }
 

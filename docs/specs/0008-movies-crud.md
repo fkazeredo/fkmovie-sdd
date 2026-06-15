@@ -4,7 +4,7 @@ Status: Implemented
 Related ADRs: 0001
 
 > Implementation notes (backend):
-> - Lives in the new `screening` module (`com.fksoft.application.screening`), which will
+> - Lives in the new `screening` module (`com.fksoft.domain.screening`, ADR 0012), which will
 >   also host `Screening` (0009). v1 ships only `Movie`.
 > - Admin-only access is served by the existing `/api/admin/**` → `ROLE_ADMIN` rule in
 >   SecurityConfig (no security change); 401/403 use the existing `auth.unauthenticated`/

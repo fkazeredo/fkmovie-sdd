@@ -1,8 +1,8 @@
 package com.fksoft.infra.web;
 
-import com.fksoft.shared.error.DomainException;
-import com.fksoft.shared.error.ErrorDetails;
-import com.fksoft.shared.error.RateLimited;
+import com.fksoft.domain.error.DomainException;
+import com.fksoft.domain.error.ErrorDetails;
+import com.fksoft.domain.error.RateLimited;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

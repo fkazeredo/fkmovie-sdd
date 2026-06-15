@@ -2,7 +2,7 @@ package com.fksoft.infra.security;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.fksoft.application.auth.AccessTokens.IssuedAccessToken;
+import com.fksoft.domain.auth.AccessTokens.IssuedAccessToken;
 import com.nimbusds.jose.jwk.source.ImmutableSecret;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;

@@ -1,6 +1,6 @@
 package com.fksoft.infra.security;
 
-import com.fksoft.application.auth.AccessTokens;
+import com.fksoft.domain.auth.AccessTokens;
 import java.time.Duration;
 import java.time.Instant;
 import org.springframework.beans.factory.annotation.Value;

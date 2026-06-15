@@ -1,12 +1,12 @@
 package com.fksoft.infra.email;
 
-import com.fksoft.application.notification.EmailPermanentlyFailed;
-import com.fksoft.application.notification.EmailSendException;
-import com.fksoft.application.notification.EmailSender;
-import com.fksoft.application.notification.EmailSent;
-import com.fksoft.application.notification.OutboxEmail;
-import com.fksoft.application.notification.OutboxEmailRepository;
-import com.fksoft.application.notification.OutboxStatus;
+import com.fksoft.domain.notification.EmailPermanentlyFailed;
+import com.fksoft.domain.notification.EmailSendException;
+import com.fksoft.domain.notification.EmailSender;
+import com.fksoft.domain.notification.EmailSent;
+import com.fksoft.domain.notification.OutboxEmail;
+import com.fksoft.domain.notification.OutboxEmailRepository;
+import com.fksoft.domain.notification.OutboxStatus;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Timer;
 import java.time.Clock;

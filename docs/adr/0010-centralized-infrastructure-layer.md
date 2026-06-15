@@ -2,7 +2,8 @@
 
 ## Status
 
-Accepted (owner decision; refines ADR 0001)
+Accepted (owner decision; refines ADR 0001). Layering refined by **ADR 0012** (domain /
+application / infra; `shared` deleted; `application → infra` allowed).
 
 ## Context
 
@@ -60,6 +61,9 @@ Rules that make this coherent:
 4. **`shared` remains the kernel.** `com.fksoft.shared` (error contracts,
    pagination envelope, `UserContext`/`UserContextProvider`) holds cross-cutting
    types the **domain imports directly**; by rule (1) these cannot live in infra.
+   *(Superseded by ADR 0012: `shared` was deleted — the error kernel moved to
+   `com.fksoft.domain.error`, and identity + `PageResponse` moved into `com.fksoft.infra`
+   once `application → infra` became allowed.)*
 
 ## Consequences
 
@@ -81,7 +85,9 @@ infra/api boundaries remain enforced by ArchUnit + Modulith.
   they want a single centralized infra layer.
 - **Two-tier (global infra + module-local `infra/`).** Rejected: the owner
   prefers everything technical in the global infra.
-- **Move `shared` into infra too.** Rejected — impossible under the owner's own
-  rule: the domain imports `BusinessException`/`ApiErrorResponse`/`PageResponse`/
-  `UserContextProvider`, so they must stay in a domain-accessible kernel, not in
-  infra.
+- **Move `shared` into infra too.** Rejected here — at the time, the domain imported
+  `BusinessException`/`ApiErrorResponse`/`PageResponse`/`UserContextProvider`, so they had to
+  stay in a domain-accessible kernel. **Revisited in ADR 0012**: the error kernel went to
+  `com.fksoft.domain.error` (the domain still imports it), while identity and `PageResponse`
+  — which only the delivery layer imports — went to `com.fksoft.infra`, and `shared` was
+  deleted.

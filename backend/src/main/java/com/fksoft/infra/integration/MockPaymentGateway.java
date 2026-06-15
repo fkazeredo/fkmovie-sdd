@@ -1,16 +1,16 @@
 package com.fksoft.infra.integration;
 
-import com.fksoft.application.payment.MockPaymentJob;
-import com.fksoft.application.payment.MockPaymentJobRepository;
-import com.fksoft.application.payment.Payment;
-import com.fksoft.application.payment.PaymentGateway;
-import com.fksoft.application.payment.PaymentOutcome;
-import com.fksoft.application.payment.PaymentRepository;
-import com.fksoft.application.payment.PaymentRequest;
-import com.fksoft.application.payment.PaymentRequestResult;
-import com.fksoft.application.payment.PaymentStatus;
-import com.fksoft.application.payment.RefundRequest;
-import com.fksoft.application.payment.RefundRequestResult;
+import com.fksoft.domain.payment.MockPaymentJob;
+import com.fksoft.domain.payment.MockPaymentJobRepository;
+import com.fksoft.domain.payment.Payment;
+import com.fksoft.domain.payment.PaymentGateway;
+import com.fksoft.domain.payment.PaymentOutcome;
+import com.fksoft.domain.payment.PaymentRepository;
+import com.fksoft.domain.payment.PaymentRequest;
+import com.fksoft.domain.payment.PaymentRequestResult;
+import com.fksoft.domain.payment.PaymentStatus;
+import com.fksoft.domain.payment.RefundRequest;
+import com.fksoft.domain.payment.RefundRequestResult;
 import io.micrometer.core.instrument.MeterRegistry;
 import java.time.Clock;
 import java.time.Duration;

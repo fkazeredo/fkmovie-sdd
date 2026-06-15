@@ -3,10 +3,10 @@ package com.fksoft.infra.email;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.fksoft.AbstractIntegrationTest;
-import com.fksoft.application.notification.EmailTemplate;
-import com.fksoft.application.notification.OutboxEmail;
-import com.fksoft.application.notification.OutboxEmailRepository;
-import com.fksoft.application.notification.OutboxStatus;
+import com.fksoft.domain.notification.EmailTemplate;
+import com.fksoft.domain.notification.OutboxEmail;
+import com.fksoft.domain.notification.OutboxEmailRepository;
+import com.fksoft.domain.notification.OutboxStatus;
 import com.icegreen.greenmail.junit5.GreenMailExtension;
 import com.icegreen.greenmail.util.ServerSetupTest;
 import java.time.Instant;

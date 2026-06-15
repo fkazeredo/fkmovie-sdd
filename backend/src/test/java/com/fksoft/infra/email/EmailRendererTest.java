@@ -2,8 +2,8 @@ package com.fksoft.infra.email;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.fksoft.application.notification.EmailTemplate;
-import com.fksoft.application.notification.OutboxEmail;
+import com.fksoft.domain.notification.EmailTemplate;
+import com.fksoft.domain.notification.OutboxEmail;
 import java.util.Map;
 import java.util.Set;
 import org.junit.jupiter.api.Test;

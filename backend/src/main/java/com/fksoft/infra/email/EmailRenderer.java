@@ -1,7 +1,7 @@
 package com.fksoft.infra.email;
 
-import com.fksoft.application.notification.EmailMessage;
-import com.fksoft.application.notification.OutboxEmail;
+import com.fksoft.domain.notification.EmailMessage;
+import com.fksoft.domain.notification.OutboxEmail;
 import java.util.Locale;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Qualifier;

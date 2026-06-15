@@ -2,7 +2,14 @@
 
 ## Status
 
-Accepted
+**Superseded by ADR 0012.** The decision that realtime publishing belongs with the events it
+reacts to (not in a generic module) still holds, but the publishers are now part of the
+**delivery layer** at `com.fksoft.application.realtime` (driving adapters), not inside the
+booking module. They remain `@TransactionalEventListener(AFTER_COMMIT)` consumers of the
+booking domain events; transport config stays in `com.fksoft.infra.socket`. The historical
+decision below referenced `com.fksoft.application.booking.realtime`.
+
+Accepted (original)
 
 ## Context
 

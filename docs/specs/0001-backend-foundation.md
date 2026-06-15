@@ -84,7 +84,7 @@ Not applicable.
 
 ## Error Behavior
 
-- Global `@RestControllerAdvice` handler in `com.fksoft.shared.error`
+- Global `@RestControllerAdvice` handler in `com.fksoft.infra.web` (ADR 0011/0012)
   returns the standard error format:
 
 ```json

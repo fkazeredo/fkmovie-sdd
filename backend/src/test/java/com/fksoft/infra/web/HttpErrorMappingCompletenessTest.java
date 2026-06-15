@@ -2,7 +2,7 @@ package com.fksoft.infra.web;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.fksoft.shared.error.DomainException;
+import com.fksoft.domain.error.DomainException;
 import com.tngtech.archunit.core.domain.JavaClass;
 import com.tngtech.archunit.core.domain.JavaClasses;
 import com.tngtech.archunit.core.domain.JavaModifier;

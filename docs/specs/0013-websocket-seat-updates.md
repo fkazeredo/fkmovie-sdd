@@ -10,9 +10,9 @@ Related ADRs: 0009, 0005, 0002
 >   in-memory broker (`/topic`, `/queue`, `/app`, `/user`); the CONNECT frame is authenticated with
 >   the existing `JwtDecoder` (the STOMP JWT-on-CONNECT promised in 0003 lands here) and the principal
 >   is the userId. The `/ws` handshake is permitAll (auth is on CONNECT, not the HTTP upgrade).
-> - Publishers in `com.fksoft.application.booking.realtime` (ADR 0009): consume the booking events
->   AFTER_COMMIT and send via `SimpMessagingTemplate` — read-only, never changing seat state, never
->   depending on `infra`. Seat row/number resolved via the cinema facade.
+> - Publishers in `com.fksoft.application.realtime` (ADR 0012; originally ADR 0009): consume the
+>   booking events AFTER_COMMIT and send via `SimpMessagingTemplate` — read-only, never changing
+>   seat state. Seat row/number resolved via the cinema facade.
 > - Metrics: `ws_connections_active`, `ws_connect_rejected_total`, `ws_messages_sent_total{type}`.
 > - To make the payment/confirmation e2e tests deterministic, the mock payment dispatcher is driven
 >   explicitly in tests (long poll interval); no behavior change in prod.
@@ -31,9 +31,9 @@ Realtime is a core product requirement.
 
 ## Scope
 
-Two parts, in line with ADR 0009: STOMP transport configuration in
-`com.fksoft.infra.socket`, and the seat-update publisher inside
-`com.fksoft.application.booking.realtime`. Also the per-user reservation
+Two parts (ADR 0009, refined by ADR 0012): STOMP transport configuration in
+`com.fksoft.infra.socket`, and the seat-update publisher in the delivery layer at
+`com.fksoft.application.realtime`. Also the per-user reservation
 status channel used by 0015/0016.
 
 ## Business Rules

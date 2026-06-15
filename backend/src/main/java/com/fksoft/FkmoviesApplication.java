@@ -7,9 +7,10 @@ import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
 /**
- * fkmovies modular monolith entry point (ADR 0001). Business modules live under
- * {@code com.fksoft.application.<module>}. Scheduling is enabled for the email outbox
- * dispatcher (SPEC-0006).
+ * fkmovies modular monolith entry point (ADR 0001, ADR 0012). The domain modules live under
+ * {@code com.fksoft.domain.<module>}; the delivery layer (REST/realtime) under
+ * {@code com.fksoft.application}; the technical adapters under {@code com.fksoft.infra}.
+ * Scheduling is enabled for the email outbox dispatcher (SPEC-0006).
  */
 @SpringBootApplication
 @ConfigurationPropertiesScan

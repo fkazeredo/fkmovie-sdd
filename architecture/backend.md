@@ -9,34 +9,40 @@ Pragmatic modular hexagonal architecture, organized by business domain. Hexagona
 principle, not folder theater. Spring, Lombok, Bean Validation and JPA annotations are
 acceptable; the project does not pretend Spring does not exist.
 
+Three top-level layers (ADR 0012): `domain` (pure hexagon core), `application` (delivery /
+driving adapters), `infra` (driven adapters).
+
 ```txt
-com.company.project
-  application
-    order            <- module root = domain/application core (business only)
-      Order.java  OrderStatus.java  OrderService.java  OrderRepository.java
-      OrderCancelledEvent.java  OrderCannotBeCancelledException.java  OrderAccessPolicy.java
-      OrderImporter.java         <- PORT (interface) for a technical adapter
-      api/    OrderController.java  CreateOrderRequest.java  OrderResponse.java
-      queue/  OrderCancelledConsumer.java
-    customer ...
-  infra      <- CENTRALIZED technical layer, by concern (ADR 0010)
-      security/ email/ integration/ time/ i18n/ socket/ observability/ persistence/ config/
-      (Spring config, framework adapters, external/provider clients, schedulers/workers,
-       and the *impls* of module ports such as CsvOrderImporter implements order.OrderImporter)
-  shared     <- kernel: cross-cutting types the DOMAIN imports directly
-      error/ pagination/ security (UserContext)
+com.fksoft
+  domain                  <- DOMAIN: pure hexagon core (business only), one package per module
+    screening
+      Movie.java  MovieStatus.java  MovieService.java  MovieRepository.java
+      ScreeningCreated.java  ScreeningNotFoundException.java  MovieDeletionGuard.java
+      ScreeningCatalog.java       <- public module facade (port consumed by other modules)
+      PaymentGateway.java         <- PORT (interface) for a technical adapter
+      MovieResponse.java          <- a Response that maps an @Entity stays inside the module
+    auth  booking  cinema  notification  payment  pricing
+    error                 <- domain kernel: DomainException, ErrorDetails, RateLimited
+  application             <- DELIVERY (driving adapters): entry mechanisms only, entity-free
+    api/       MovieAdminController.java ...           (REST controllers)
+    api/dto/   MovieRequest.java  LoginRequest.java ... (request/response DTOs)
+    realtime/      SeatUpdatePublisher.java            (WebSocket publishers)
+    realtime/dto/  SeatUpdateMessage.java              (messages)
+  infra                   <- CENTRALIZED technical layer, by concern (ADR 0010)
+      security/ (UserContext, UserContextProvider + impl)  email/  integration/  time/  i18n/
+      socket/  observability/  web/ (ApiErrorResponse, GlobalExceptionHandler, HttpErrorMapping,
+      PageResponse) — Spring config, framework adapters, and the *impls* of module ports such
+      as MockPaymentGateway implements payment.PaymentGateway
 ```
 
-**Dependency rule (ADR 0010, ArchUnit-enforced):** `application` (domain) and
-`infra` may depend on the domain; the **domain must NOT depend on `api`
-(controllers/endpoints) or on `infra`**. Technical adapters live in
-`com.fksoft.infra.<concern>` and implement a **port defined in the module**, so
-the domain depends on the port, never on infra. Infra MAY read/write a module's
-own persistence to run that module's technical adapter (outbox dispatch, mock
-gateway); other business modules still must not touch each other's persistence
-(Spring Modulith). `shared` is the kernel — it holds only cross-cutting types the
-domain imports directly (error contracts, pagination, user context); it is NOT a
-dumping ground and is distinct from `infra`.
+**Dependency rule (ADR 0012, ArchUnit-enforced):** `domain` is the pure core — it **MUST NOT**
+depend on `application` (delivery: controllers/realtime) or on `infra`. Both `application` and
+`infra` may depend on `domain`; `application` **MAY** depend on `infra` (delivery wires domain +
+infra). Technical adapters live in `com.fksoft.infra.<concern>` and implement a **port defined
+in the domain module**, so the domain depends on the port, never on infra. Infra MAY read/write
+a module's own persistence to run that module's technical adapter (outbox dispatch, mock
+gateway); other business modules still must not touch each other's persistence (Spring Modulith).
+The delivery layer is **entity-free**: services return view/response records, never `@Entity`.
 
 **MUST NOT** create `domain/application/ports/adapters/in/out` folder trees unless complexity
 truly justifies it. Single Maven project with strong package modularity; multi-module only
@@ -78,7 +84,7 @@ depend on controller validation to remain valid.
 ## Errors and i18n
 
 Business errors are explicit, specific exceptions (`OrderCannotBeCancelledException`) that extend
-the pure **`DomainException`** (kernel `shared.error`) carrying only domain data: a stable `code`
+the pure **`DomainException`** (domain kernel `com.fksoft.domain.error`) carrying only domain data: a stable `code`
 (== i18n key) + optional message args, and — when needed — extra domain data via the kernel
 interfaces `ErrorDetails` (e.g. the unavailable seat ids) or `RateLimited` (a retry duration).
 **Domain exceptions carry NO transport concern** (no `HttpStatus`, no headers, no response DTO) —
@@ -106,16 +112,22 @@ interface+`Impl` pairs for internal services — interfaces are for real ports (
 providers, messaging, file storage, notification gateways, AI providers, cache, multiple
 implementations).
 
-## Shared code
+## Cross-cutting types (no `shared` module — ADR 0012)
 
-`shared` is the **kernel**: only cross-cutting types the **domain imports directly** —
-error contracts (`ApiErrorResponse`, `BusinessException`), pagination envelope,
-`UserContext`/`UserContextProvider`. It **MUST NOT** become a dumping ground and is
-distinct from `infra`: anything the domain does NOT import (the web error handler, the
-correlation filter, the i18n `MessageSource` config, mail/JWT/STOMP adapters) is technical
-and lives in `com.fksoft.infra.<concern>` (ADR 0010), not in `shared`. i18n message bundles
-(`messages*.properties`) are resources; the `MessageSource` config is `infra.i18n`. Prefer
-small duplication over a bad shared abstraction.
+There is **no `com.fksoft.shared` package**; cross-cutting types live where their dependency
+direction allows:
+
+- **Domain kernel** `com.fksoft.domain.error` — `DomainException`, `ErrorDetails`, `RateLimited`.
+  The domain depends on these, so they must sit in the domain (never in infra).
+- **Identity** `com.fksoft.infra.security` — `UserContext` + the `UserContextProvider` port and
+  its `SecurityContextUserProvider` adapter. Controllers (delivery) inject the port.
+- **Web/presentation** `com.fksoft.infra.web` — `ApiErrorResponse`, `GlobalExceptionHandler`,
+  `HttpErrorMapping`, `PageResponse` (the pagination envelope controllers wrap pages with).
+
+Anything technical the domain does NOT import (web error handler, correlation filter, i18n
+`MessageSource` config, mail/JWT/STOMP adapters) is `com.fksoft.infra.<concern>` (ADR 0010).
+i18n message bundles (`messages*.properties`) are resources; the `MessageSource` config is
+`infra.i18n`. Prefer small duplication over a bad shared abstraction.
 
 ## Dates and timezones
 

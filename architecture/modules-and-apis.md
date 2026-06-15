@@ -3,6 +3,22 @@
 > Read when: defining module boundaries, calling across modules, designing/changing
 > endpoints or JSON contracts, considering microservices, BFF or repository split.
 
+## Package layers (hexagonal / DDD — ADR 0012)
+
+Three top-level layers under `com.fksoft`:
+
+| Layer | Package | Contents |
+|---|---|---|
+| **Domain** (hexagon core) | `com.fksoft.domain.<module>` | Services, entities, repositories, domain events, enums, value/view records, **business exceptions**, module facades (ports). Plus the kernel `com.fksoft.domain.error` (`DomainException`, `ErrorDetails`, `RateLimited`). |
+| **Delivery** (driving adapters) | `com.fksoft.application` | Only the entry mechanisms: `api` (REST controllers) + `api.dto` (request/response DTOs), `realtime` (WebSocket publishers) + `realtime.dto` (messages), `queue` (consumers) if any. |
+| **Infra** (driven adapters) | `com.fksoft.infra.<concern>` | Email, integration, security (incl. `UserContext`/`UserContextProvider`), web (`ApiErrorResponse`, `GlobalExceptionHandler`, `HttpErrorMapping`, `PageResponse`), i18n, time, observability, socket config. |
+
+**Dependency rule (ArchUnit-enforced):** `domain` is pure — it **MUST NOT** depend on
+`application` or `infra`. `application` and `infra` may depend on `domain`; `application`
+**MAY** depend on `infra` (delivery wires domain + infra). Entities never leave the domain:
+the delivery layer is entity-free — services return view/response records, never `@Entity`
+(the few Response DTOs that map an entity stay inside their domain module).
+
 ## Modules and bounded contexts
 
 Modules are defined primarily by business domain: own language, rules, workflows, state

@@ -1,13 +1,13 @@
 package com.fksoft.infra.integration;
 
-import com.fksoft.application.payment.MockPaymentJob;
-import com.fksoft.application.payment.MockPaymentJobRepository;
-import com.fksoft.application.payment.PaymentKind;
-import com.fksoft.application.payment.PaymentOutcome;
-import com.fksoft.application.payment.PaymentRepository;
-import com.fksoft.application.payment.PaymentSigner;
-import com.fksoft.application.payment.WebhookJson;
-import com.fksoft.application.payment.WebhookPayload;
+import com.fksoft.domain.payment.MockPaymentJob;
+import com.fksoft.domain.payment.MockPaymentJobRepository;
+import com.fksoft.domain.payment.PaymentKind;
+import com.fksoft.domain.payment.PaymentOutcome;
+import com.fksoft.domain.payment.PaymentRepository;
+import com.fksoft.domain.payment.PaymentSigner;
+import com.fksoft.domain.payment.WebhookJson;
+import com.fksoft.domain.payment.WebhookPayload;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
